@@ -80,7 +80,7 @@ class Snap_FileUtil_Test_getFileList extends Snap_UnitTestCase {
  */
 class Snap_FileUtil_Test_reset extends Snap_UnitTestCase {
     public function setUp() {
-        $this->util = $this->mock('Snap_FileUtil')->requiresInheritence()->construct();
+        $this->util = $this->mock('Snap_FileUtil')->requiresInheritance()->construct();
         $this->util->makeFile();
         $this->util->makeFile();
         $this->file_count = count($this->util->getFileList());

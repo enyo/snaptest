@@ -93,7 +93,7 @@ abstract class Snap_UnitTestReporter {
         // file trace is worthless
         unset($trace['file']);
         
-        $this->recordMessage('Error: '.$errstr. '[line: '.$errline.']', $trace);
+        $this->recordMessage('Error: '.$errstr. '[line: '.$errline.' '.$errfile.']', $trace);
         $this->php_errors++;
     }
     

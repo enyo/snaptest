@@ -68,7 +68,7 @@ abstract class Snap_UnitTestCase {
     protected function assertMinimumCallCount($object, $method_name, $expected_count, $method_params = array(), $msg = '') {
         $actual_count = $this->getTallyFromMock($object, $method_name, $method_params);
         
-        if ($expected_count >= $actual_count) {
+        if ($expected_count < $actual_count) {
             $class_name = get_parent_class($object).'->'.$method_name;
             throw new Snap_AssertCallCountUnitTestException('assert_min_call_count', $msg, $class_name, $expected_count, $actual_count);
         }
@@ -86,7 +86,7 @@ abstract class Snap_UnitTestCase {
     protected function assertMaximumCallCount($object, $method_name, $expected_count, $method_params = array(), $msg = '') {
         $actual_count = $this->getTallyFromMock($object, $method_name, $method_params);
         
-        if ($expected_count < $actual_count) {
+        if ($expected_count > $actual_count) {
             $class_name = get_parent_class($object).'->'.$method_name;
             throw new Snap_AssertCallCountUnitTestException('assert_max_call_count', $msg, $class_name, $expected_count, $actual_count);
         }

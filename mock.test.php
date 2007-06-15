@@ -71,7 +71,7 @@ class Snap_MockObject_Test_MockGeneration extends Snap_UnitTestCase {
 
     public function setUp() {
         $this->mock = new Snap_MockObject('Snap_MockObject_Mockable');
-        $this->mock_generated = $this->mock->requiresInheritence()
+        $this->mock_generated = $this->mock->requiresInheritance()
                                             ->setReturnValue('pubReturnTrue', false)
                                             ->construct();
         $this->mock_generated->pubCallReturnTrueThreeTimes();

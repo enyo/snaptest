@@ -6,7 +6,7 @@
  */
 class Snap_MockObject {
     
-    protected $requires_inheritence;
+    protected $requires_inheritance;
     protected $mocked_class;
     
     public $methods;
@@ -23,7 +23,7 @@ class Snap_MockObject {
     */
     public function __construct($class_name) {
         // $this->test = $test;
-        $this->requires_inheritence = false;
+        $this->requires_inheritance = false;
         $this->methods = array();
         $this->signatures = array();
         $this->constructor_args = array();
@@ -32,20 +32,20 @@ class Snap_MockObject {
     }
     
     /**
-     * Specify this mock object requires inheritence (mocks protected methods, copies private)
+     * Specify this mock object requires inheritance (mocks protected methods, copies private)
      * @return MockObject the mock setup object
      */
-    public function requiresInheritence() {
-        $this->requires_inheritence = true;
+    public function requiresInheritance() {
+        $this->requires_inheritance = true;
         return $this;
     }
     
     /**
-     * Get the inheritence required state of the mock object
-     * @return boolean TRUE if object requires inheritence
+     * Get the inheritance required state of the mock object
+     * @return boolean TRUE if object requires inheritance
      */
     public function isInherited() {
-        return $this->requires_inheritence;
+        return $this->requires_inheritance;
     }
     
     /**
@@ -81,8 +81,6 @@ class Snap_MockObject {
         $method_params = $this->handleMethodParameters($method_params);
         $method_signature = $this->getMethodSignature($method_name, $method_params);
         $this->logMethodSignature($method_name, $method_signature, $method_params);
-        $this->methods[$method_signature]['count'] = 0;
-        $this->methods[$method_signature]['exec_count'] = 0;
         return $this;
     }
         
@@ -97,6 +95,10 @@ class Snap_MockObject {
         if (!isset($this->signatures[$method_name])) {
             $this->signatures[$method_name] = array();
         }
+        
+        $this->methods[$method_signature]['count'] = 0;
+        $this->methods[$method_signature]['exec_count'] = 0;
+        
         $this->signatures[$method_name][$method_signature] = array(
             'params'    => $method_params,
         );
@@ -118,7 +120,7 @@ class Snap_MockObject {
                 $method_params[$idx] = new Snap_Regex_Expectation($param);
             }
             
-            $method_params[$idx] = new Snap_Expectation($param);
+            $method_params[$idx] = new Snap_Equals_Expectation($param);
         }
         return $method_params;
     }
@@ -143,7 +145,7 @@ class Snap_MockObject {
     public function getTally($method_name, $method_params = array()) {
         $method_params = $this->handleMethodParameters($method_params);
         $method_signature = $this->getMethodSignature($method_name, $method_params);
-        return $this->methods[$method_signature]['count'];
+        return (isset($this->methods[$method_signature]['count'])) ? $this->methods[$method_signature]['count'] : 0;
     }
     
     /**
@@ -237,7 +239,7 @@ class Snap_MockObject {
             $p_methods .= $this->buildMethod($method, 'public');
         }
         
-        // if this needs inheritence, protected methods may need to be
+        // if this needs inheritance, protected methods may need to be
         // punched out as well
         if ($this->isInherited()) {
             foreach($protected_methods as $method) {
@@ -303,6 +305,13 @@ class Snap_MockObject {
         $output .= '        if (isset($this->mock->methods[$method_signature][\'returns\'][\'default\'])) {'.$endl;
         $output .= '            return $this->mock->methods[$method_signature][\'returns\'][\'default\'];'.$endl;
         $output .= '        }'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    // if we have a return value for the default signature, return that (option 2)'.$endl;
+        $output .= '    if (isset($this->mock->methods[$default_signature][\'returns\'][$call_count])) {'.$endl;
+        $output .= '        return $this->mock->methods[$default_signature][\'returns\'][$call_count];'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    if (isset($this->mock->methods[$default_signature][\'returns\'][\'default\'])) {'.$endl;
+        $output .= '        return $this->mock->methods[$default_signature][\'returns\'][\'default\'];'.$endl;
         $output .= '    }'.$endl;
         $output .= '    // if this is an inherited method, return parent method call'.$endl;
         $output .= '    if ($this->mock->isInherited()) {'.$endl;
@@ -395,13 +404,24 @@ class Snap_MockObject {
      * @return string php eval ready output
      */
     protected function buildMethod($method_name, $scope) {
+        $method = new ReflectionMethod($this->mocked_class, $method_name);
+
+        $param_string = '';
+        foreach ($method->getParameters() as $i => $param) {
+            $default_value = ($param->isOptional()) ? '=' . var_export($param->getDefaultValue(), true) : '';
+            $type = ($param->getClass()) ? $param->getClass()->getName().' ' : '';
+
+            $param_string .= $type .'$par'.$i.$default_value.',';
+        }
+        
+        $param_string = trim($param_string, ',');
+        
         $output  = '';
         $endl = "\n";
-        $output .= $scope.' function '.$method_name.'() {'.$endl;
+        $output .= $scope.' function '.$method_name.'('.$param_string.') {'.$endl;
         $output .= '    $args = func_get_args();'.$endl;
         $output .= '    return $this->'.$this->class_signature.'_invokeMethod(\''.$method_name.'\', $args);'.$endl;
         $output .= '}'.$endl;
-        
         return $output;
     }
 
