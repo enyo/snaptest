@@ -25,6 +25,16 @@ class Snap_Anything_Expectation extends Snap_Expectation {
     public function match($statement) { return true; }
 }
 
+/**
+ * Snap Object Expectation. Must Pass an instanceof
+ * @param string class name to match against
+ */
+class Snap_Object_Expectation extends Snap_Expectation {
+    public function match($obj) {
+        return ($obj instanceof $this->data) ? true : false;
+    }
+}
+
 
 /**
  * Basic Equals Expectation

@@ -90,6 +90,50 @@ class Snap_Same_Expectation_Test extends Snap_UnitTestCase {
 
 
 /**
+ * Tests Snap_Object_Expectation
+ */
+class Snap_Object_Expectation_Test extends Snap_UnitTestCase {
+
+    public function setUp() {
+        $this->expect = new Exception();
+        $this->non_object = 'foo';
+        $this->wrong_object = new Snap_Anything_Expectation();
+    }
+    
+    public function tearDown() {
+        unset($this->expect);
+        unset($this->non_object);
+        unset($this->wrong_object);
+    }
+    
+    public function testIsAnInstanceOfSnapExpectation() {
+        $expectation = new Snap_Same_Expectation($this->expect);
+        return $this->assertTrue($expectation instanceof Snap_Expectation);
+    }
+    
+    public function testNonObjectFails() {
+        $expectation = new Snap_Same_Expectation($this->expect);
+        $response = $expectation->match($this->non_object);
+        return $this->assertFalse($response);
+    }
+    
+    public function testWrongObjectFails() {
+        $expectation = new Snap_Same_Expectation($this->expect);
+        $response = $expectation->match($this->wrong_object);
+        return $this->assertFalse($response);
+    }
+    
+    public function testStrictTypeMatches() {
+        $expectation = new Snap_Same_Expectation($this->expect);
+        $response = $expectation->match($this->expect);
+        return $this->assertTrue($response);
+    }
+
+}
+
+
+
+/**
  * Tests Snap_Regex_Expectation
  */
 class Snap_Regex_Expectation_Test extends Snap_UnitTestCase {
