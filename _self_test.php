@@ -2,8 +2,6 @@
 
 include_once 'snap.php';
 
-// comment added for git testing
-
 // ------------------------------------------------------------
 // END SETUP
 // BEGIN ACTUAL SNAP TEST
