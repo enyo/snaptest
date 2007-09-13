@@ -14,6 +14,7 @@ class Snap_File_UnitTestLoader extends Snap_UnitTestLoader {
      * add a file and collect the tests for it
      * this adds the file and then looks for all classes with runTest method
      * @param string $files the file to load
+     * @throws Snap_File_UnitTestLoader_LoadException
      */
     public function add($file) {
 

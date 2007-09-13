@@ -14,6 +14,12 @@ abstract class Snap_Expectation {
         $this->data = $data;
     }
     
+    /**
+     * Perform a match, must be overriden in derrived classes
+     *
+     * @return boolean
+     * @author Jakob Heuser <jakob@felocity.org>
+     **/
     abstract public function match($statement);
 }
 
@@ -27,7 +33,6 @@ class Snap_Anything_Expectation extends Snap_Expectation {
 
 /**
  * Snap Object Expectation. Must Pass an instanceof
- * @param string class name to match against
  */
 class Snap_Object_Expectation extends Snap_Expectation {
     public function match($obj) {
@@ -37,7 +42,7 @@ class Snap_Object_Expectation extends Snap_Expectation {
 
 
 /**
- * Basic Equals Expectation
+ * Basic Equals Expectation. Must pass a == check
  */
 class Snap_Equals_Expectation extends Snap_Expectation {
 
@@ -52,7 +57,7 @@ class Snap_Equals_Expectation extends Snap_Expectation {
 }
 
 /**
- * Snap Same Expectation
+ * Snap Same Expectation. Must pass a === check
  */
 class Snap_Same_Expectation extends Snap_Expectation {
 
@@ -66,7 +71,7 @@ class Snap_Same_Expectation extends Snap_Expectation {
 
 
 /**
- * A regular expression expectation
+ * A regular expression expectation. Must pass a preg_match
  */
 class Snap_Regex_Expectation extends Snap_Expectation {
 
