@@ -63,7 +63,7 @@ abstract class Snap_UnitTestReporter {
      * @param Exception $e
      */
     public final function recordUnhandledException(Exception $e) {
-        $this->addReport($this->recordMessage('Unhandled exception with message: '.$e->getMessage(), $this->cullTrace($e->getTrace())));
+        $this->addReport($this->recordMessage('Unhandled exception of type '.get_class($e).' with message: '.$e->getMessage(), $this->cullTrace($e->getTrace())));
     }
     
     /**
