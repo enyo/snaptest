@@ -67,7 +67,7 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
         $output .= '    in file:   ';
         $output .= (isset($origin['file'])) ? $origin['file'] : 'unknown';
         
-        $this->addReport($output);
+        return $output;
     }
 }
 ?>

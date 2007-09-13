@@ -54,28 +54,28 @@ abstract class Snap_UnitTestReporter {
      * records a test exception and adds it to the report queue
      * @param UnitTestException $e
      */
-    public function recordTestException(Snap_UnitTestException $e) {
-        $this->recordMessage($e->getUserMessage(), $this->cullTrace($e->getTrace()));
+    public final function recordTestException(Snap_UnitTestException $e) {
+        $this->addReport($this->recordMessage($e->getUserMessage(), $this->cullTrace($e->getTrace())));
     }
     
     /**
      * records an unhandled exception and adds it to the report queue
      * @param Exception $e
      */
-    public function recordUnhandledException(Exception $e) {
-        $this->recordMessage('Unhandled exception with message: '.$e->getMessage(), $this->cullTrace($e->getTrace()));
+    public final function recordUnhandledException(Exception $e) {
+        $this->addReport($this->recordMessage('Unhandled exception with message: '.$e->getMessage(), $this->cullTrace($e->getTrace())));
     }
     
     /**
      * records a test defect exception that occured in setup/teardown
      * @param UnitTestException $e
      */
-    public function recordTestDefect(Exception $e) {
+    public final function recordTestDefect(Exception $e) {
         if (method_exists($e, 'getUserMessage')) {
-            $this->recordMessage('Defect: '.$e->getUserMessage(), $this->cullTrace($e->getTrace()));
+            $this->addReport($this->recordMessage('Defect: '.$e->getUserMessage(), $this->cullTrace($e->getTrace())));
         }
         else {
-            $this->recordMessage('Defect: '.$e->getMessage(), $this->cullTrace($e->getTrace()));
+            $this->addReport($this->recordMessage('Defect: '.$e->getMessage(), $this->cullTrace($e->getTrace())));
         }
     }
     
@@ -86,14 +86,14 @@ abstract class Snap_UnitTestReporter {
      * @param int $errline the line of the php error
      * @param array $trace the backtrace of the error
      */
-    public function recordPHPError($errstr, $errfile, $errline, $trace) {
+    public final function recordPHPError($errstr, $errfile, $errline, $trace) {
 
         $trace = $this->cullTrace($trace);
         
         // file trace is worthless
         unset($trace['file']);
         
-        $this->recordMessage('Error: '.$errstr. '[line: '.$errline.' '.$errfile.']', $trace);
+        $this->addReport($this->recordMessage('Error: '.$errstr. '[line: '.$errline.' '.$errfile.']', $trace));
         $this->php_errors++;
     }
     
@@ -103,7 +103,7 @@ abstract class Snap_UnitTestReporter {
      * @param int $tests the number of tests ran
      * @param string $classname the name of the class the report came from
      */
-    public function addTestPasses($passes, $defects, $tests, $classname) {
+    public final function addTestPasses($passes, $defects, $tests, $classname) {
         $this->passes += $passes;
         $this->tests += $tests;
         $this->defects += $defects;
@@ -117,7 +117,7 @@ abstract class Snap_UnitTestReporter {
      * @param array $trace the trace array
      * @return array an array reduced to the occurance of the test/setup
      */
-    protected function cullTrace($trace) {
+    protected final function cullTrace($trace) {
         while (true) {
             if (!isset($trace[0])) {
                 break;
@@ -143,14 +143,15 @@ abstract class Snap_UnitTestReporter {
      * add a report to the output stack
      * @param string $output the output to add to the report
      */
-    protected function addReport($output) {
+    protected final function addReport($output) {
         $this->reports[] = $output;
     }
     
     /**
-     * abstract function, records a message calling $this->addReport()
+     * abstract function, returns a message to place in the report stack
      * @param string $message the message to store
      * @param array $origin the origin of the message
+     * @return string the output to record
      */
     abstract protected function recordMessage($message, $origin);
     
