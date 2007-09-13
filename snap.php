@@ -122,6 +122,7 @@ class Snap_Tester {
      * @param string $name the name of the handler to load
      * @param string $type the type of handler, input or output
      * @return Snap_UnitTestReporter or Snap_UnitTestLoader
+     * @throws Snap_Exception
      */
     protected function getTesterClass($name, $type) {
         if ($type == 'output') {
@@ -141,7 +142,7 @@ class Snap_Tester {
         
         // if class still does not exist, this is an error
         if (!class_exists($class_name)) {
-            throw new Exception('Handler '.$class_name.' is not found.');
+            throw new Snap_Exception('Handler '.$class_name.' is not found.');
         }
         
         return new $class_name();

@@ -6,12 +6,12 @@ abstract class Snap_UnitTestCase {
 
     /**
      * constructor that is owned by the parent unit test
-     */
+     **/
     public final function __construct() {}
     
     /**
      * destructor that is owned by the parent unit test
-     */
+     **/
     public final function __destruct() {}
     
     abstract public function setUp();
@@ -26,7 +26,7 @@ abstract class Snap_UnitTestCase {
      * @param array $params the parameters to test
      * @throws Snap_UnitTestException when object is not a properly designed mock
      * @return int
-     */
+     **/
     protected function getTallyFromMock($object, $method, $params) {
         if (!isset($object->mock)
             || !is_object($object->mock)
@@ -45,7 +45,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws Snap_AssertCallCountException
-     */
+     **/
     protected function assertCallCount($object, $method_name, $expected_count, $method_params = array(), $msg = '') {
         $actual_count = $this->getTallyFromMock($object, $method_name, $method_params);
         
@@ -64,7 +64,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws Snap_AssertCallCountException
-     */
+     **/
     protected function assertMinimumCallCount($object, $method_name, $expected_count, $method_params = array(), $msg = '') {
         $actual_count = $this->getTallyFromMock($object, $method_name, $method_params);
         
@@ -76,13 +76,14 @@ abstract class Snap_UnitTestCase {
         return new Snap_PassedTestAssertion();
     }
     
-    /** Assert that a maximum call count was met
+    /**
+     * Assert that a maximum call count was met
      * @param $mock a mock object to test for
      * @param array a set of parameteres to create a signature with
      * @param string $msg user message on failure
      * @return boolean true
      * @throws Snap_AssertCallCountException
-     */
+     **/
     protected function assertMaximumCallCount($object, $method_name, $expected_count, $method_params = array(), $msg = '') {
         $actual_count = $this->getTallyFromMock($object, $method_name, $method_params);
         
@@ -100,7 +101,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws AssertSameUnitTestException
-     */
+     **/
     protected function assertTrue($value, $msg = '') {
         if ($value !== true) {
             throw new Snap_AssertSameUnitTestException('assert_true', $msg, $value, true);
@@ -115,7 +116,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws AssertSameUnitTestException
-     */    
+     **/    
     protected function assertFalse($value, $msg = '') {
         if ($value !== false) {
             throw new Snap_AssertSameUnitTestException('assert_false', $msg, $value, false);
@@ -131,7 +132,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws AssertEqualUnitTestException
-     */
+     **/
     protected function assertEqual($expected, $actual, $msg = '') {
         if ($expected != $actual) {
             throw new Snap_AssertEqualUnitTestException('assert_equal', $msg, $expected, $actual);
@@ -147,7 +148,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws AssertNotEqualUnitTestException
-     */
+     **/
     protected function assertNotEqual($expected, $actual, $msg = '') {
         if ($expected == $actual) {
             throw new Snap_AssertNotEqualUnitTestException('assert_not_equal', $msg, $expected, $actual);
@@ -163,7 +164,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws AssertSameUnitTestException
-     */
+     **/
     protected function assertSame($expected, $actual, $msg = '') {
         if ($expected !== $actual) {
             throw new Snap_AssertSameUnitTestException('assert_same', $msg, $expected, $actual);
@@ -178,7 +179,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws AssertSameUnitTestException
-     */
+     **/
     protected function assertNull($value, $msg = '') {
         if ($value !== null) {
             throw new Snap_AssertSameUnitTestException('assert_null', $msg, $value, null);
@@ -193,7 +194,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws AssertNotSameUnitTestException
-     */
+     **/
     protected function assertNotNull($value, $msg = '') {
         if ($value === null) {
             throw new Snap_AssertNotSameUnitTestException('assert_not_null', $msg, $value, null);
@@ -209,7 +210,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg the user message on failure
      * @return boolean true
      * @throws AssertInstanceOfUnitTestException
-     */
+     **/
     protected function assertIsA($object, $classname, $msg = '') {
         if (!($object instanceof $classname)) {
             throw new Snap_AssertInstanceOfUnitTestException('assert_isa', $msg, $object, $classname);
@@ -225,7 +226,7 @@ abstract class Snap_UnitTestCase {
      * @param string $msg user message on failure
      * @return boolean true
      * @throws AssertRegexUnitTestException
-     */
+     **/
     protected function assertRegex($value, $regex, $msg = '') {
         if (!preg_match($regex, $value)) {
             throw new Snap_AssertRegexUnitTestException('assert_matches', $msg, $value, $regex);
@@ -237,18 +238,21 @@ abstract class Snap_UnitTestCase {
     /**
      * specify that calling this test will cause an exception of the specified class
      * @param string $exception_name the name of the exception expected
-     */
+     **/
     protected function willThrow($exception_name) {
         $this->willThrow = $exception_name;
     }
     
     /**
      * specify that calling this test will cause a PHP error under normal circumstances
-     */
+     **/
     protected function willError() {
         $this->willError = true;
     }
     
+    /**
+     * returns the status if the currently running test is allowed to chuck a PHP error
+     **/
     public function canError() {
         return $this->willError;
     }
@@ -257,7 +261,7 @@ abstract class Snap_UnitTestCase {
      * Force an exception stating that the test is not yet complete.
      * until a test is actually believed to be complete, this failure should be called
      * @throws Snap_NotImplementedException
-     */
+     **/
     protected function notImplemented() {
         throw new Snap_NotImplementedException('not_implemented', 'Test has not been fully implemented.');
     }
@@ -269,7 +273,7 @@ abstract class Snap_UnitTestCase {
      * return values and remove external dependencies
      * @param string $class_name the name of the class to mock
      * @return MockObject the new MockObject instance
-     */
+     **/
     protected function mock($class_name) {
         return new Snap_MockObject($class_name);
     }
@@ -285,7 +289,7 @@ abstract class Snap_UnitTestCase {
      * if an error is encountered in setup or teardown, the result is scrapped
      * as a defective test
      * @param Snap_UnitTestReporter $reporter
-     */
+     **/
     public function runTests(Snap_UnitTestReporter $reporter) {
     
         // reflect the class

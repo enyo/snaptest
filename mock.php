@@ -153,6 +153,7 @@ class Snap_MockObject {
      * the class signature is unique to the sum of expectations, so an idential object
      * will share the same class signature for its public methods
      * @return Object
+     * @throws Snap_UnitTestException
      */
     public function construct() {
         // include once on matching file

@@ -26,6 +26,7 @@ class Snap_FileUtil {
     /**
      * creates a file using tempnam and holds a reference to it
      * @return string the path to the temp file
+     * @throws Snap_UnitTestException
      */
     public function makeFile() {
         $path = tempnam('/tmp', 'snap');

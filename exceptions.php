@@ -1,11 +1,16 @@
 <?php
 
 /**
+ * Generic Framework Exception
+ **/
+class Snap_Exception extends Exception {}
+
+/**
  * Generic Unit Test Exception
  * Basic test exception that defines something having gone wrong
  * during the unit test exception.
  */
-class Snap_UnitTestException extends Exception {
+class Snap_UnitTestException extends Snap_Exception {
 
     protected $user_message;
 
