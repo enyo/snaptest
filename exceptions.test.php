@@ -1,6 +1,6 @@
 <?php
 
-include_once SNAPTEST_ROOT.'src'.DIRECTORY_SEPARATOR.'exceptions.php';
+include_once SNAPTEST_ROOT.'exceptions.php';
 
 /**
  * Tests Snap_UnitTestException
