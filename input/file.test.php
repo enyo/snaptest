@@ -1,6 +1,6 @@
 <?php
 
-include_once SNAPTEST_ROOT.'input'.DIRECTORY_SEPARATOR.'file.php';
+include_once SNAPTEST_ROOT.'src'.DIRECTORY_SEPARATOR.'input'.DIRECTORY_SEPARATOR.'file.php';
 
 class Snap_File_UnitTestLoader_Test extends Snap_UnitTestCase {
 

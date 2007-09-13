@@ -4,7 +4,7 @@ if (!defined('SNAPTEST_ROOT')) {
     define('SNAPTEST_ROOT', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
 }
 
-include_once SNAPTEST_ROOT.'snap.php';
+include_once SNAPTEST_ROOT.'src'.DIRECTORY_SEPARATOR.'snap.php';
 
 // ------------------------------------------------------------
 // END SETUP

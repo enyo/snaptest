@@ -1,6 +1,6 @@
 <?php
 
-include_once SNAPTEST_ROOT.'file.php';
+include_once SNAPTEST_ROOT.'src'.DIRECTORY_SEPARATOR.'file.php';
 
 /**
  * Tests Snap_FileUtil
