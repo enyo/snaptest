@@ -1,6 +1,6 @@
 <?php
 
-include_once 'file.php';
+include_once SNAPTEST_ROOT.'file.php';
 
 /**
  * Tests Snap_FileUtil

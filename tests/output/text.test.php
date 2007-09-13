@@ -1,5 +1,7 @@
 <?php
 
+include_once SNAPTEST_ROOT.'output'.DIRECTORY_SEPARATOR.'text.php';
+
 class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
     public function setUp() {
         $this->reporter = new Snap_Text_UnitTestReporter();

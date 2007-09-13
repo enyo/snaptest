@@ -1,6 +1,6 @@
 <?php
 
-include_once 'mock.php';
+include_once SNAPTEST_ROOT.'mock.php';
 
 class Snap_MockObject_Mockable {
     public function pubReturnTrue() {

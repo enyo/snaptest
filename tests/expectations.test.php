@@ -1,6 +1,6 @@
 <?php
 
-include_once 'expectations.php';
+include_once SNAPTEST_ROOT.'expectations.php';
 
 /** 
  * Tests Snap_Anything_Expectation
