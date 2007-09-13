@@ -18,7 +18,7 @@ abstract class Snap_UnitTestLoader {
      * Adds a test to the stack
      * @param string $test the class to add
      */
-    protected function addTest($test) {
+    protected final function addTest($test) {
         $this->tests[] = $test;
     }
 
@@ -26,7 +26,7 @@ abstract class Snap_UnitTestLoader {
      * Get the tests that have been loaded from the add method
      * @return array the array of test objects
      */
-    public function getTests() {
+    public final function getTests() {
         return $this->tests;
     }
 
