@@ -31,6 +31,12 @@ interface Snap_MockObject_MockableInterface {
     public function pubCallReturnTrueTwoTimesFromPro();
 }
 
+class Snap_MockObject_Mockable_Using_Interface implements Snap_MockObject_MockableInterface {
+    public function pubReturnTrue() {}
+    public function pubCallReturnTrueThreeTimes() {}
+    public function pubCallReturnTrueTwoTimesFromPro() {}
+}
+
 class Snap_MockObject_Test_StubGeneration extends Snap_UnitTestCase {
 
     public function setUp() {
@@ -84,8 +90,37 @@ class Snap_MockObject_Test_StubGeneration_With_Interface extends Snap_UnitTestCa
         unset($this->mock_generated);
     }
     
-    public function testInstanceIsMockOjbect() {
+    public function testBaseIsMockOjbect() {
         return $this->assertIsA($this->mock, 'Snap_MockObject');
+    }
+    
+    public function testInstanceImplementsInterface() {
+        return $this->assertIsA($this->mock_generated, 'Snap_MockObject_MockableInterface');
+    }
+}
+
+class Snap_MockObject_Test_MockGeneration_With_Interface_With_Inheritance extends Snap_UnitTestCase {
+
+    public function setUp() {
+        $this->mock = new Snap_MockObject('Snap_MockObject_Mockable_Using_Interface');
+        $this->mock_generated = $this->mock->requiresInheritance()->construct();
+    }
+    
+    public function tearDown() {
+        unset($this->mock);
+        unset($this->mock_generated);
+    }
+    
+    public function testBaseIsMockOjbect() {
+        return $this->assertIsA($this->mock, 'Snap_MockObject');
+    }
+    
+    public function testInstanceImplementsInterface() {
+        return $this->assertIsA($this->mock_generated, 'Snap_MockObject_MockableInterface');
+    }
+    
+    public function testMaintainsOriginalClassAsSuperClass() {
+        return $this->assertIsA($this->mock_generated, 'Snap_MockObject_Mockable_Using_Interface');
     }
 }
 
