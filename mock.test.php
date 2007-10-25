@@ -25,6 +25,12 @@ class Snap_MockObject_Mockable {
     }
 }
 
+interface Snap_MockObject_MockableInterface {
+    public function pubReturnTrue();
+    public function pubCallReturnTrueThreeTimes();
+    public function pubCallReturnTrueTwoTimesFromPro();
+}
+
 class Snap_MockObject_Test_StubGeneration extends Snap_UnitTestCase {
 
     public function setUp() {
@@ -64,6 +70,23 @@ class Snap_MockObject_Test_StubGeneration extends Snap_UnitTestCase {
         return $this->assertEqual($count, 0);
     }
 
+}
+
+class Snap_MockObject_Test_StubGeneration_With_Interface extends Snap_UnitTestCase {
+
+    public function setUp() {
+        $this->mock = new Snap_MockObject('Snap_MockObject_MockableInterface');
+        $this->mock_generated = $this->mock->construct();
+    }
+    
+    public function tearDown() {
+        unset($this->mock);
+        unset($this->mock_generated);
+    }
+    
+    public function testInstanceIsMockOjbect() {
+        return $this->assertIsA($this->mock, 'Snap_MockObject');
+    }
 }
 
 
