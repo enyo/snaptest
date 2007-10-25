@@ -7,6 +7,7 @@
 class Snap_MockObject {
     
     protected $requires_inheritance;
+    protected $interface_names;
     protected $mocked_class;
     
     public $methods;
@@ -24,11 +25,24 @@ class Snap_MockObject {
     public function __construct($class_name) {
         // $this->test = $test;
         $this->requires_inheritance = false;
+        $this->interface_names = array();
         $this->methods = array();
         $this->signatures = array();
         $this->constructor_args = array();
         $this->counters = array();
         $this->mocked_class = $class_name;
+        
+        // do some quick reflection on the class
+        $reflected_class = new ReflectionClass($this->mocked_class);
+        if ($reflected_class->isInterface()) {
+            $this->interface_names[] = $class_name;
+        }
+        
+        if (count($reflected_class->getInterfaces()) > 0) {
+            foreach($reflected_class->getInterfaces() as $k => $interface) {
+                $this->interface_names[] = $interface->getName();
+            }
+        }
     }
     
     /**
@@ -46,6 +60,14 @@ class Snap_MockObject {
      */
     public function isInherited() {
         return $this->requires_inheritance;
+    }
+    
+    /**
+     * Get the interfaces for this mock
+     * @return array A collection of strings that are all interfaces this mock implements
+     **/
+    public function getInterfaces() {
+        return $this->interface_names;
     }
     
     /**
@@ -169,6 +191,14 @@ class Snap_MockObject {
         
         $mock_class = 'mock_'.$this->mocked_class.'_'.$this->class_signature;
         
+        // add suffixes if there is inheritance / interface
+        if ($this->isInherited()) {
+            $mock_class .= '_ri';
+        }
+        if (count($this->getInterfaces()) > 0) {
+            $mock_class .= '_if';
+        }
+        
         $constructor_method_name = $this->class_signature.'_runConstructor';
         $this->constructor_args = func_get_args();
         
@@ -253,12 +283,17 @@ class Snap_MockObject {
         $output  = '';
         
         // class header
+        $class_header = 'class '.$mock_class;
         if ($this->isInherited()) {
-            $output .= 'class '.$mock_class.' extends '.$this->mocked_class.' {'.$endl;
+            $class_header .= ' extends '.$this->mocked_class;
         }
-        else {
-            $output .= 'class '.$mock_class.' {'.$endl;
+        if (count($this->getInterfaces()) > 0) {
+            $class_header .= ' implements '.implode(', ', $this->getInterfaces());
         }
+        $class_header .= ' {'.$endl;
+        
+        // attach header to the output
+        $output .= $class_header;
         
         // constructor
         $output .= 'public function __construct($mock) {'.$endl;
@@ -383,8 +418,8 @@ class Snap_MockObject {
         // ending } for class
         $output .= '}'.$endl;
         
-        //echo $output;
-        //echo "\n\n----------\n\n";
+        // echo $output;
+        // echo "\n\n----------\n\n";
         //var_dump($this->methods);
         //echo "\n\n----------\n\n";
         // var_dump($this->signatures);
