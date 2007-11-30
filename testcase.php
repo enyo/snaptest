@@ -159,15 +159,24 @@ abstract class Snap_UnitTestCase {
     
     /**
      * assert that the incoming value is same (===) to the incomming expectation
+     * @see Snap_UnitTestCase::assertIdentical()
+     * @deprecated
+     **/
+    protected function assertSame($expected, $actual, $msg = '') {
+        return $this->assertIdentical($expected, $actual, $msg);
+    }
+    
+    /**
+     * Assert that the incomming value is identical (===) to the incoming expectation
      * @param mixed $expected the value it should be
      * @param mixed $actual the value actually testing
      * @param string $msg user message on failure
      * @return boolean true
      * @throws AssertSameUnitTestException
      **/
-    protected function assertSame($expected, $actual, $msg = '') {
+    protected function assertIdentical($expected, $actual, $msg = '') {
         if ($expected !== $actual) {
-            throw new Snap_AssertSameUnitTestException('assert_same', $msg, $expected, $actual);
+            throw new Snap_AssertSameUnitTestException('assert_identical', $msg, $expected, $actual);
         }
         
         return new Snap_PassedTestAssertion();

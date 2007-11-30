@@ -250,7 +250,8 @@ class Snap_AssertCompareUnitTestException extends Snap_UnitTestException {
                 $prefix = 'Not Equal (!=) assertion failed.';
                 break;
             case 'assert_same':
-                $prefix = 'Same (===) assertion failed.';
+            case 'assert_identical':
+                $prefix = 'Identical (===) assertion failed.';
                 break;
             case 'assert_null':
                 $prefix = 'Null assertion failed.';

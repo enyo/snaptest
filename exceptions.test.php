@@ -238,7 +238,12 @@ class Snap_AssertCompareUnitTestException_Test_Codes extends Snap_UnitTestCase {
     
     public function testAssertSameInMessage() {
         $e = $this->buildAssertWithCode('assert_same');
-        return $this->assertRegex($e->getUserMessage(), '/same/i');
+        return $this->assertRegex($e->getUserMessage(), '/identical/i');
+    }
+    
+    public function testAssertIdenticalInMessage() {
+        $e = $this->buildAssertWithCode('assert_identical');
+        return $this->assertRegex($e->getUserMessage(), '/identical/i');
     }
     
     public function testAssertNullInMessage() {
