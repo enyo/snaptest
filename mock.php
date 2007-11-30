@@ -14,6 +14,7 @@ class Snap_MockObject {
     public $signatures;
     public $constructor_args;
     public $counters;
+    public $mock_output;
 
     /**
     * Begin defining a mock object, and setting its expectations
@@ -200,6 +201,7 @@ class Snap_MockObject {
         }
         
         $constructor_method_name = $this->class_signature.'_runConstructor';
+        $setmock_method_name = $this->class_signature.'_injectMock';
         $this->constructor_args = func_get_args();
         
         // reflect the class
@@ -211,6 +213,7 @@ class Snap_MockObject {
         foreach ($reflected_class->getMethods() as $method) {
             if ($method->isConstructor()) {
                 // special constructor stuff here
+                $public_methods[] = $method->getName();
                 $this->listenTo($method->getName());
                 continue;
             }
@@ -251,13 +254,7 @@ class Snap_MockObject {
         
         // if the class exists with everything intact, no need to eval from here on out
         if (class_exists($mock_class)) {
-            $ready_class = new $mock_class($this);
-            
-            if ($this->isInherited()) {
-                $ready_class->$constructor_method_name();
-            }
-            
-            return $ready_class;
+            return $this->buildClassInstantiation($mock_class, $setmock_method_name, $constructor_method_name);
         }
         
         // for each public method found, build it's code block
@@ -295,8 +292,8 @@ class Snap_MockObject {
         // attach header to the output
         $output .= $class_header;
         
-        // constructor
-        $output .= 'public function __construct($mock) {'.$endl;
+        // special mock setter method
+        $output .= 'public function '.$setmock_method_name.'($mock) {'.$endl;
         $output .= '    $this->mock = $mock;'.$endl;
         $output .= '}'.$endl;
         
@@ -420,16 +417,54 @@ class Snap_MockObject {
         
         // echo $output;
         // echo "\n\n----------\n\n";
-        //var_dump($this->methods);
-        //echo "\n\n----------\n\n";
+        // var_dump($this->methods);
+        // echo "\n\n----------\n\n";
         // var_dump($this->signatures);
         
         eval($output);
-        $ready_class = new $mock_class($this);
+        $this->mock_output = $output;
         
-        if ($this->isInherited()) {
-            $ready_class->$constructor_method_name();        
+        // create the ready class
+        return $this->buildClassInstantiation($mock_class, $setmock_method_name, $constructor_method_name);
+    }
+    
+    /**
+     * Builds and instantiates a named mock class
+     * In addition to instantiating the mock class, it injects the mock object
+     * and runs the constructor if required
+     * @return Object the mocked object, ready for use
+     * @param string $mock_class the mock class name
+     * @param string $setmock_method the method to call for setting the mock object
+     * @param string $constructor_method the constructor to call if required
+     **/
+    protected function buildClassInstantiation($mock_class, $setmock_method, $constructor_method) {
+        // make the arguments for the ready class
+        $ready_class = '';
+        if (count($this->constructor_args) > 0) {
+            $arg_output = "";
+            
+            foreach ($this->constructor_args as $idx => $arg) {
+                $arg_output .= '$this->constructor_args['.$idx.'],';
+            }
+            $arg_output = trim($arg_output, ',');
+            
+            $ready_class = 'return new '.$mock_class.'('.$arg_output.');';
         }
+        else {
+            $ready_class = 'return new '.$mock_class.'();';
+        }
+
+        $ready_class = eval($ready_class);
+        
+        // inject the mock class
+        $ready_class->$setmock_method($this);
+        
+        // call a real constructor if required
+        if ($this->isInherited()) {
+            $ready_class->$constructor_method();        
+        }
+        
+        // return the ready class
         return $ready_class;
     }
     
@@ -455,8 +490,10 @@ class Snap_MockObject {
         $output  = '';
         $endl = "\n";
         $output .= $scope.' function '.$method_name.'('.$param_string.') {'.$endl;
-        $output .= '    $args = func_get_args();'.$endl;
-        $output .= '    return $this->'.$this->class_signature.'_invokeMethod(\''.$method_name.'\', $args);'.$endl;
+        if (!$method->isConstructor()) {
+            $output .= '    $args = func_get_args();'.$endl;
+            $output .= '    return $this->'.$this->class_signature.'_invokeMethod(\''.$method_name.'\', $args);'.$endl;
+        }
         $output .= '}'.$endl;
         return $output;
     }
