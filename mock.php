@@ -417,8 +417,8 @@ class Snap_MockObject {
         
         // echo $output;
         // echo "\n\n----------\n\n";
-        // var_dump($this->methods);
-        // echo "\n\n----------\n\n";
+        //var_dump($this->methods);
+        //echo "\n\n----------\n\n";
         // var_dump($this->signatures);
         
         eval($output);
