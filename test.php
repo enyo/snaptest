@@ -5,7 +5,7 @@
  **/
 include_once 'snap.php';
 
-if (!isset($argv) && !is_array($argv)) {
+if ((!isset($argv) && !is_array($argv)) || (!isset($argv[1]))) {
     echo "\nUSAGE: php test.php <path>\n";
     exit;
 }
