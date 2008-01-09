@@ -12,6 +12,10 @@ include_once 'loader.php';
 include_once 'testcase.php';
 include_once 'file.php';
 
+if (!defined('SNAPTEST_ROOT')) {
+    define('SNAPTEST_ROOT', dirname(__FILE__) . DIRECTORY_SEPARATOR);
+}
+
 /**
  * Snap error handling function.  Takes care of PHP errors, and redirects to the current test
  * @param int $errno the error number
@@ -110,6 +114,15 @@ class Snap_Tester {
     }
     
     /**
+     * Get an output class instance. Useful for aggregating multiple tests
+     * @param $name the name of the class
+     * @return Snap_UnitTestReporter
+     **/
+    public function getOutput($name) {
+        return $this->getTesterClass($name, 'output');
+    }
+    
+    /**
      * adds tests to the test stack
      * @param array $tests an array of tests to add
      */
@@ -150,4 +163,3 @@ class Snap_Tester {
 
 }
 
-?>

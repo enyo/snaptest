@@ -6,6 +6,11 @@
 class Snap_Exception extends Exception {}
 
 /**
+ * Exceptions for when a unit test loader does not work properly
+ **/
+class Snap_File_UnitTestLoader_LoadException extends Exception {}
+
+/**
  * Generic Unit Test Exception
  * Basic test exception that defines something having gone wrong
  * during the unit test exception.

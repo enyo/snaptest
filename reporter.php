@@ -49,13 +49,23 @@ abstract class Snap_UnitTestReporter {
         $this->test_cases = 0;
         $this->reports = array();
     }
+    
+    public final function createReport($reports, $test_cases, $total_tests, $passes, $defects, $php_errors) {
+        $this->reports = $reports;
+        $this->test_cases = $test_cases;
+        $this->tests = $total_tests;
+        $this->passes = $passes;
+        $this->defects = $defects;
+        $this->php_errors = $php_errors;
+        $this->generateReport();
+    }
 
     /**
      * records a test exception and adds it to the report queue
      * @param UnitTestException $e
      */
     public final function recordTestException(Snap_UnitTestException $e) {
-        $this->addReport($this->recordMessage($e->getUserMessage(), $this->cullTrace($e->getTrace())));
+        $this->addReport($this->record('user', $e->getUserMessage(), $this->cullTrace($e->getTrace())));
     }
     
     /**
@@ -63,7 +73,7 @@ abstract class Snap_UnitTestReporter {
      * @param Exception $e
      */
     public final function recordUnhandledException(Exception $e) {
-        $this->addReport($this->recordMessage('Unhandled exception of type '.get_class($e).' with message: '.$e->getMessage(), $this->cullTrace($e->getTrace())));
+        $this->addReport($this->record('unhandled_exception', 'Unhandled exception of type '.get_class($e).' with message: '.$e->getMessage(), $this->cullTrace($e->getTrace())));
     }
     
     /**
@@ -72,10 +82,10 @@ abstract class Snap_UnitTestReporter {
      */
     public final function recordTestDefect(Exception $e) {
         if (method_exists($e, 'getUserMessage')) {
-            $this->addReport($this->recordMessage('Defect: '.$e->getUserMessage(), $this->cullTrace($e->getTrace())));
+            $this->addReport($this->record('defect', $e->getUserMessage(), $this->cullTrace($e->getTrace())));
         }
         else {
-            $this->addReport($this->recordMessage('Defect: '.$e->getMessage(), $this->cullTrace($e->getTrace())));
+            $this->addReport($this->record('defect', $e->getMessage(), $this->cullTrace($e->getTrace())));
         }
     }
     
@@ -93,7 +103,7 @@ abstract class Snap_UnitTestReporter {
         // file trace is worthless
         unset($trace['file']);
         
-        $this->addReport($this->recordMessage('Error: '.$errstr. '[line: '.$errline.' '.$errfile.']', $trace));
+        $this->addReport($this->record('error', $errstr, $trace, $errline));
         $this->php_errors++;
     }
     
@@ -118,6 +128,8 @@ abstract class Snap_UnitTestReporter {
      * @return array an array reduced to the occurance of the test/setup
      */
     protected final function cullTrace($trace) {
+        $file = '';
+        
         while (true) {
             if (!isset($trace[0])) {
                 break;
@@ -125,6 +137,7 @@ abstract class Snap_UnitTestReporter {
         
             // drill up until you find a unit test: testXXXXX or setUp or tearDown
             if (isset($trace[0]['function']) && (!preg_match('/^(test.*)|(setUp)|(tearDown)$/i', $trace[0]['function']))) {
+                $file = $trace[0]['file'];
                 array_shift($trace);
                 continue;
             }
@@ -135,6 +148,9 @@ abstract class Snap_UnitTestReporter {
         if (!isset($trace[0])) {
             return array();
         }
+        
+        // restore the proper file
+        $trace[0]['file'] = $file;
         
         return $trace[0];
     }
@@ -148,12 +164,22 @@ abstract class Snap_UnitTestReporter {
     }
     
     /**
-     * abstract function, returns a message to place in the report stack
-     * @param string $message the message to store
-     * @param array $origin the origin of the message
-     * @return string the output to record
+     * turn a trace and message into it's final output.
+     * @param string $message the input message
+     * @param array $origin the array origin for the message
      */
-    abstract protected function recordMessage($message, $origin);
+    protected function record($type, $message, $backtrace, $line = '') {
+        $output = array(
+            'type'      => $type,
+            'message'   => $message,
+            'function'  => (isset($backtrace['function'])) ? $backtrace['function'] : 'unknown',
+            'class'     => (isset($backtrace['class'])) ? $backtrace['class'] : 'unknown',
+            'file'      => (isset($backtrace['file'])) ? $backtrace['file'] : 'unknown',
+            'line'      => $line,
+        );
+        
+        return $output;
+    }
     
     /**
      * abstract function, generates the final report

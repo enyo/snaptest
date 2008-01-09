@@ -12,7 +12,22 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
     public function generateReport() {
         echo "\n";
         foreach ($this->reports as $report) {
-            echo $report."\n";
+            $output  = $report['message'];
+            $output .= "\n";
+                    
+            $output .= '    in method: ';
+            $output .= (isset($report['function'])) ? $report['function'] : 'unknown';
+            $output .= "\n";
+                    
+            $output .= '    in class:  ';
+            $output .= (isset($report['class'])) ? $report['class'] : 'unknown';
+            $output .= "\n";
+                    
+            $output .= '    in file:   ';
+            $output .= (isset($report['file'])) ? $report['file'] : 'unknown';
+            $output .= "\n";
+            
+            echo $output;
         }
         
         echo '______________________________________________________________________'."\n";
@@ -46,28 +61,4 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
         echo '.';
         return;
     }
-    
-    /**
-     * turn a trace and message into it's final output.
-     * @param string $message the input message
-     * @param array $origin the array origin for the message
-     */
-    protected function recordMessage($message, $origin) {
-        $output  = $message;
-        $output .= "\n";
-        
-        $output .= '    in method: ';
-        $output .= (isset($origin['function'])) ? $origin['function'] : 'unknown';
-        $output .= "\n";
-        
-        $output .= '    in class:  ';
-        $output .= (isset($origin['class'])) ? $origin['class'] : 'unknown';
-        $output .= "\n";
-        
-        $output .= '    in file:   ';
-        $output .= (isset($origin['file'])) ? $origin['file'] : 'unknown';
-        
-        return $output;
-    }
 }
-?>

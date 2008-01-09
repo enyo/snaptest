@@ -1,7 +1,5 @@
 <?php
 
-class Snap_File_UnitTestLoader_LoadException extends Exception {}
-
 /**
  * File Based Unit Test Loader
  * Loads a specified set of tests by including a specified file
@@ -29,7 +27,7 @@ class Snap_File_UnitTestLoader extends Snap_UnitTestLoader {
         include_once $file;
         $classes = array_diff(get_declared_classes(), $classes);
         
-        // loop through the tests and if it does not hand a runTest method, continue
+        // loop through the tests and if it does not have a runTest method, continue
         // otherwise, add that class as a valid test
         foreach ($classes as $class_name) {
             if (!method_exists($class_name, 'runTests')) {
