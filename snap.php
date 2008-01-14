@@ -138,18 +138,22 @@ class Snap_Tester {
      * @throws Snap_Exception
      */
     protected function getTesterClass($name, $type) {
+        $directory_name = '';
+        
         if ($type == 'output') {
             $suffix = 'UnitTestReporter';
+            $directory_name = 'reporters';
         }
         else {
             $suffix = 'UnitTestLoader';
+            $directory_name = 'loaders';
         }
 
         $class_name = 'Snap_'.ucwords(strtolower($name)).'_'.$suffix;
         
         // if class does not exist, include
         if (!class_exists($class_name)) {
-            $path = $type.DIRECTORY_SEPARATOR.strtolower($name).'.php';
+            $path = $directory_name.DIRECTORY_SEPARATOR.strtolower($name).'.php';
             @include $path;
         }
         
