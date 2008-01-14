@@ -43,18 +43,19 @@ if (substr($path, 0, 1) != '/') {
     $path = dirname(__FILE__).DIRECTORY_SEPARATOR.$path;
 }
 
-// start a tester
-$snap = new Snap_Tester('textaggregator');
-
-// get an aggregator and a proper output
-$aggregator = $snap->getOutput('textaggregator');
-$real_output = $snap->getOutput($out_mode);
-
-// create a temporary file
-$tmpfile_handle = tmpfile();
-
 // change input mode depending on path
 if (is_dir($path)) {
+    
+    // start a tester
+    $snap = new Snap_Tester('textaggregator');
+
+    // get an aggregator and a proper output
+    $aggregator = $snap->getOutput('textaggregator');
+    $real_output = $snap->getOutput($out_mode);
+
+    // create a temporary file
+    $tmpfile_handle = tmpfile();
+    
     $handle = opendir($path);
     while (false !== ($file = readdir($handle))) {
         if (substr($file, 0, 1) == '.') {
@@ -102,79 +103,90 @@ if (is_dir($path)) {
             $snap->addInput('file', $path.'/'.$file);
         }
     }
-    
+
+    // capture the output from the file level
+    ob_start();
+
+    // run the tests for any files in top level dir
+    $snap->runTests();
+
+    // capture the output
+    $output = ob_get_contents();
+    ob_end_clean();
+
+    // report status to the output util
+    $results = $aggregator->extractReportData($output);
+
+    // report an empty test for every test case
+    for ($i = 0; $i < $results['test_cases']; $i++) {
+        $real_output->addTestPasses(0, 0, 0, 'aggregate');
+    }
+
+    // output for the top level files
+    $real_output->addTestPasses($results['passes'], $results['defects'], $results['tests'], 'aggregate');
+
+    // write the output to the file
+    fwrite($tmpfile_handle, $output);
+
+    // seek to start of temp file
+    fseek($tmpfile_handle, 0);
+
+    // read file into local var
+    $output = stream_get_contents($tmpfile_handle);
+
+    // close resource
+    fclose($tmpfile_handle);
+
+    // capture the test windows, convert to an array, build our totals
+    $results = array(
+        'passes' => 0,
+        'defects' => 0,
+        'test_cases' => 0,
+        'tests' => 0,
+        'php_errors' => 0,
+        'reports' => array(),
+    );
+
+    // extract all tests into a usable array
+    preg_match_all('/(===BEGIN TEST===\s*.*?\s*===END TEST===)/m', $output, $matches);
+
+    // free up memory
+    unset($matches[0]);
+
+    // loop through each test, and add to the proper tally
+    foreach ($matches[1] as $match) {
+        $output = $aggregator->extractReportData($match);
+
+        $results['passes'] += $output['passes'];
+        $results['defects'] += $output['defects'];
+        $results['test_cases'] += $output['test_cases'];
+        $results['tests'] += $output['tests'];
+        $results['php_errors'] += $output['php_errors'];
+        
+        $output['reports'] = (isset($output['reports']) && is_array($output['reports'])) ? $output['reports'] : array();
+        
+        $results['reports'] = array_merge($results['reports'], $output['reports']);
+    }
+
+    // free more memory
+    unset($matches);
+    unset($aggregator);
+
+    // create the final proper output
+    $real_output->createReport($results['reports'],
+                               $results['test_cases'],
+                               $results['tests'],
+                               $results['passes'],
+                               $results['defects'],
+                               $results['php_errors']);
+
+
+
 }
-
-// capture the output from the file level
-ob_start();
-
-// run the tests for any files in top level dir
-$snap->runTests();
-
-// capture the output
-$output = ob_get_contents();
-ob_end_clean();
-
-// report status to the output util
-$results = $aggregator->extractReportData($output);
-
-// report an empty test for every test case
-for ($i = 0; $i < $results['test_cases']; $i++) {
-    $real_output->addTestPasses(0, 0, 0, 'aggregate');
+elseif (is_file($path)) {
+    // testing a single file
+    $snap = new Snap_Tester($out_mode);
+    $snap->addInput('file', $path);
+    $snap->runTests();
 }
-
-// output for the top level files
-$real_output->addTestPasses($results['passes'], $results['defects'], $results['tests'], 'aggregate');
-
-// write the output to the file
-fwrite($tmpfile_handle, $output);
-
-// seek to start of temp file
-fseek($tmpfile_handle, 0);
-
-// read file into local var
-$output = stream_get_contents($tmpfile_handle);
-
-// close resource
-fclose($tmpfile_handle);
-
-// capture the test windows, convert to an array, build our totals
-$results = array(
-    'passes' => 0,
-    'defects' => 0,
-    'test_cases' => 0,
-    'tests' => 0,
-    'php_errors' => 0,
-    'reports' => array(),
-);
-
-// extract all tests into a usable array
-preg_match_all('/(===BEGIN TEST===\s*.*?\s*===END TEST===)/m', $output, $matches);
-
-// free up memory
-unset($matches[0]);
-
-// loop through each test, and add to the proper tally
-foreach ($matches[1] as $match) {
-    $output = $aggregator->extractReportData($match);
-
-    $results['passes'] += $output['passes'];
-    $results['defects'] += $output['defects'];
-    $results['test_cases'] += $output['test_cases'];
-    $results['tests'] += $output['tests'];
-    $results['php_errors'] += $output['php_errors'];
-    $results['reports'] = array_merge($results['reports'], $output['reports']);
-}
-
-// free more memory
-unset($matches);
-unset($aggregator);
-
-// create the final proper output
-$real_output->createReport($results['reports'],
-                           $results['test_cases'],
-                           $results['tests'],
-                           $results['passes'],
-                           $results['defects'],
-                           $results['php_errors']);
 

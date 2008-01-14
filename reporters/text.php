@@ -11,7 +11,7 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
      */
     public function generateReport() {
         echo "\n";
-        foreach ($this->reports as $report) {
+        if (is_array($this->reports)) foreach ($this->reports as $report) {
             $output  = $report['message'];
             $output .= "\n";
                     
@@ -42,6 +42,14 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
             echo 'removed, or acknowledged with $this->willError() in their respective'."\n";
             echo 'tests.'."\n";
         }
+        
+        $addons = unserialize(SNAP_ADDONS);
+        if (count($addons) > 0) {
+            echo "\nAddons Loaded:\n";
+            foreach($addons as $addon) {
+                echo '    '.$addon['name']."\n";
+            }
+        }
     }
     
     protected function announceTestPasses($passes, $defects, $tests, $classname) {
@@ -54,7 +62,6 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
         
         if ($defects > 0) {
             echo 'D';
-            // echo $defects . ' in '.$classname;
             return;
         }
         

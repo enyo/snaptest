@@ -145,7 +145,7 @@ class Snap_AssertRegexUnitTestException extends Snap_UnitTestException {
         if ($message) {
             $message = ' with user message: '.$message;
         }
-        $output = 'Regular expression assertion failed. ['.$value.' not in pattern '.$regex.']'.$message;
+        $output = 'Regular expression assertion failed. ['.$value.' does not match pattern '.$regex.']'.$message;
         
         parent::__construct($code, $output);
     }

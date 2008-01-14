@@ -1,10 +1,10 @@
 <?php
 
-include_once SNAPTEST_ROOT.'reporters'.DIRECTORY_SEPARATOR.'text.php';
+include_once SNAPTEST_ROOT.'reporters'.DIRECTORY_SEPARATOR.'textaggregator.php';
 
-class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
+class Snap_TextAggregator_UnitTestReporter_Test extends Snap_UnitTestCase {
     public function setUp() {
-        $this->reporter = new Snap_Text_UnitTestReporter();
+        $this->reporter = new Snap_TextAggregator_UnitTestReporter();
 
         // throw assert
         try {
@@ -64,14 +64,15 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
     }
 }
 
-class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTestCase {
+class Snap_TextAggregator_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTestCase {
 
     const passes = 2;
     const defects = 4;
     const testcount = 6;
+    const testcases =1;
 
     public function setUp() {
-        $this->reporter = new Snap_Text_UnitTestReporter();
+        $this->reporter = new Snap_TextAggregator_UnitTestReporter();
 
         ob_start();
         $this->reporter->addTestPasses(self::passes, self::defects, self::testcount, __CLASS__);
@@ -79,33 +80,45 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
         $this->reporter->generateReport();
         $this->reporter_output = ob_get_contents();
         ob_end_clean();
+        
+        $matches = array();
+        preg_match('/^\s*===BEGIN TEST===([\s\S]*)===END TEST===\s*$/', $this->reporter_output, $matches);
+        $this->reporter_parsed_output = trim($matches[1]);
     }
     
     public function tearDown() {
         unset($this->reporter);
         unset($this->reporter_output);
+        unset($this->reporter_parsed_output);
     }
-
+    
+    public function testTestDelimitersInOutputString() {
+        return $this->assertRegex($this->reporter_output, '/^\s*===BEGIN TEST===[\s\S]*===END TEST===\s*$/');
+    }
+    
+    public function testPayloadUnserializes() {
+        return $this->assertTrue(is_array(unserialize($this->reporter_parsed_output)));
+    }
+    
     public function testPassesTotalInReport() {
-        return $this->assertRegex($this->reporter_output, '/^.*?total pass:.*?'.self::passes.'.*?$/im');
+        $rep = unserialize($this->reporter_parsed_output);
+        return $this->assertEqual($rep['passes'], self::passes);
     }
     
     public function testDefectsTotalInReport() {
-        return $this->assertRegex($this->reporter_output, '/^.*?total defects:.*?'.self::defects.'.*?$/im');
-    }
-    
-    public function testTestsRanTotalInReport() {
-        return $this->assertRegex($this->reporter_output, '/^.*?total tests:.*?'.self::testcount.'.*?$/im');
+        $rep = unserialize($this->reporter_parsed_output);
+        return $this->assertEqual($rep['defects'], self::defects);
     }
 
-    public function testFailuresTotalInReport() {
-        return $this->assertRegex($this->reporter_output, '/^.*?total failures:.*?'.(self::testcount - self::passes - self::defects).'.*?$/im');
+    public function testTotalTestsRanInReport() {
+        $rep = unserialize($this->reporter_parsed_output);
+        return $this->assertEqual($rep['tests'], self::testcount);
     }
     
-    public function testCasesRanTotalInReport() {
-        return $this->assertRegex($this->reporter_output, '/^.*?total cases:.*?1.*?$/im');
+    public function testTestCasesTotalInReport() {
+        $rep = unserialize($this->reporter_parsed_output);
+        return $this->assertEqual($rep['test_cases'], self::testcases);
     }
 
 }
 
-?>

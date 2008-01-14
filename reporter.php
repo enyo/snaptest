@@ -39,6 +39,12 @@ abstract class Snap_UnitTestReporter {
     protected $test_cases;
     
     /**
+     * addons loaded
+     * @var array $addons
+     **/
+    protected $addons;
+    
+    /**
      * report constructor, initializes all the variables
      */
     public function __construct() {
