@@ -59,7 +59,7 @@ class Snap_MockObject_Test_StubGeneration extends Snap_UnitTestCase {
     }
     
     public function testPublicMethodsAreCopied() {
-        return $this->assertTrue(method_exists($this->mock_generated, 'pubReturnTrue'));
+        return $this->assertFalse(method_exists($this->mock_generated, 'pubReturnTrue'));
     }
     
     public function testProtectedMethodsAreNotCopied() {
