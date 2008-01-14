@@ -3,7 +3,16 @@
 require_once 'snap.php';
 require_once 'functions.php';
 
-$options = SNAP_get_long_options($argv);
+if (isset($argv) && is_array($argv)) {
+    $options = SNAP_get_long_options($argv);
+}
+elseif (isset($_GET) && is_array($_GET)) {
+    $options = SNAP_get_long_options($_GET);
+}
+else {
+    echo "\nOptions must be in command line or via GET";
+    $options = array();
+}
 
 $out_mode = (isset($options['out']) && $options['out']) ? $options['out'] : 'text';
 $php = (isset($options['php']) && $options['php']) ? $options['php'] : 'php';
