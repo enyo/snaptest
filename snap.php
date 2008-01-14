@@ -79,7 +79,7 @@ class Snap_Tester {
             continue;
         }
 
-        $c = $this->getTesterClass($input_handler, 'input');
+        $c = $this->getTesterClass($input_handler, 'loader');
         foreach($params as $item) {
             $c->add($item);
         }
@@ -110,7 +110,7 @@ class Snap_Tester {
      * @param string $output_type the name of an output handler
      */
     protected function setOutput($output_type) {
-        $this->output = $this->getTesterClass($output_type, 'output');
+        $this->output = $this->getTesterClass($output_type, 'reporter');
     }
     
     /**
@@ -119,7 +119,7 @@ class Snap_Tester {
      * @return Snap_UnitTestReporter
      **/
     public function getOutput($name) {
-        return $this->getTesterClass($name, 'output');
+        return $this->getTesterClass($name, 'reporter');
     }
     
     /**
@@ -138,28 +138,25 @@ class Snap_Tester {
      * @throws Snap_Exception
      */
     protected function getTesterClass($name, $type) {
-        $directory_name = '';
         
-        if ($type == 'output') {
+        if ($type == 'reporter') {
             $suffix = 'UnitTestReporter';
-            $directory_name = 'reporters';
         }
         else {
             $suffix = 'UnitTestLoader';
-            $directory_name = 'loaders';
         }
 
         $class_name = 'Snap_'.ucwords(strtolower($name)).'_'.$suffix;
         
         // if class does not exist, include
         if (!class_exists($class_name)) {
-            $path = $directory_name.DIRECTORY_SEPARATOR.strtolower($name).'.php';
+            $path = $type.'s'.DIRECTORY_SEPARATOR.strtolower($name).'.php';
             @include $path;
         }
         
         // if class still does not exist, this is an error
         if (!class_exists($class_name)) {
-            throw new Snap_Exception('Handler '.$class_name.' is not found.');
+            throw new Snap_Exception('Handler '.$class_name.' is not found, tried path '.$path);
         }
         
         return new $class_name();
