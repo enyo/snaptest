@@ -268,9 +268,27 @@ class Snap_MockObject {
             if (strpos($method_name, '__') === 0) {
                 continue;
             }
-            if (!in_array($method_name, $public_methods) && !in_array($method_name, $protected_methods) && !$this->hasMagicMethods()) {
-                throw new Snap_UnitTestException('setup_invalid_method', $this->mocked_class.'::'.$method_name.' cannot have expects or return values. It might be private or final.');
+            
+            // if in public, we are okay
+            if (in_array($method_name, $public_methods)) {
+                continue;
             }
+            
+            // if in protected, and we are requiring inheritance, we are okay
+            if ($this->isInherited() && in_array($method_name, $protected_methods)) {
+                continue;
+            }
+            
+            // if magic methods are enabled for this class, we are okay
+            // we also need to listen to it
+            if ($this->hasMagicMethods()) {
+                $this->listenTo($method_name);
+                continue;
+            }
+            
+            // now we're in trouble. We throw an exception, as they
+            // called on something that is not mockable
+            throw new Snap_UnitTestException('setup_invalid_method', $this->mocked_class.'::'.$method_name.' cannot have expects or return values. It might be private or final.');
         }
         
         // if the class exists with everything intact, no need to eval from here on out
