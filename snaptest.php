@@ -1,5 +1,31 @@
 <?php
 
+function SNAP_usage() {
+    echo "\n";
+    echo "Usage: snaptest.sh [--out=outmode] [--php=phppath] [--help] <path>\n";
+    echo "Usage: php snaptest.php [--out=outmode] [--php=phppath] [--help] <path>\n";
+    echo "\n";
+    echo "<path> :: The path to the test you want to run. Should be a file\n";
+    echo "ending in .test.php or a directory.\n";
+    echo "\n";
+    echo "--out=outmode :: sets the output handler to 'outmode'. The\n";
+    echo "output mode must be located in <snaptest>/outmode.php.\n";
+    echo "\n";
+    echo "--php=phppath :: set the php path for recursion. If not specified,\n";
+    echo "the call 'php' will be used, using whatever is in the current env\n";
+    echo "variable.\n";
+    echo "\n";
+    echo "--match=regex :: Specifies a PCRE regular expression to match. Files\n";
+    echo "that match this regular expression will be included by the test\n";
+    echo "harness.\n";
+    exit;
+}
+
+// requires PHP 5.2+
+if (version_compare(phpversion(), '5.2.0') < 0) {
+    SNAP_usage();
+}
+
 require_once 'snap.php';
 require_once 'functions.php';
 
@@ -18,40 +44,13 @@ $out_mode = (isset($options['out']) && $options['out']) ? $options['out'] : 'tex
 $php = (isset($options['php']) && $options['php']) ? $options['php'] : 'php';
 $ofile = (isset($options['ofile']) && $options['ofile']) ? $options['ofile'] : tempnam('/tmp', 'SNAP');
 $xtn = (isset($options['match']) && $options['match']) ? $options['match'] : '^.*\.stest\.php';
-$help = (isset($options['help']) && $options['help']) ? true : false;
+$help = (isset($options['help'])) ? true : false;
 
 $path = (isset($options[0]) && $options[0]) ? $options[0] : '';
 
 // help output if no path is specified
 if ($path == '' || $help) {
-    echo "\n";
-    echo "Usage: snaptest.sh <path>\n";
-    echo "Usage: php snaptest.php [--out=outmode] [--php=phppath]\n";
-    echo "           [--ofile=filepath] [--help] <path>\n";
-    echo "\n";
-    echo "<path> :: The path to the test you want to run. Should be a file\n";
-    echo "ending in .test.php or a directory.\n";
-    echo "\n";
-    echo "--out=outmode :: sets the output handler to 'outmode'. The\n";
-    echo "output mode must be located in <snaptest>/outmode.php.\n";
-    echo "This is specific to snaptest.php only\n";
-    echo "\n";
-    echo "--php=phppath :: set the php path for recursion. If not specified,\n";
-    echo "the call 'php' will be used, using whatever is in the current env\n";
-    echo "variable.\n";
-    echo "This is specific to snaptest.php only\n";
-    echo "\n";
-    echo "--ofile=filepath :: Declare a file you want to write to. This is\n";
-    echo "especially useful if you plan to fork and want all reports to go\n";
-    echo "to a single location. If ofile is not specified, a file in /tmp\n";
-    echo "from tempnam() will be used.\n";
-    echo "This is specific to snaptest.php only\n";
-    echo "\n";
-    echo "--match=regex :: Specifies a regular expression to match. Files\n";
-    echo "that match this regular expression will be included by the test\n";
-    echo "harness.\n";
-    echo "This is specific to snaptest.php only\n";
-    exit;
+    SNAP_usage();
 }
 
 

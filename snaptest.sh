@@ -1,17 +1,58 @@
 #!/bin/bash
 
-#$> ./snaptest.sh <path>
-#        runs snaptest/bootstrap.php --mode=directory --path=<path>
-#
+# load options
+. getoptx.sh
 
-# Debian / STD Linux
-# phppath=/usr/local/bin/php
+# Auto Locate PHP
+PHP=`which php`
+if [[ ! -x "$PHP" ]] ; then
+    PHP=""
+    if [ -z $PHP ] ; then
+        if [ -x "/usr/local/bin/php" ] ; then
+            PHP="/usr/local/bin/php"
+        fi
+        if [ -x "/usr/bin/php" ] ; then
+            PHP="/usr/bin/php"
+        fi
+        if [ -x "/opt/local/bin/php" ] ; then
+            PHP="/opt/local/bin/php"
+        fi
+    fi
+fi
 
-# OSX / Darwin
-phppath=/opt/local/bin/php
+# choke and die if we couldn't auto-find PHP
+if [ -z $PHP ] ; then
+    echo "PHP was not found in any common location. You will need to"
+    echo "supply the --php=<path> switch."
+    exit 0
+fi
 
-# END CONFIG
-filepath=`dirname "$0"`
-cd $filepath;
+# parse the options
+CMD=""
+while getoptex "out. php. match. help;" "$@"
+do
+    if [ "$OPTOPT" = "php" ] ; then
+        if [ -n PHP ] ; then
+            echo "OHSHITNOPHPLAWL"
+        fi
+        PHP=$OPTARG
+    fi
+    if [ "$OPTOPT" = "help" ] ; then
+        CMD="$CMD --help"
+    else
+        CMD="$CMD --$OPTOPT=$OPTARG"
+    fi
+done
+shift $[OPTIND-1]
+for arg in "$@"
+do
+    CMD="$CMD $arg"
+done
 
-$phppath $filepath/snaptest.php --out=text --php=$phppath $1
+# change to shell script real location
+FPATH=`dirname "$0"`
+cd $FPATH;
+
+# run php on the snaptest.php file with the commands
+CMD="$PHP snaptest.php $CMD"
+$CMD
