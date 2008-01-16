@@ -15,9 +15,8 @@ abstract class Snap_UnitTestReporter {
         $this->reports = array();
     }
     
-    public final function createReport($reports) {
-        $this->reports = $reports;
-        $this->generateReport();
+    public final function createReport() {
+        $this->generateReport($this->reports);
     }
     
     /**
@@ -154,7 +153,7 @@ abstract class Snap_UnitTestReporter {
     /**
      * abstract function, generates the final report
      */
-    abstract public function generateReport();
+    abstract public function generateReport($reports);
     
     /**
      * abstract function, handles announcing a test's completion to the output

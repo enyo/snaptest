@@ -98,6 +98,12 @@ if (is_dir($path)) {
                 'type' => 'fatal',
                 'message' => ($problem_output) ? $problem_output : $file . ' had a fatal error: '.$read,
             );
+            
+            $real_output->announceTestFail();
+            
+            unset($matches);
+            unset($read);
+            continue;
         }
         
         // cleanup that string
@@ -127,7 +133,7 @@ if (is_dir($path)) {
     }
     
     // create the final proper output
-    $real_output->createReport($report_list);
+    $real_output->generateReport($report_list);
 
 }
 else {

@@ -9,7 +9,7 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
      * generate a text based report of the output data
      * @return void
      */
-    public function generateReport() {
+    public function generateReport($reports) {
         echo "\n";
         echo "TAP version 13\n";
         
@@ -25,7 +25,7 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
         echo "#\n";
         
         $i = 1;
-        if (is_array($this->reports)) foreach ($this->reports as $report) {
+        if (is_array($reports)) foreach ($reports as $report) {
             $report_number = $i;
             $i++;
 

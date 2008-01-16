@@ -9,8 +9,8 @@ class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter {
      * generate a text based report of the output data
      * @return void
      */
-    public function generateReport() {
-        echo '===START===' . serialize($this->reports) . '===END===';
+    public function generateReport($reports) {
+        echo '===START===' . serialize($reports) . '===END===';
     }
     
     public function announceTestPass() {}

@@ -8,15 +8,15 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
      * generate a text based report of the output data
      * @return void
      */
-    public function generateReport() {
+    public function generateReport($reports) {
         $cases  = 0;
         $pass   = 0;
         $defect = 0;
         $fail   = 0;
         $error  = 0;
-        
+
         echo "\n";
-        if (is_array($this->reports)) foreach ($this->reports as $report) {
+        if (is_array($reports)) foreach ($reports as $report) {
             
             // passes
             if ($report['type'] == 'pass') {

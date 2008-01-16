@@ -100,7 +100,7 @@ class Snap_Tester {
             $test->runTests($this->output);
         }
 
-        $this->output->generateReport();
+        $this->output->createReport();
         
         return true;
     }

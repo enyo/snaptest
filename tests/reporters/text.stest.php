@@ -37,7 +37,7 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
         $this->reporter->recordPHPError('phperr_message', __FILE__, __LINE__, debug_backtrace());
         // generate and store report
         ob_start();
-        $this->reporter->generateReport();
+        $this->reporter->createReport();
         $this->reporter_output = ob_get_contents();
         ob_end_clean();
     }
@@ -74,7 +74,7 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
         $this->reporter = new Snap_Text_UnitTestReporter();
 
         ob_start();
-        $this->reporter->createReport(array(
+        $this->reporter->generateReport(array(
             array('type' => 'pass'),
             array('type' => 'pass'),
             array('type' => 'pass'),
@@ -84,12 +84,10 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
             array('type' => 'defect'),
             array('type' => 'case'),
         ));
-        
-        $this->reporter->generateReport();
         $this->reporter_output = ob_get_contents();
         ob_end_clean();
     }
-    
+
     public function tearDown() {
         unset($this->reporter);
         unset($this->reporter_output);
