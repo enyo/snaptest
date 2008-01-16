@@ -9,9 +9,35 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
      * @return void
      */
     public function generateReport() {
+        $cases  = 0;
+        $pass   = 0;
+        $defect = 0;
+        $fail   = 0;
+        $error  = 0;
+        
         echo "\n";
         if (is_array($this->reports)) foreach ($this->reports as $report) {
-            $output  = $report['message'];
+            
+            // passes
+            if ($report['type'] == 'pass') {
+                $pass++;
+                continue;
+            }
+            elseif ($report['type'] == 'case') {
+                $cases++;
+                continue;
+            }
+            elseif ($report['type'] == 'defect') {
+                $defect++;
+            }
+            elseif ($report['type'] == 'phperr') {
+                $error++;
+            }
+            else {
+                $fail++;
+            }
+            
+            $output  = (isset($report['message'])) ? $report['message'] : '[No Message Supplied]';
             $output .= "\n";
                     
             $output .= '    in method: ';
@@ -24,19 +50,22 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
                     
             $output .= '    in file:   ';
             $output .= (isset($report['file'])) ? $report['file'] : 'unknown';
+            $output .= (isset($report['line'])) ? ' ('.$report['line'].')' : '';
             $output .= "\n";
             
             echo $output;
         }
         
-        echo '______________________________________________________________________'."\n";
-        echo 'Total Cases:    '.$this->test_cases."\n";
-        echo 'Total Tests:    '.$this->tests."\n";
-        echo 'Total Pass:     '.$this->passes."\n";
-        echo 'Total Defects:  '.$this->defects."\n";
-        echo 'Total Failures: '.($this->tests - $this->passes - $this->defects)."\n";
+        $tests = $pass + $fail + $defect;
         
-        if ($this->php_errors > 0) {
+        echo '______________________________________________________________________'."\n";
+        echo 'Total Cases:    '.$cases."\n";
+        echo 'Total Tests:    '.$tests."\n";
+        echo 'Total Pass:     '.$pass."\n";
+        echo 'Total Defects:  '.$defect."\n";
+        echo 'Total Failures: '.$fail."\n";
+        
+        if ($error > 0) {
             echo "\n".'You have unchecked errors in your tests.  These errors should be'."\n";
             echo 'removed, or acknowledged with $this->willError() in their respective'."\n";
             echo 'tests.'."\n";
@@ -51,20 +80,14 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
         }
     }
     
-    protected function announceTestPasses($passes, $defects, $tests, $classname) {
-        $failures = $tests - $passes - $defects;
-        
-        if ($failures > 0) {
-            echo 'F';
-            return;
-        }
-        
-        if ($defects > 0) {
-            echo 'D';
-            return;
-        }
-        
+    public function announceTestPass() {
         echo '.';
-        return;
     }
+    public function announceTestFail() {
+        echo 'F';
+    }
+    public function announceTestDefect() {
+        echo 'D';
+    }
+    public function announceTestCaseComplete() {}
 }

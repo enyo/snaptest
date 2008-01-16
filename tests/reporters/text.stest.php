@@ -66,15 +66,24 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
 
 class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTestCase {
 
-    const passes = 2;
-    const defects = 4;
-    const testcount = 6;
-
+    const passes = 4;
+    const defects = 2;
+    const testcount = 7;
+    
     public function setUp() {
         $this->reporter = new Snap_Text_UnitTestReporter();
 
         ob_start();
-        $this->reporter->addTestPasses(self::passes, self::defects, self::testcount, __CLASS__);
+        $this->reporter->createReport(array(
+            array('type' => 'pass'),
+            array('type' => 'pass'),
+            array('type' => 'pass'),
+            array('type' => 'pass'),
+            array('type' => 'fail'),
+            array('type' => 'defect'),
+            array('type' => 'defect'),
+            array('type' => 'case'),
+        ));
         
         $this->reporter->generateReport();
         $this->reporter_output = ob_get_contents();

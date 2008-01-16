@@ -324,10 +324,6 @@ abstract class Snap_UnitTestCase {
         
         $old_error_handler = set_error_handler('SNAP_error_handler');
         
-        // init for our loop
-        $tests = 0;
-        $passes = 0;
-        $defects = 0;
         foreach ($public_methods as $method) {
                 
             if (!preg_match('/^test/i', $method)) {
@@ -337,7 +333,6 @@ abstract class Snap_UnitTestCase {
             $this->willThrow = null;
             $this->willError = false;
             $result = false;
-            $tests++;
             
             // run setup
             try {
@@ -345,7 +340,6 @@ abstract class Snap_UnitTestCase {
             }
             catch (Exception $e) {
                 $reporter->recordTestDefect($e);
-                $defects++;
                 continue;
             }
             
@@ -360,7 +354,6 @@ abstract class Snap_UnitTestCase {
                 }
                 catch (Exception $e) {
                     $reporter->recordTestDefect($e);
-                    $defects++;
                 }
                 
                 continue;
@@ -378,7 +371,6 @@ abstract class Snap_UnitTestCase {
                     }
                     catch (Exception $e) {
                         $reporter->recordTestDefect($e);
-                        $defects++;
                     }
                     
                     continue;
@@ -401,7 +393,6 @@ abstract class Snap_UnitTestCase {
                     }
                     catch (Exception $e) {
                         $reporter->recordTestDefect($e);
-                        $defects++;
                     }
                     
                     continue;
@@ -418,11 +409,10 @@ abstract class Snap_UnitTestCase {
             }
             catch (Exception $e) {
                 $reporter->recordTestDefect($e);
-                $defects++;
                 continue;
             }
             
-            $passes++;
+            $reporter->recordTestPass(get_class($this), $method);
             
         } // end foreach test
         
@@ -430,8 +420,7 @@ abstract class Snap_UnitTestCase {
         restore_error_handler();
         // set_error_handler($old_error_handler);
         
-        // record results
-        $reporter->addTestPasses($passes, $defects, $tests, get_class($this));
+        $reporter->recordTestCaseComplete(get_class($this));
     }
 
 }

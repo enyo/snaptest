@@ -16,14 +16,18 @@ else {
 
 $out_mode = (isset($options['out']) && $options['out']) ? $options['out'] : 'text';
 $php = (isset($options['php']) && $options['php']) ? $options['php'] : 'php';
+$ofile = (isset($options['ofile']) && $options['ofile']) ? $options['ofile'] : tempnam('/tmp', 'SNAP');
+$xtn = (isset($options['match']) && $options['match']) ? $options['match'] : '^.*\.stest\.php';
+$help = (isset($options['help']) && $options['help']) ? true : false;
 
 $path = (isset($options[0]) && $options[0]) ? $options[0] : '';
 
 // help output if no path is specified
-if ($path == '') {
+if ($path == '' || $help) {
     echo "\n";
     echo "Usage: snaptest.sh <path>\n";
-    echo "Usage: php snaptest.php [--out=outmode] [--php=phppath] <path>\n";
+    echo "Usage: php snaptest.php [--out=outmode] [--php=phppath]\n";
+    echo "           [--ofile=filepath] [--help] <path>\n";
     echo "\n";
     echo "<path> :: The path to the test you want to run. Should be a file\n";
     echo "ending in .test.php or a directory.\n";
@@ -36,8 +40,20 @@ if ($path == '') {
     echo "the call 'php' will be used, using whatever is in the current env\n";
     echo "variable.\n";
     echo "This is specific to snaptest.php only\n";
+    echo "\n";
+    echo "--ofile=filepath :: Declare a file you want to write to. This is\n";
+    echo "especially useful if you plan to fork and want all reports to go\n";
+    echo "to a single location. If ofile is not specified, a file in /tmp\n";
+    echo "from tempnam() will be used.\n";
+    echo "This is specific to snaptest.php only\n";
+    echo "\n";
+    echo "--match=regex :: Specifies a regular expression to match. Files\n";
+    echo "that match this regular expression will be included by the test\n";
+    echo "harness.\n";
+    echo "This is specific to snaptest.php only\n";
     exit;
 }
+
 
 if (substr($path, 0, 1) != '/') {
     $path = dirname(__FILE__).DIRECTORY_SEPARATOR.$path;
@@ -45,147 +61,76 @@ if (substr($path, 0, 1) != '/') {
 
 $path = '/'.trim($path, '/');
 
-// change input mode depending on path
 if (is_dir($path)) {
+    $file_list = SNAP_recurse_directory($path, $xtn);
     
-    // start a tester
-    $snap = new Snap_Tester('textaggregator');
-
-    // get an aggregator and a proper output
-    $aggregator = $snap->getOutput('textaggregator');
+    $snap = new Snap_Tester($out_mode);
     $real_output = $snap->getOutput($out_mode);
-
-    // create a temporary file
-    $tmpfile_handle = tmpfile();
     
-    $handle = opendir($path);
-    while (false !== ($file = readdir($handle))) {
-        if (substr($file, 0, 1) == '.') {
+    $report_list = array();
+
+    foreach($file_list as $file) {
+        $exec = $php .' '.__FILE__.' --out=phpserializer --php='.$php.' '.$file.' 2>&1';
+        
+        $exec_handle = popen($exec, "r");
+        if ($exec_handle === false) {
             continue;
         }
+        
+        // get the contents of the stream off of STDIN
+        $read = stream_get_contents($exec_handle);
+        
+        // close the resource
+        pclose($exec_handle);
 
-        if (is_dir($path.'/'.$file)) {
-            // echo 'NOT: '.$path.$file."\n";
-            $exec = $php .' '.__FILE__.' --out=textaggregator --php='.$php.' '.$path.'/'.$file.' 2>&1';
+        // get the report data, and announce the results for that sub directory
+        //$results = unserialize(trim($read));
+        $matches = array();
+        preg_match('/===START===([\s\S]*)===END===/', $read, $matches);
 
-            $dir_handle = popen($exec, "r");
+        $results = unserialize($matches[1]);
+        
+        if (!$results) {
+            // look for problem output
+            $problem_output = substr(0, strpos($read, '===START==='), $read);
             
-            if ($dir_handle === false) {
+            $report_list[] = array(
+                'type' => 'fatal',
+                'message' => ($problem_output) ? $problem_output : $file . ' had a fatal error: '.$read,
+            );
+        }
+        
+        // cleanup that string
+        unset($matches);
+        unset($read);
+
+        foreach ($results as $report) {
+            $report_list[] = $report;
+            if ($report['type'] == 'case') {
                 continue;
             }
-            
-            // get the contents of the stream off of STDIN
-            $read = stream_get_contents($dir_handle);
-            
-            // get the report data, and announce the results for that sub directory
-            $results = $aggregator->extractReportData($read);
-            
-            // report an empty test for every test case
-            for ($i = 0; $i < $results['test_cases']; $i++) {
-                $real_output->addTestPasses(0, 0, 0, 'aggregate');
-            }
-            
-            // now report the summary
-            $real_output->addTestPasses($results['passes'], $results['defects'], $results['tests'], 'aggregate');
-            
-            // close the resource
-            pclose($dir_handle);
-            
-            // write the contents into the temp file
-            fwrite($tmpfile_handle, $read);
-            
-            // clean up the stream, save memory
-            unset($read);
-        }
-        else {
-            if (strtolower(substr($file, -10)) != '.stest.php') {
+            elseif ($report['type'] == 'pass') {
+                $real_output->announceTestPass();
                 continue;
             }
-            // echo 'IS : '.$path.$file."\n";
-            $snap->addInput('file', $path.'/'.$file);
+            elseif ($report['type'] == 'defect') {
+                $real_output->announceTestDefect();
+                continue;
+            }
+            else {
+                $real_output->announceTestFail();
+            }
         }
+
+        // cleanup that unserialized thing
+        unset($results);
     }
-
-    // capture the output from the file level
-    ob_start();
-
-    // run the tests for any files in top level dir
-    $snap->runTests();
-
-    // capture the output
-    $output = ob_get_contents();
-    ob_end_clean();
-
-    // report status to the output util
-    $results = $aggregator->extractReportData($output);
-
-    // report an empty test for every test case
-    for ($i = 0; $i < $results['test_cases']; $i++) {
-        $real_output->addTestPasses(0, 0, 0, 'aggregate');
-    }
-
-    // output for the top level files
-    $real_output->addTestPasses($results['passes'], $results['defects'], $results['tests'], 'aggregate');
-
-    // write the output to the file
-    fwrite($tmpfile_handle, $output);
-
-    // seek to start of temp file
-    fseek($tmpfile_handle, 0);
-
-    // read file into local var
-    $output = stream_get_contents($tmpfile_handle);
-
-    // close resource
-    fclose($tmpfile_handle);
-
-    // capture the test windows, convert to an array, build our totals
-    $results = array(
-        'passes' => 0,
-        'defects' => 0,
-        'test_cases' => 0,
-        'tests' => 0,
-        'php_errors' => 0,
-        'reports' => array(),
-    );
-
-    // extract all tests into a usable array
-    preg_match_all('/(===BEGIN TEST===\s*.*?\s*===END TEST===)/m', $output, $matches);
-
-    // free up memory
-    unset($matches[0]);
-
-    // loop through each test, and add to the proper tally
-    foreach ($matches[1] as $match) {
-        $output = $aggregator->extractReportData($match);
-
-        $results['passes'] += $output['passes'];
-        $results['defects'] += $output['defects'];
-        $results['test_cases'] += $output['test_cases'];
-        $results['tests'] += $output['tests'];
-        $results['php_errors'] += $output['php_errors'];
-        
-        $output['reports'] = (isset($output['reports']) && is_array($output['reports'])) ? $output['reports'] : array();
-        
-        $results['reports'] = array_merge($results['reports'], $output['reports']);
-    }
-
-    // free more memory
-    unset($matches);
-    unset($aggregator);
-
+    
     // create the final proper output
-    $real_output->createReport($results['reports'],
-                               $results['test_cases'],
-                               $results['tests'],
-                               $results['passes'],
-                               $results['defects'],
-                               $results['php_errors']);
-
-
+    $real_output->createReport($report_list);
 
 }
-elseif (is_file($path)) {
+else {
     // testing a single file
     $snap = new Snap_Tester($out_mode);
     $snap->addInput('file', $path);

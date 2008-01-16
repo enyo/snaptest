@@ -19,31 +19,39 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
         // header information
         echo "#\n";
         echo "# Snap TAP Output Reporter\n";
-        echo "# Test numbers 1..N are simulated, errors will be\n";
-        echo "# in the last N-failures test slots\n";
+        echo "# This reporter shows errors after the fact. If planning on\n";
+        echo "# streaming this output, testing should be done in as small\n";
+        echo "# segments as possible.\n";
         echo "#\n";
         
-        for ($i = 1; $i <= $this->passes; $i++) {
-            echo "ok $i - simulated test\n";
-        }
-        
-        $test_counter = $this->passes + 1;
-        
-        foreach ($this->reports as $report) {
+        $i = 1;
+        if (is_array($this->reports)) foreach ($this->reports as $report) {
+            $report_number = $i;
+            $i++;
+
             $function = (isset($report['function'])) ? $report['function'] : 'unknown';
             $classname = (isset($report['class'])) ? $report['class'] : 'unknown';
             $file = (isset($report['file'])) ? $report['file'] : 'unknown';
             $message = (isset($report['message'])) ? $report['message'] : 'unknown';
             
-            echo "not ok $test_counter - $function\n";
-            echo "  ---\n";
-            echo "    message: $message\n";
-            echo "    severity: fail\n";
-            echo "    location:\n";
-            echo "      method: $function\n";
-            echo "      class:  $classname\n";
-            echo "      file:   $file\n";
-            echo "  ...\n";
+            // normalize pass status
+            $pass_status = (isset($report['type']) && $report['type'] == 'pass') ? 'ok' : 'not ok';
+            
+            // make pretty classname / function
+            $pretty_function = preg_replace('/^test /i', '', preg_replace('/[^A-Z0-9 ]/i', '', preg_replace('/([A-Z])/', ' \\1', $function)));
+            
+            echo "$pass_status $report_number - $pretty_function\n";
+            
+            if ($pass_status != 'ok') {
+                echo "  ---\n";
+                echo "    message: $message\n";
+                echo "    severity: fail\n";
+                echo "    location:\n";
+                echo "      method: $function\n";
+                echo "      class:  $classname\n";
+                echo "      file:   $file\n";
+                echo "  ...\n";
+            }
         }
         
         if ($this->php_errors > 0) {
