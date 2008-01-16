@@ -6,7 +6,7 @@ function SNAP_usage() {
     echo "Usage: php snaptest.php [--out=outmode] [--php=phppath] [--help] <path>\n";
     echo "\n";
     echo "<path> :: The path to the test you want to run. Should be a file\n";
-    echo "ending in .test.php or a directory.\n";
+    echo "ending in .php or a directory.\n";
     echo "\n";
     echo "--out=outmode :: sets the output handler to 'outmode'. The\n";
     echo "output mode must be located in <snaptest>/outmode.php.\n";
