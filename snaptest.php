@@ -43,6 +43,8 @@ if (substr($path, 0, 1) != '/') {
     $path = dirname(__FILE__).DIRECTORY_SEPARATOR.$path;
 }
 
+$path = '/'.trim($path, '/');
+
 // change input mode depending on path
 if (is_dir($path)) {
     
@@ -62,9 +64,9 @@ if (is_dir($path)) {
             continue;
         }
 
-        if (is_dir($file)) {
+        if (is_dir($path.'/'.$file)) {
             // echo 'NOT: '.$path.$file."\n";
-            $exec = $php .' '.__FILE__.' --out=textaggregator --php='.$php.' '.$path.$file.' 2>&1';
+            $exec = $php .' '.__FILE__.' --out=textaggregator --php='.$php.' '.$path.'/'.$file.' 2>&1';
 
             $dir_handle = popen($exec, "r");
             
