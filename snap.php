@@ -16,49 +16,6 @@ if (!defined('SNAPTEST_ROOT')) {
     define('SNAPTEST_ROOT', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 }
 
-// load all addons
-// we scan ./addons within the current directory, pulling out all .php files
-// and include_once on them. After each include, we scan $config
-// and report on what was loaded.  This is then serialized and stored as a
-// constant, so that any module can read it.
-$handle = opendir(SNAPTEST_ROOT.'addons');
-$addon_report = array();
-while (false !== ($file = readdir($handle))) {
-    
-    // skip files starting with .
-    if (substr($file, 0, 1) == '.') {
-        continue;
-    }
-
-    // skip directories
-    if (is_dir($file)) {
-        continue;
-    }
-    
-    // skip things not ending in .php
-    if (substr($file, -4) != '.php') {
-        continue;
-    }
-    
-    // valid addon, clear config and load
-    $config = array();
-    include_once SNAPTEST_ROOT.'addons'.DIRECTORY_SEPARATOR.$file;
-    
-    $addon_report[] = array(
-        'name'          => $config['name'],
-        'version'       => $config['version'],
-        'author'        => $config['author'],
-        'description'   => $config['description'],
-    );
-    
-    // free mem in case of big config
-    unset($config);
-}
-// do our define, then unset to clean up
-define('SNAP_ADDONS', serialize($addon_report));
-unset($handle);
-unset($addon_report);
-
 /**
  * Snap error handling function.  Takes care of PHP errors, and redirects to the current test
  * @param int $errno the error number
@@ -207,3 +164,46 @@ class Snap_Tester {
 
 }
 
+
+// load all addons
+// we scan ./addons within the current directory, pulling out all .php files
+// and include_once on them. After each include, we scan $config
+// and report on what was loaded.  This is then serialized and stored as a
+// constant, so that any module can read it.
+$handle = opendir(SNAPTEST_ROOT.'addons');
+$addon_report = array();
+while (false !== ($file = readdir($handle))) {
+    
+    // skip files starting with .
+    if (substr($file, 0, 1) == '.') {
+        continue;
+    }
+
+    // skip directories
+    if (is_dir($file)) {
+        continue;
+    }
+    
+    // skip things not ending in .php
+    if (substr($file, -4) != '.php') {
+        continue;
+    }
+    
+    // valid addon, clear config and load
+    $config = array();
+    include_once SNAPTEST_ROOT.'addons'.DIRECTORY_SEPARATOR.$file;
+    
+    $addon_report[] = array(
+        'name'          => $config['name'],
+        'version'       => $config['version'],
+        'author'        => $config['author'],
+        'description'   => $config['description'],
+    );
+    
+    // free mem in case of big config
+    unset($config);
+}
+// do our define, then unset to clean up
+define('SNAP_ADDONS', serialize($addon_report));
+unset($handle);
+unset($addon_report);

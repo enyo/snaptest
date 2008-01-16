@@ -96,7 +96,7 @@ if (is_dir($path)) {
             unset($read);
         }
         else {
-            if (strtolower(substr($file, -9)) != '.test.php') {
+            if (strtolower(substr($file, -10)) != '.stest.php') {
                 continue;
             }
             // echo 'IS : '.$path.$file."\n";
