@@ -5,6 +5,14 @@
  */
 class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
 
+    protected $type_mapping = array(
+        'pass'      => true,
+        'case'      => true,
+        'fail'      => false,
+        'defect'    => false,
+        'phperr'    => false,
+    );
+
     /**
      * generate a text based report of the output data
      * @return void
@@ -13,8 +21,17 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
         echo "\n";
         echo "TAP version 13\n";
         
+        $count = 0;
+        if (is_array($reports)) foreach ($reports as $report) {
+            if ($report['type'] == 'case') {
+                continue;
+            }
+            
+            $count++;
+        }
+        
         // number of tests
-        echo "1..{$this->tests}\n";
+        echo "1..{$count}\n";
         
         // header information
         echo "#\n";
@@ -23,9 +40,16 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
         echo "# streaming this output, testing should be done in as small\n";
         echo "# segments as possible.\n";
         echo "#\n";
+
         
         $i = 1;
         if (is_array($reports)) foreach ($reports as $report) {
+            
+            // skip case complete
+            if ($report['type'] == 'case') {
+                continue;
+            }
+            
             $report_number = $i;
             $i++;
 
@@ -35,14 +59,14 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
             $message = (isset($report['message'])) ? $report['message'] : 'unknown';
             
             // normalize pass status
-            $pass_status = (isset($report['type']) && $report['type'] == 'pass') ? 'ok' : 'not ok';
+            $pass_status = ($this->type_mapping[$report['type']]) ? 'ok' : 'not ok';
             
             // make pretty classname / function
             $pretty_function = preg_replace('/^test /i', '', preg_replace('/[^A-Z0-9 ]/i', '', preg_replace('/([A-Z])/', ' \\1', $function)));
             
             echo "$pass_status $report_number - $pretty_function\n";
             
-            if ($pass_status != 'ok') {
+            if (!$this->type_mapping[$report['type']]) {
                 echo "  ---\n";
                 echo "    message: $message\n";
                 echo "    severity: fail\n";
@@ -64,5 +88,8 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
     }
     
     // simulated TAP streaming does not do this
-    protected function announceTestPasses($passes, $defects, $tests, $classname) {}
+    public function announceTestPass() {}
+    public function announceTestFail() {}
+    public function announceTestDefect() {}
+    public function announceTestCaseComplete() {}
 }
