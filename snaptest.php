@@ -189,4 +189,3 @@ elseif (is_file($path)) {
     $snap->addInput('file', $path);
     $snap->runTests();
 }
-

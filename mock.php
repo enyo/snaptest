@@ -9,6 +9,7 @@ class Snap_MockObject {
     protected $requires_inheritance;
     protected $interface_names;
     protected $mocked_class;
+    protected $requires_magic_methods;
     
     public $methods;
     public $signatures;
@@ -26,6 +27,7 @@ class Snap_MockObject {
     public function __construct($class_name) {
         // $this->test = $test;
         $this->requires_inheritance = false;
+        $this->requires_magic_methods = false;
         $this->interface_names = array();
         $this->methods = array();
         $this->signatures = array();
@@ -61,6 +63,22 @@ class Snap_MockObject {
      */
     public function isInherited() {
         return $this->requires_inheritance;
+    }
+    
+    /**
+     * Specify this mock object requires magic methods (has a __call)
+     * @return MockObject the mock setup object
+     **/
+    public function requiresMagicMethods() {
+        $this->requires_magic_methods = true;
+    }
+    
+    /**
+     * Get the magic method required state of the mock object
+     * @return boolean TRUE if the object requires magic methods
+     **/
+    public function hasMagicMethods() {
+        return $this->requires_magic_methods;
     }
     
     /**
@@ -220,6 +238,9 @@ class Snap_MockObject {
             
             // skip all other magic methods
             if (strpos($method->getName(), '__') === 0) {
+                if (strtolower($method->getName()) == '__call') {
+                    $this->requiresMagicMethods();
+                }
                 continue;
             }
             
@@ -247,7 +268,7 @@ class Snap_MockObject {
             if (strpos($method_name, '__') === 0) {
                 continue;
             }
-            if (!in_array($method_name, $public_methods) && !in_array($method_name, $protected_methods)) {
+            if (!in_array($method_name, $public_methods) && !in_array($method_name, $protected_methods) && !$this->hasMagicMethods()) {
                 throw new Snap_UnitTestException('setup_invalid_method', $this->mocked_class.'::'.$method_name.' cannot have expects or return values. It might be private or final.');
             }
         }

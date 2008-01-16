@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Text Output Unit Test Reporter
  */
