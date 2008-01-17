@@ -2,7 +2,11 @@
 
 class Snap_PassedTestAssertion {}
 
-abstract class Snap_UnitTestCase {
+interface Snap_RunnableTestCaseInterface {
+    public function runTests(Snap_UnitTestReporter $reporter);
+}
+
+abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
 
     /**
      * constructor that is owned by the parent unit test
@@ -100,11 +104,11 @@ abstract class Snap_UnitTestCase {
      * @param mixed $value
      * @param string $msg user message on failure
      * @return boolean true
-     * @throws AssertSameUnitTestException
+     * @throws AssertIdenticalUnitTestException
      **/
     protected function assertTrue($value, $msg = '') {
         if ($value !== true) {
-            throw new Snap_AssertSameUnitTestException('assert_true', $msg, $value, true);
+            throw new Snap_AssertIdenticalUnitTestException('assert_true', $msg, $value, true);
         }
         
         return new Snap_PassedTestAssertion();
@@ -115,11 +119,11 @@ abstract class Snap_UnitTestCase {
      * @param mixed $value
      * @param string $msg user message on failure
      * @return boolean true
-     * @throws AssertSameUnitTestException
+     * @throws AssertIdenticalUnitTestException
      **/    
     protected function assertFalse($value, $msg = '') {
         if ($value !== false) {
-            throw new Snap_AssertSameUnitTestException('assert_false', $msg, $value, false);
+            throw new Snap_AssertIdenticalUnitTestException('assert_false', $msg, $value, false);
         }
         
         return new Snap_PassedTestAssertion();
@@ -133,7 +137,7 @@ abstract class Snap_UnitTestCase {
      * @return boolean true
      * @throws AssertEqualUnitTestException
      **/
-    protected function assertEqual($expected, $actual, $msg = '') {
+    protected function assertEqual($actual, $expected, $msg = '') {
         if ($expected != $actual) {
             throw new Snap_AssertEqualUnitTestException('assert_equal', $msg, $expected, $actual);
         }
@@ -149,7 +153,7 @@ abstract class Snap_UnitTestCase {
      * @return boolean true
      * @throws AssertNotEqualUnitTestException
      **/
-    protected function assertNotEqual($expected, $actual, $msg = '') {
+    protected function assertNotEqual($actual, $expected, $msg = '') {
         if ($expected == $actual) {
             throw new Snap_AssertNotEqualUnitTestException('assert_not_equal', $msg, $expected, $actual);
         }
@@ -158,25 +162,16 @@ abstract class Snap_UnitTestCase {
     }
     
     /**
-     * assert that the incoming value is same (===) to the incomming expectation
-     * @see Snap_UnitTestCase::assertIdentical()
-     * @deprecated
-     **/
-    protected function assertSame($expected, $actual, $msg = '') {
-        return $this->assertIdentical($expected, $actual, $msg);
-    }
-    
-    /**
      * Assert that the incomming value is identical (===) to the incoming expectation
      * @param mixed $expected the value it should be
      * @param mixed $actual the value actually testing
      * @param string $msg user message on failure
      * @return boolean true
-     * @throws AssertSameUnitTestException
+     * @throws AssertIdenticalUnitTestException
      **/
-    protected function assertIdentical($expected, $actual, $msg = '') {
+    protected function assertIdentical($actual, $expected, $msg = '') {
         if ($expected !== $actual) {
-            throw new Snap_AssertSameUnitTestException('assert_identical', $msg, $expected, $actual);
+            throw new Snap_AssertIdenticalUnitTestException('assert_identical', $msg, $expected, $actual);
         }
         
         return new Snap_PassedTestAssertion();
@@ -187,11 +182,11 @@ abstract class Snap_UnitTestCase {
      * @param mixed $value the value to test
      * @param string $msg user message on failure
      * @return boolean true
-     * @throws AssertSameUnitTestException
+     * @throws AssertIdenticalUnitTestException
      **/
     protected function assertNull($value, $msg = '') {
         if ($value !== null) {
-            throw new Snap_AssertSameUnitTestException('assert_null', $msg, $value, null);
+            throw new Snap_AssertIdenticalUnitTestException('assert_null', $msg, $value, null);
         }
         
         return new Snap_PassedTestAssertion();

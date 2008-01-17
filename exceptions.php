@@ -155,7 +155,7 @@ class Snap_AssertRegexUnitTestException extends Snap_UnitTestException {
 /**
  * Used for testing when assertions were supposed to be the same
  */
-class Snap_AssertSameUnitTestException extends Snap_AssertCompareUnitTestException {
+class Snap_AssertIdenticalUnitTestException extends Snap_AssertCompareUnitTestException {
 
     /**
      * Constructor

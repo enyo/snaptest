@@ -64,7 +64,7 @@ class Snap_UnitTestCase_AssertTrue_Test extends Snap_UnitTestCase {
         try {
             $this->assertTrue(false);
         }
-        catch (Snap_AssertSameUnitTestException $e) {
+        catch (Snap_AssertIdenticalUnitTestException $e) {
             return new Snap_PassedTestAssertion();
         }
     }
@@ -137,7 +137,7 @@ class Snap_UnitTestCase_AssertFalse_Test extends Snap_UnitTestCase {
         try {
             $this->assertFalse(true);
         }
-        catch (Snap_AssertSameUnitTestException $e) {
+        catch (Snap_AssertIdenticalUnitTestException $e) {
             return $this->assertTrue(true);
         }
         
@@ -190,21 +190,21 @@ class Snap_UnitTestCase_AssertNotEqual_Test extends Snap_UnitTestCase {
     }
 }
     
-class Snap_UnitTestCase_AssertSame_Test extends Snap_UnitTestCase {
+class Snap_UnitTestCase_AssertIdentical_Test extends Snap_UnitTestCase {
 
     public function setUp() {}
     public function tearDown() {}
     
-    public function testAssertSameReturnsPassedTest() {
-        $result = $this->assertSame(true, true);
+    public function testAssertIdenticalReturnsPassedTest() {
+        $result = $this->assertIdentical(true, true);
         return $this->assertIsA($result, 'Snap_PassedTestAssertion');
     }
     
-    public function testFailingAssertSameThrowsException() {
+    public function testFailingAssertIdenticalThrowsException() {
         try {
-            $this->assertSame(1, true);
+            $this->assertIdentical(1, true);
         }
-        catch (Snap_AssertSameUnitTestException $e) {
+        catch (Snap_AssertIdenticalUnitTestException $e) {
             return $this->assertTrue(true);
         }
         
@@ -226,7 +226,7 @@ class Snap_UnitTestCase_AssertNull_Test extends Snap_UnitTestCase {
         try {
             $this->assertNull(0);
         }
-        catch (Snap_AssertSameUnitTestException $e) {
+        catch (Snap_AssertIdenticalUnitTestException $e) {
             return $this->assertTrue(true);
         }
         
