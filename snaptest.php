@@ -54,11 +54,11 @@ if ($path == '' || $help) {
 }
 
 
-if (substr($path, 0, 1) != '/') {
-    $path = dirname(__FILE__).DIRECTORY_SEPARATOR.$path;
-}
-
-$path = '/'.trim($path, '/');
+// if (substr($path, 0, 1) != '/') {
+//     $path = dirname(__FILE__).DIRECTORY_SEPARATOR.$path;
+// }
+// 
+// $path = '/'.trim($path, '/');
 
 if (is_dir($path)) {
     $file_list = SNAP_recurse_directory($path, $xtn);

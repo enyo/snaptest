@@ -1,7 +1,14 @@
 #!/bin/bash
 
+# change to shell script real location
+FPATH=`dirname "$0"`
+OPATH=`pwd`
+cd $FPATH;
+
 # load options
 . getoptx.sh
+
+cd $OPATH
 
 # Auto Locate PHP
 PHP=`which php`
@@ -49,10 +56,6 @@ do
     CMD="$CMD $arg"
 done
 
-# change to shell script real location
-FPATH=`dirname "$0"`
-cd $FPATH;
-
 # run php on the snaptest.php file with the commands
-CMD="$PHP snaptest.php $CMD"
+CMD="$PHP $FPATH/snaptest.php $CMD"
 $CMD

@@ -50,7 +50,7 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
                     
             $output .= '    in file:   ';
             $output .= (isset($report['file'])) ? $report['file'] : 'unknown';
-            $output .= (isset($report['line'])) ? ' ('.$report['line'].')' : '';
+            $output .= (isset($report['line']) && strlen($report['line']) > 0) ? ' ('.$report['line'].')' : '';
             $output .= "\n";
             
             echo $output;
