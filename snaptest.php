@@ -22,8 +22,10 @@ function SNAP_usage() {
 }
 
 // requires PHP 5.2+
-if (version_compare(phpversion(), '5.2.0') < 0) {
-    SNAP_usage();
+if (version_compare(phpversion(), '5.0.0') < 0) {
+    echo "\n";
+    echo "SnapTest requires a PHP version >= 5.0.0\n";
+    exit;
 }
 
 require_once 'snap.php';
