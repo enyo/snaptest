@@ -82,6 +82,15 @@ class Snap_MockObject {
     }
     
     /**
+     * Specify an interface that this mock object should have
+     * @param string $iface the name of an interface to implement
+     * @return MockObject the mock setup object
+     **/
+    public function requiresInterface($iface) {
+        $this->interface_names[] = $iface;
+    }
+    
+    /**
      * Get the interfaces for this mock
      * @return array A collection of strings that are all interfaces this mock implements
      **/
