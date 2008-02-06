@@ -10,6 +10,7 @@ class Snap_MockObject {
     protected $interface_names;
     protected $mocked_class;
     protected $requires_magic_methods;
+    protected $has_constructor;
     
     public $methods;
     public $signatures;
@@ -28,6 +29,7 @@ class Snap_MockObject {
         // $this->test = $test;
         $this->requires_inheritance = false;
         $this->requires_magic_methods = false;
+        $this->has_constructor = false;
         $this->interface_names = array();
         $this->methods = array();
         $this->signatures = array();
@@ -238,10 +240,11 @@ class Snap_MockObject {
         $public_methods = array();
         $protected_methods = array();
         foreach ($reflected_class->getMethods() as $method) {
-            if ($method->isConstructor()) {
+            if ($method->isConstructor() || strtolower($method->getName()) == '__construct') {
                 // special constructor stuff here
                 $public_methods[] = $method->getName();
                 $this->listenTo($method->getName());
+                $this->has_constructor = true;
                 continue;
             }
             
@@ -279,12 +282,12 @@ class Snap_MockObject {
             }
             
             // if in public, we are okay
-            if (in_array($method_name, $public_methods)) {
+            if (is_array($public_methods) && in_array($method_name, $public_methods)) {
                 continue;
             }
             
             // if in protected, and we are requiring inheritance, we are okay
-            if ($this->isInherited() && in_array($method_name, $protected_methods)) {
+            if ($this->isInherited() && is_array($protected_methods) && in_array($method_name, $protected_methods)) {
                 continue;
             }
             
@@ -344,9 +347,9 @@ class Snap_MockObject {
         $output .= 'public function '.$setmock_method_name.'($mock) {'.$endl;
         $output .= '    $this->mock = $mock;'.$endl;
         $output .= '}'.$endl;
-        
+
         // add a runConstructor call if this is refection+extension
-        if ($this->isInherited()) {
+        if ($this->isInherited() || $this->has_constructor) {
             $output .= 'public function '.$constructor_method_name.'() {'.$endl;
             $output .= '    // foreach constructor arg, build the syntax'.$endl;
             $output .= '    $arg_output = "";'.$endl;
@@ -363,7 +366,7 @@ class Snap_MockObject {
             $output .= '    if ($method_signature != null) {'.$endl;
             $output .= '        $this->'.$this->class_signature.'_tallyMethod($method_signature);'.$endl;
             $output .= '    }'.$endl;
-            $output .= '    if (in_array(\'__construct\', $parent_methods)) {'.$endl;
+            $output .= '    if (is_array($parent_methods) && in_array(\'__construct\', $parent_methods)) {'.$endl;
             $output .= '        eval(\'parent::__construct(\'.$arg_output.\');\');'.$endl;
             $output .= '    }'.$endl;
             $output .= '}'.$endl;
@@ -486,6 +489,9 @@ class Snap_MockObject {
      * @param string $constructor_method the constructor to call if required
      **/
     protected function buildClassInstantiation($mock_class, $setmock_method, $constructor_method) {
+        global $SNAP_MockObject;
+        $SNAP_MockObject = $this;
+        
         // make the arguments for the ready class
         $ready_class = '';
         if (count($this->constructor_args) > 0) {
@@ -506,11 +512,14 @@ class Snap_MockObject {
         
         // inject the mock class
         $ready_class->$setmock_method($this);
-        
+
         // call a real constructor if required
-        if ($this->isInherited()) {
+        if ($this->isInherited() || $this->has_constructor) {
             $ready_class->$constructor_method();        
         }
+        
+        // clean up that global
+        unset($SNAP_MockObject);
         
         // return the ready class
         return $ready_class;
@@ -538,9 +547,14 @@ class Snap_MockObject {
         $output  = '';
         $endl = "\n";
         $output .= $scope.' function '.$method_name.'('.$param_string.') {'.$endl;
-        if (!$method->isConstructor()) {
+        if (!$method->isConstructor() && strtolower($method->getName()) != '__construct') {
             $output .= '    $args = func_get_args();'.$endl;
             $output .= '    return $this->'.$this->class_signature.'_invokeMethod(\''.$method_name.'\', $args);'.$endl;
+        }
+        else {
+            // constructor takes the mock in question and loads it
+            $output .= '    global $SNAP_MockObject;'.$endl;
+            $output .= '    $this->mock = $SNAP_MockObject;'.$endl;
         }
         $output .= '}'.$endl;
         return $output;
