@@ -36,12 +36,6 @@ CMD=""
 while getoptex "out. php. match. help;" "$@"
 do
     if [ "$OPTOPT" = "php" ] ; then
-        if [ -z PHPX ] ; then
-            # choke and die if we couldn't auto-find PHP
-            echo "PHP was not found in any common location. You will need to"
-            echo "supply the --php=<path> switch."
-            exit 0
-        fi
         if [ -x "$OPTARG" ] ; then
             PHP=$OPTARG
         else
@@ -58,11 +52,29 @@ do
     fi
 done
 shift $[OPTIND-1]
+PTH=""
 for arg in "$@"
 do
-    CMD="$CMD $arg"
+    PTH="$PTH $arg"
 done
 
+if [ -z $PHP ] ; then
+    # choke and die if we couldn't auto-find PHP
+    echo "PHP was not found in any common location. You will need to"
+    echo "supply the --php=<path> switch."
+    exit 0
+fi
+
+# is the PHP we are using CLI or CGI
+CGI=`$PHP -v | grep cgi | wc -l | sed "s/[^0-9]//g"`
+
 # run php on the snaptest.php file with the commands
-CMD="$PHP -q $FPATH/snaptest.php --php=$PHP $CMD"
+if [ "$CGI" = "0" ] ; then
+    CMD="$PHP -q $FPATH/snaptest.php --php=$PHP $CMD $PTH"
+else
+    PHPSAFE=`echo "$PHP" | sed "s/\./__D_O_T__/g"`
+    CMDSAFE=`echo "$CMD" | sed "s/\./__D_O_T__/g"`
+    PTHSAFE=`echo "$PTH" | sed "s/\./__D_O_T__/g"`
+    CMD="$PHP -q $FPATH/snaptest.php --php=$PHPSAFE $CMDSAFE $PTHSAFE"
+fi
 $CMD

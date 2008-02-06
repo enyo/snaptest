@@ -31,16 +31,15 @@ if (version_compare(phpversion(), '5.0.0') < 0) {
 require_once 'snap.php';
 require_once 'functions.php';
 
-if (isset($argv) && is_array($argv)) {
-    $options = SNAP_get_long_options($argv);
-}
-elseif (isset($_REQUEST) && is_array($_REQUEST) && count($_REQUEST) > 0) {
-    $options = SNAP_get_long_options($_REQUEST);
+define('SNAP_MANGLE_STRING', '__D_O_T__');
+if (!isset($argv) || !is_array($argv)) {
+    define('SNAP_CGI_MODE', true);
 }
 else {
-    echo "\nOptions must be in command line or via GET";
-    $options = array();
+    define ('SNAP_CGI_MODE', false);
 }
+
+$options = SNAP_get_long_options();
 
 $out_mode = (isset($options['out']) && $options['out']) ? $options['out'] : 'text';
 $php = (isset($options['php']) && $options['php']) ? $options['php'] : 'php';
@@ -64,15 +63,26 @@ if ($path == '' || $help) {
 
 if (is_dir($path)) {
     $file_list = SNAP_recurse_directory($path, $xtn);
-    
+
     $snap = new Snap_Tester($out_mode);
     $real_output = $snap->getOutput($out_mode);
     
     $report_list = array();
 
     foreach($file_list as $file) {
-        $exec = $php .' -q '.__FILE__.' --out=phpserializer --php='.$php.' '.$file.' 2>&1';
+        $options = SNAP_make_long_options(array(
+            'out'   => 'phpserializer',
+            'php'   => $php,
+            1       => $file,
+        ));
         
+        if (SNAP_CGI_MODE) {
+            $exec = $php .' -q ' . __FILE__ . ' ' . $options;
+        }
+        else {
+            $exec = $php . ' ' . __FILE__ . ' ' . $options . ' 2>&1';
+        }
+
         $exec_handle = popen($exec, "r");
         if ($exec_handle === false) {
             continue;
