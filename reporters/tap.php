@@ -41,7 +41,7 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
         echo "# segments as possible.\n";
         echo "#\n";
 
-        
+        $phperr = 0;
         $i = 1;
         if (is_array($reports)) foreach ($reports as $report) {
             
@@ -52,6 +52,10 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
             
             $report_number = $i;
             $i++;
+            
+            if ($report['type'] == 'phperr') {
+                $phperr++;
+            }
 
             $function = (isset($report['function'])) ? $report['function'] : 'unknown';
             $classname = (isset($report['class'])) ? $report['class'] : 'unknown';
@@ -78,7 +82,7 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
             }
         }
         
-        if ($this->php_errors > 0) {
+        if ($phperr > 0) {
             echo "\n";
             echo '# You have unchecked errors in your tests.  These errors should be'."\n";
             echo '# removed, or acknowledged with $this->willError() in their respective'."\n";

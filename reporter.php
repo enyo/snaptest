@@ -106,7 +106,7 @@ abstract class Snap_UnitTestReporter {
         
             // drill up until you find a unit test: testXXXXX or setUp or tearDown
             if (isset($trace[0]['function']) && (!preg_match('/^(test.*)|(setUp)|(tearDown)$/i', $trace[0]['function']))) {
-                $file = $trace[0]['file'];
+                $file = (isset($trace[0]['file'])) ? $trace[0]['file'] : '';
                 array_shift($trace);
                 continue;
             }
