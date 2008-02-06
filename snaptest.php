@@ -89,15 +89,20 @@ if (is_dir($path)) {
         $matches = array();
         preg_match('/===START===([\s\S]*)===END===/', $read, $matches);
 
-        $results = unserialize($matches[1]);
+        $results = (isset($matches[1])) ? unserialize($matches[1]) : false;
         
         if (!$results) {
             // look for problem output
             $problem_output = substr(0, strpos($read, '===START==='), $read);
             
+            if (!$read) {
+                $read = 'No error output captured. Please ensure your PHP environment allows output of errors.';
+            }
+            
             $report_list[] = array(
                 'type' => 'fatal',
                 'message' => ($problem_output) ? $problem_output : $file . ' had a fatal error: '.$read,
+                'skip_details' => true,
             );
             
             $real_output->announceTestFail();

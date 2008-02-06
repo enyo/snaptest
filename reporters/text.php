@@ -39,19 +39,21 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
             
             $output  = (isset($report['message'])) ? $report['message'] : '[No Message Supplied]';
             $output .= "\n";
+
+            if (isset($report['skip_details'])) {
+                $output .= '    in method: ';
+                $output .= (isset($report['function'])) ? $report['function'] : 'unknown';
+                $output .= "\n";
                     
-            $output .= '    in method: ';
-            $output .= (isset($report['function'])) ? $report['function'] : 'unknown';
-            $output .= "\n";
+                $output .= '    in class:  ';
+                $output .= (isset($report['class'])) ? $report['class'] : 'unknown';
+                $output .= "\n";
                     
-            $output .= '    in class:  ';
-            $output .= (isset($report['class'])) ? $report['class'] : 'unknown';
-            $output .= "\n";
-                    
-            $output .= '    in file:   ';
-            $output .= (isset($report['file'])) ? $report['file'] : 'unknown';
-            $output .= (isset($report['line']) && strlen($report['line']) > 0) ? ' ('.$report['line'].')' : '';
-            $output .= "\n";
+                $output .= '    in file:   ';
+                $output .= (isset($report['file'])) ? $report['file'] : 'unknown';
+                $output .= (isset($report['line']) && strlen($report['line']) > 0) ? ' ('.$report['line'].')' : '';
+                $output .= "\n";
+            }
             
             echo $output;
         }

@@ -207,3 +207,7 @@ while (false !== ($file = readdir($handle))) {
 define('SNAP_ADDONS', serialize($addon_report));
 unset($handle);
 unset($addon_report);
+
+// ensure after init errors are proper
+error_reporting(E_ALL);
+ini_set('display_errors', true);
