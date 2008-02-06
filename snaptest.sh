@@ -11,27 +11,24 @@ cd $FPATH;
 cd $OPATH
 
 # Auto Locate PHP
-PHP=`which php`
-if [[ ! -x "$PHP" ]] ; then
-    PHP=""
-    if [ -z $PHP ] ; then
+PHPX=`which php`
+if [[ ! -x "$PHPX" ]] ; then
+    PHPX=""
+    if [ -z $PHPX ] ; then
         if [ -x "/usr/local/bin/php" ] ; then
-            PHP="/usr/local/bin/php"
+            PHPX="/usr/local/bin/php"
         fi
         if [ -x "/usr/bin/php" ] ; then
-            PHP="/usr/bin/php"
+            PHPX="/usr/bin/php"
         fi
         if [ -x "/opt/local/bin/php" ] ; then
-            PHP="/opt/local/bin/php"
+            PHPX="/opt/local/bin/php"
         fi
     fi
 fi
 
-# choke and die if we couldn't auto-find PHP
-if [ -z $PHP ] ; then
-    echo "PHP was not found in any common location. You will need to"
-    echo "supply the --php=<path> switch."
-    exit 0
+if [[ ! -z PHPX ]] ; then
+    PHP=$PHPX
 fi
 
 # parse the options
@@ -39,15 +36,25 @@ CMD=""
 while getoptex "out. php. match. help;" "$@"
 do
     if [ "$OPTOPT" = "php" ] ; then
-        if [ -n PHP ] ; then
-            echo "OHSHITNOPHPLAWL"
+        if [ -z PHPX ] ; then
+            # choke and die if we couldn't auto-find PHP
+            echo "PHP was not found in any common location. You will need to"
+            echo "supply the --php=<path> switch."
+            exit 0
         fi
-        PHP=$OPTARG
+        if [ -x "$OPTARG" ] ; then
+            PHP=$OPTARG
+        else
+            echo "The path of $OPTARG was not a valid php path."
+            exit 0
+        fi
     fi
     if [ "$OPTOPT" = "help" ] ; then
         CMD="$CMD --help"
     else
-        CMD="$CMD --$OPTOPT=$OPTARG"
+        if [ "$OPTOPT" != "php" ] ; then
+            CMD="$CMD --$OPTOPT=$OPTARG"
+        fi
     fi
 done
 shift $[OPTIND-1]
@@ -57,5 +64,5 @@ do
 done
 
 # run php on the snaptest.php file with the commands
-CMD="$PHP $FPATH/snaptest.php $CMD"
+CMD="$PHP -q $FPATH/snaptest.php --php=$PHP $CMD"
 $CMD

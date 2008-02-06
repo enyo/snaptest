@@ -34,8 +34,8 @@ require_once 'functions.php';
 if (isset($argv) && is_array($argv)) {
     $options = SNAP_get_long_options($argv);
 }
-elseif (isset($_GET) && is_array($_GET)) {
-    $options = SNAP_get_long_options($_GET);
+elseif (isset($_REQUEST) && is_array($_REQUEST) && count($_REQUEST) > 0) {
+    $options = SNAP_get_long_options($_REQUEST);
 }
 else {
     echo "\nOptions must be in command line or via GET";
@@ -71,7 +71,7 @@ if (is_dir($path)) {
     $report_list = array();
 
     foreach($file_list as $file) {
-        $exec = $php .' '.__FILE__.' --out=phpserializer --php='.$php.' '.$file.' 2>&1';
+        $exec = $php .' -q '.__FILE__.' --out=phpserializer --php='.$php.' '.$file.' 2>&1';
         
         $exec_handle = popen($exec, "r");
         if ($exec_handle === false) {
