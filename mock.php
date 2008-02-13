@@ -345,6 +345,7 @@ class Snap_MockObject {
         
         // attach header to the output
         $output .= $class_header;
+        $output .= 'public $mock;'.$endl;
         
         // special mock setter method
         $output .= 'public function '.$setmock_method_name.'($mock) {'.$endl;
