@@ -55,11 +55,18 @@ shift $[OPTIND-1]
 PTH=""
 for arg in "$@"
 do
-    PTH="$PTH $arg"
+    PTH="$arg"
 done
 
+# if the path begins with ./ or ../, sub in $OPATH at the front
+RELPTH=`echo "$PTH" | sed "s/^\.\{1,2\}\/.*/RELPTHMATCH/"`
+if [ "$RELPTH" = "RELPTHMATCH" ] ; then
+    PTH="$OPATH/$PTH"
+fi
+
+# choke and die if we couldn't auto-find PHP and the user didn't supply
+# a valid PHP executable path
 if [ -z $PHP ] ; then
-    # choke and die if we couldn't auto-find PHP
     echo "PHP was not found in any common location. You will need to"
     echo "supply the --php=<path> switch."
     exit 0
@@ -72,6 +79,8 @@ CGI=`$PHP -v | grep cgi | wc -l | sed "s/[^0-9]//g"`
 if [ "$CGI" = "0" ] ; then
     CMD="$PHP -q $FPATH/snaptest.php --php=$PHP $CMD $PTH"
 else
+    # if we are running in CGI mode, we need to mangle our . characters
+    # otherwise PHP mangles them in the request
     PHPSAFE=`echo "$PHP" | sed "s/\./__D_O_T__/g"`
     CMDSAFE=`echo "$CMD" | sed "s/\./__D_O_T__/g"`
     PTHSAFE=`echo "$PTH" | sed "s/\./__D_O_T__/g"`
