@@ -15,11 +15,17 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
         $fail   = 0;
         $error  = 0;
 
+        $debugs = array();
+
         echo "\n";
         if (is_array($reports)) foreach ($reports as $report) {
             
             // passes
-            if ($report['type'] == 'pass') {
+            if ($report['type'] == 'debug') {
+                $debugs[] = $report['file'] . "\n" . $report['message'];
+                continue;
+            }
+            elseif ($report['type'] == 'pass') {
                 $pass++;
                 continue;
             }
@@ -40,7 +46,7 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
             $output  = (isset($report['message'])) ? $report['message'] : '[No Message Supplied]';
             $output .= "\n";
 
-            if (isset($report['skip_details'])) {
+            if (!isset($report['skip_details'])) {
                 $output .= '    in method: ';
                 $output .= (isset($report['function'])) ? $report['function'] : 'unknown';
                 $output .= "\n";
@@ -59,6 +65,12 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
         }
         
         $tests = $pass + $fail + $defect;
+        
+        if (count($debugs) > 0) {
+            echo '______________________________________________________________________'."\n";
+            echo "DEBUG:\n";
+            echo implode("\n", $debugs);
+        }
         
         echo '______________________________________________________________________'."\n";
         echo 'Total Cases:    '.$cases."\n";

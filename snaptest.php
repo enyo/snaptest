@@ -100,10 +100,9 @@ if (is_dir($path)) {
         preg_match('/===START===([\s\S]*)===END===/', $read, $matches);
 
         $results = (isset($matches[1])) ? unserialize($matches[1]) : false;
+        $problem_output = substr($read, 0, strpos($read, '===START==='));
         
         if (!$results) {
-            // look for problem output
-            $problem_output = substr(0, strpos($read, '===START==='), $read);
             
             if (!$read) {
                 $read = 'No error output captured. Please ensure your PHP environment allows output of errors.';
@@ -120,6 +119,16 @@ if (is_dir($path)) {
             unset($matches);
             unset($read);
             continue;
+        }
+        else {
+            if (strlen($problem_output) > 0) {
+                $report_list[] = array(
+                    'type' => 'debug',
+                    'message' => $problem_output,
+                    'file' => $file,
+                    'skip_details' => true,
+                );
+            }
         }
         
         // cleanup that string

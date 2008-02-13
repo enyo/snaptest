@@ -23,7 +23,7 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
         
         $count = 0;
         if (is_array($reports)) foreach ($reports as $report) {
-            if ($report['type'] == 'case') {
+            if ($report['type'] == 'case' || $report['type'] == 'debug') {
                 continue;
             }
             
@@ -50,12 +50,20 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
                 continue;
             }
             
-            $report_number = $i;
-            $i++;
+            if ($report['type'] == 'debug') {
+                $debug = str_replace(array("\r\n", "\r"), "\n", $report['message']);
+                $debug = preg_replace('/\n/m', "\n# ", $debug);
+                $file = $report['file'];
+                echo "# DEBUG:\n# $file\n# $debug\n";
+                continue;
+            }
             
             if ($report['type'] == 'phperr') {
                 $phperr++;
             }
+            
+            $report_number = $i;
+            $i++;
 
             $function = (isset($report['function'])) ? $report['function'] : 'unknown';
             $classname = (isset($report['class'])) ? $report['class'] : 'unknown';

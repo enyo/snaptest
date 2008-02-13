@@ -4,6 +4,7 @@ include_once SNAPTEST_ROOT.'reporters'.DIRECTORY_SEPARATOR.'text.php';
 
 class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
     public function setUp() {
+        ob_start();
         $this->reporter = new Snap_Text_UnitTestReporter();
 
         // throw assert
@@ -39,6 +40,8 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
         ob_start();
         $this->reporter->createReport();
         $this->reporter_output = ob_get_contents();
+        ob_end_clean();
+        
         ob_end_clean();
     }
     
