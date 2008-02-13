@@ -295,6 +295,9 @@ class Snap_MockObject {
             // we also need to listen to it
             if ($this->hasMagicMethods()) {
                 $this->listenTo($method_name);
+                if (is_array($public_methods) && !in_array($method_name, $public_methods)) {
+                    $public_methods[] = $method_name;
+                }
                 continue;
             }
             
@@ -532,6 +535,21 @@ class Snap_MockObject {
      * @return string php eval ready output
      */
     protected function buildMethod($method_name, $scope) {
+        if (!method_exists($this->mocked_class, $method_name) && $this->hasMagicMethods()) {
+            // magic method code!
+            // if the method doesn't exist, and this class has magic methods, we have to
+            // assume this was a magic method.
+            $output = '';
+            $endl = "\n";
+            $output .= $scope.' function '.$method_name.'() {'.$endl;
+            $output .= '    $args = func_get_args();'.$endl;
+            $output .= '    return $this->'.$this->class_signature.'_invokeMethod(\''.$method_name.'\', $args);'.$endl;
+            $output .= '}'.$endl;
+            return $output;
+        }
+        
+        // this is considered a normal method, we can use reflection to build it to
+        // specification.
         $method = new ReflectionMethod($this->mocked_class, $method_name);
 
         $param_string = '';
