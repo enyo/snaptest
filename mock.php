@@ -68,6 +68,23 @@ class Snap_MockObject {
     }
     
     /**
+     * Specify this mock object requires a constructor
+     * @return MockObject the mock setup object
+     **/
+    public function requiresConstructor() {
+        $this->has_constructor = true;
+        return $this;
+    }
+    
+    /**
+     * Returns if this mock object has a constructor
+     * @return boolean TRUE if object has a constructor
+     **/
+    public function hasConstructor() {
+        return $this->has_constructor;
+    }
+    
+    /**
      * Specify this mock object requires magic methods (has a __call)
      * @return MockObject the mock setup object
      **/
@@ -244,7 +261,7 @@ class Snap_MockObject {
                 // special constructor stuff here
                 $public_methods[] = $method->getName();
                 $this->listenTo($method->getName());
-                $this->has_constructor = true;
+                $this->requiresConstructor();
                 continue;
             }
             
@@ -353,14 +370,8 @@ class Snap_MockObject {
         $output .= '}'.$endl;
 
         // add a runConstructor call if this is refection+extension
-        if ($this->isInherited() || $this->has_constructor) {
+        if ($this->isInherited() || $this->hasConstructor()) {
             $output .= 'public function '.$constructor_method_name.'() {'.$endl;
-            $output .= '    // foreach constructor arg, build the syntax'.$endl;
-            $output .= '    $arg_output = "";'.$endl;
-            $output .= '    foreach($this->mock->constructor_args as $idx => $arg) {'.$endl;
-            $output .= '        $arg_output .= \'$this->mock->constructor_args[\'.$idx.\'],\';'.$endl;
-            $output .= '    }'.$endl;
-            $output .= '    $arg_output = trim($arg_output, \',\');'.$endl;
             $output .= '    $parent_methods = get_class_methods(get_parent_class($this));'.$endl;
             $output .= '    $method_signature = $this->'.$this->class_signature.'_findSignature(\'__construct\', $this->mock->constructor_args);'.$endl;
             $output .= '    $default_signature = $this->'.$this->class_signature.'_findSignature(\'__construct\', array());'.$endl;
@@ -370,8 +381,8 @@ class Snap_MockObject {
             $output .= '    if ($method_signature != null) {'.$endl;
             $output .= '        $this->'.$this->class_signature.'_tallyMethod($method_signature);'.$endl;
             $output .= '    }'.$endl;
-            $output .= '    if (is_array($parent_methods) && in_array(\'__construct\', $parent_methods)) {'.$endl;
-            $output .= '        eval(\'parent::__construct(\'.$arg_output.\');\');'.$endl;
+            $output .= '    if (in_array(\'__construct\', $parent_methods)) {'.$endl;
+            $output .= '        return call_user_func_array(array($this, \'parent::__construct\'), $this->mock->constructor_args);'.$endl;
             $output .= '    }'.$endl;
             $output .= '}'.$endl;
         }
@@ -403,12 +414,7 @@ class Snap_MockObject {
         $output .= '    }'.$endl;
         $output .= '    // if this is an inherited method, return parent method call'.$endl;
         $output .= '    if ($this->mock->isInherited()) {'.$endl;
-        $output .= '        $arg_output = "";'.$endl;
-        $output .= '        foreach($method_params as $idx => $arg) {'.$endl;
-        $output .= '            $arg_output .= \'$method_params[\'.$idx.\'],\';'.$endl;
-        $output .= '        }'.$endl;
-        $output .= '        $arg_output = trim($arg_output, \',\');'.$endl;
-        $output .= '        return eval(\'return parent::\'.$method_name.\'(\'.$arg_output.\');\');'.$endl;
+        $output .= '        return call_user_func_array(array($this, \'parent::\'.$method_name), $method_params);'.$endl;
         $output .= '    }'.$endl;
         $output .= '}'.$endl;
         
@@ -518,7 +524,7 @@ class Snap_MockObject {
         $ready_class->$setmock_method($this);
 
         // call a real constructor if required
-        if ($this->isInherited() || $this->has_constructor) {
+        if ($this->isInherited() || $this->hasConstructor()) {
             $ready_class->$constructor_method();        
         }
         
