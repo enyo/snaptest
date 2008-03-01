@@ -162,4 +162,3 @@ class Snap_Regex_Expectation_Test extends Snap_UnitTestCase {
 
 }
 
-?>

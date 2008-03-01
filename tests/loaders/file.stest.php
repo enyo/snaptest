@@ -93,4 +93,3 @@ class Snap_File_UnitTestLoader_Test_Bad_Files extends Snap_UnitTestCase {
     }
 }
 
-?>

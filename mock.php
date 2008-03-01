@@ -588,4 +588,3 @@ class Snap_MockObject {
 }
 
 
-?>

@@ -419,4 +419,4 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
     }
 
 }
-?>
+

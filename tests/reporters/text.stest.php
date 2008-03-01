@@ -118,4 +118,3 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
 
 }
 
-?>

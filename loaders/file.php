@@ -40,4 +40,3 @@ class Snap_File_UnitTestLoader extends Snap_UnitTestLoader {
 
 }
 
-?>

@@ -86,5 +86,3 @@ class Snap_Regex_Expectation extends Snap_Expectation {
 
 
 
-
-?>

@@ -49,4 +49,3 @@ class Snap_Tester_Test_Invalid_Input extends Snap_UnitTestCase {
     }
 }
 
-?>

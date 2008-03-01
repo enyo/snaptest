@@ -128,4 +128,3 @@ class Snap_FileUtil_Test_gc extends Snap_UnitTestCase {
     }
 }
 
-?>

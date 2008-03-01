@@ -253,4 +253,3 @@ class Snap_AssertCompareUnitTestException_Test_Codes extends Snap_UnitTestCase {
 
 }
 
-?>

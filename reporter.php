@@ -171,4 +171,3 @@ abstract class Snap_UnitTestReporter {
 
 }
 
-?>

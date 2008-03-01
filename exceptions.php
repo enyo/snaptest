@@ -298,4 +298,3 @@ class Snap_AssertCompareUnitTestException extends Snap_UnitTestException {
 }
 
 
-?>

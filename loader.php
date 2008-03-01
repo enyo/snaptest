@@ -32,4 +32,3 @@ abstract class Snap_UnitTestLoader {
 
 }
 
-?>

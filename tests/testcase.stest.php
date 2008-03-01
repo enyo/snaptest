@@ -280,4 +280,3 @@ class Snap_UnitTestCase_AssertRegex_Test extends Snap_UnitTestCase {
     }
 }
 
-?>
