@@ -49,6 +49,16 @@ abstract class Snap_UnitTestReporter {
         $this->addReport($this->record('fail', $e->getUserMessage(), $this->cullTrace($e->getTrace())));
         $this->announceTestFail();
     }
+
+    public final function recordTestNotImplemented(Snap_UnitTestException $e) {
+        $this->addReport($this->record('notimplemented', $e->getUserMessage(), $this->cullTrace($e->getTrace())));        
+        $this->announceTestNotImplemented();
+    }
+    
+    public final function recordTestSkip(Snap_UnitTestException $e) {
+        $this->addReport($this->record('skip', $e->getUserMessage(), $this->cullTrace($e->getTrace())));        
+        $this->announceTestSkip();
+    }
     
     /**
      * records an unhandled exception and adds it to the report queue
@@ -167,6 +177,8 @@ abstract class Snap_UnitTestReporter {
     abstract public function announceTestPass();
     abstract public function announceTestFail();
     abstract public function announceTestDefect();
+    abstract public function announceTestSkip();
+    abstract public function announceTestNotImplemented();
     abstract public function announceTestCaseComplete();
 
 }

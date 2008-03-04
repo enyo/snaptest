@@ -18,6 +18,10 @@ class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter {
     public function announceTestFail() {}
     
     public function announceTestDefect() {}
+
+    public function announceTestNotImplemented() {}
+    
+    public function announceTestSkip() {}
     
     public function announceTestCaseComplete() {}
 }

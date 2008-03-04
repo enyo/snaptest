@@ -14,7 +14,9 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
         $defect = 0;
         $fail   = 0;
         $error  = 0;
-
+        $notimplemented = 0;
+        $skip   = 0;
+        
         $debugs = array();
 
         echo "\n";
@@ -38,6 +40,12 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
             }
             elseif ($report['type'] == 'phperr') {
                 $error++;
+            }
+            elseif ($report['type'] == 'notimplemented') {
+                $notimplemented++;
+            }
+            elseif ($report['type'] == 'skip') {
+                $skip++;
             }
             else {
                 $fail++;
@@ -78,6 +86,8 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
         echo 'Total Pass:     '.$pass."\n";
         echo 'Total Defects:  '.$defect."\n";
         echo 'Total Failures: '.$fail."\n";
+        echo 'Total Skips:    '.$skip."\n";
+        echo 'Total Not Implemented: '.$notimplemented."\n";        
         
         if ($error > 0) {
             echo "\n".'You have unchecked errors in your tests.  These errors should be'."\n";
@@ -102,6 +112,12 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter {
     }
     public function announceTestDefect() {
         echo 'D';
+    }
+    public function announceTestNotImplemented() {
+        echo 'N';
+    }
+    public function announceTestSkip() {
+        echo 'S';
     }
     public function announceTestCaseComplete() {}
 }

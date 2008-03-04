@@ -24,6 +24,21 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
             $this->reporter->recordUnhandledException($e);
         }
         
+        // Not implemented exception
+        try {
+            throw new Snap_NotImplementedException('short_msg', 'notimplemented_exception');
+        }
+        catch (Exception $e) {
+            $this->reporter->recordTestNotImplemented($e);
+        }
+
+        // Skip exception
+        try {
+            throw new Snap_SkipException('short_msg', 'skip_exception');
+        }
+        catch (Exception $e) {
+            $this->reporter->recordTestSkip($e);
+        }
         
         // unit test exception
         try {
@@ -65,12 +80,22 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
     public function testPHPErrorInReport() {
         return $this->assertRegex($this->reporter_output, '/phperr_message/');
     }
+
+    public function testNotImplementedInReport() {
+        return $this->assertRegex($this->reporter_output, '/notimplemented_exception/');
+    }
+    public function testSkipInReport() {
+        return $this->assertRegex($this->reporter_output, '/skip_exception/');
+    }
+
 }
 
 class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTestCase {
 
-    const passes = 4;
-    const defects = 2;
+    const passes    = 4;
+    const defects   = 2;
+    const skips     = 3;
+    const notimplemented = 1;
     const testcount = 7;
     
     public function setUp() {
@@ -79,12 +104,16 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
         ob_start();
         $this->reporter->generateReport(array(
             array('type' => 'pass'),
+            array('type' => 'skip'),            
             array('type' => 'pass'),
             array('type' => 'pass'),
             array('type' => 'pass'),
             array('type' => 'fail'),
+            array('type' => 'skip'),
+            array('type' => 'notimplemented'),
             array('type' => 'defect'),
             array('type' => 'defect'),
+            array('type' => 'skip'),
             array('type' => 'case'),
         ));
         $this->reporter_output = ob_get_contents();
@@ -111,7 +140,14 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
     public function testFailuresTotalInReport() {
         return $this->assertRegex($this->reporter_output, '/^.*?total failures:.*?'.(self::testcount - self::passes - self::defects).'.*?$/im');
     }
+
+    public function testNotImplementedInReport() {
+        return $this->assertRegex($this->reporter_output, '/^.*?total not implemented:.*?'.self::notimplemented.'.*?$/im');
+    }
     
+    public function testSkipsTotalInReport() {
+        return $this->assertRegex($this->reporter_output, '/^.*?total skips:.*?'.self::skips.'.*?$/im');
+    }
     public function testCasesRanTotalInReport() {
         return $this->assertRegex($this->reporter_output, '/^.*?total cases:.*?1.*?$/im');
     }

@@ -9,6 +9,8 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
         'pass'      => true,
         'case'      => true,
         'fail'      => false,
+        'skip'      => true,
+        'notimplemented' => false,
         'defect'    => false,
         'phperr'    => false,
     );
@@ -102,6 +104,8 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
     // simulated TAP streaming does not do this
     public function announceTestPass() {}
     public function announceTestFail() {}
+    public function announceTestNotImplemented() {}    
+    public function announceTestSkip() {}
     public function announceTestDefect() {}
     public function announceTestCaseComplete() {}
 }

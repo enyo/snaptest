@@ -155,4 +155,3 @@ class Snap_MockObject_Test_MockGeneration extends Snap_UnitTestCase {
     }
 
 }
-

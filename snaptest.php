@@ -44,7 +44,7 @@ $options = SNAP_get_long_options();
 $out_mode = (isset($options['out']) && $options['out']) ? $options['out'] : 'text';
 $php = (isset($options['php']) && $options['php']) ? $options['php'] : 'php';
 $ofile = (isset($options['ofile']) && $options['ofile']) ? $options['ofile'] : tempnam('/tmp', 'SNAP');
-$xtn = (isset($options['match']) && $options['match']) ? $options['match'] : '^.*\.stest\.php';
+$xtn = (isset($options['match']) && $options['match']) ? $options['match'] : '^.*\.stest\.php$';
 $help = (isset($options['help'])) ? true : false;
 
 $path = (isset($options[0]) && $options[0]) ? $options[0] : '';
@@ -146,6 +146,14 @@ if (is_dir($path)) {
             }
             elseif ($report['type'] == 'defect') {
                 $real_output->announceTestDefect();
+                continue;
+            }
+            elseif ($report['type'] == 'notimplemented') {
+                $real_output->announceTestNotImplemented();
+                continue;
+            }
+            elseif ($report['type'] == 'skip') {
+                $real_output->announceTestSkip();
                 continue;
             }
             else {

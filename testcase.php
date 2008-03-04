@@ -269,6 +269,10 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
     protected function notImplemented() {
         throw new Snap_NotImplementedException('not_implemented', 'Test has not been fully implemented.');
     }
+
+    protected function skip() {
+        throw new Snap_SkipException('skip', 'Test is skipped.');
+    }
     
     /**
      * factory method for creating a mock object
@@ -343,7 +347,15 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
                 $result = $this->$method();
             }
             catch (Snap_UnitTestException $e) {
-                $reporter->recordTestException($e);
+                if ($e instanceof Snap_NotImplementedException) {
+                    $reporter->recordTestNotImplemented($e);
+                }
+                elseif ($e instanceof Snap_SkipException) {
+                    $reporter->recordTestSkip($e);
+                }
+                else {
+                    $reporter->recordTestException($e);
+                }
                 try {
                     $this->tearDown();
                 }

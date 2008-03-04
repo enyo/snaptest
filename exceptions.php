@@ -54,6 +54,12 @@ class Snap_UnitTestException extends Snap_Exception {
 class Snap_NotImplementedException extends Snap_UnitTestException {}
 
 /**
+ * Skip test exception
+ * Thrown when a test method is deliberately skipped
+ **/
+class Snap_SkipException extends Snap_UnitTestException {}
+
+/**
  * Call Count Exceptions
  * Used when an expected call count was not met or exceeded
  */
