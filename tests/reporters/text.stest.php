@@ -26,7 +26,7 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
         
         // Not implemented exception
         try {
-            throw new Snap_NotImplementedException('short_msg', 'notimplemented_exception');
+            throw new Snap_NotImplementedException('notimplemented_exception_msg');
         }
         catch (Exception $e) {
             $this->reporter->recordTestNotImplemented($e);
@@ -34,7 +34,7 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
 
         // Skip exception
         try {
-            throw new Snap_SkipException('short_msg', 'skip_exception');
+            throw new Snap_SkipException('test_was_skipped_msg');
         }
         catch (Exception $e) {
             $this->reporter->recordTestSkip($e);
@@ -42,7 +42,7 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
         
         // unit test exception
         try {
-            throw new Snap_UnitTestException('short_msg', 'setup_exception');
+            throw new Snap_UnitTestException('code', 'setup_exception');
         }
         catch (Exception $e) {
             $this->reporter->recordTestDefect($e);
@@ -82,10 +82,10 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
     }
 
     public function testNotImplementedInReport() {
-        return $this->assertRegex($this->reporter_output, '/notimplemented_exception/');
+        return $this->assertRegex($this->reporter_output, '/notimplemented_exception_msg/');
     }
     public function testSkipInReport() {
-        return $this->assertRegex($this->reporter_output, '/skip_exception/');
+        return $this->assertRegex($this->reporter_output, '/test_was_skipped_msg/');
     }
 
 }

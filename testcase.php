@@ -264,14 +264,28 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
     /**
      * Force an exception stating that the test is not yet complete.
      * until a test is actually believed to be complete, this failure should be called
+     * @param string $message the message to provide on skipping
      * @throws Snap_NotImplementedException
      **/
-    protected function notImplemented() {
-        throw new Snap_NotImplementedException('not_implemented', 'Test has not been fully implemented.');
+    protected function notImplemented($message = null) {
+        if ($message === null) {
+            throw new Snap_NotImplementedException('Test has not been fully implemented.');
+        }
+        throw new Snap_NotImplementedException($message);
     }
 
-    protected function skip() {
-        throw new Snap_SkipException('skip', 'Test is skipped.');
+    /**
+     * Force an exception saying the test was explicitly skipped
+     * this allows you to skip a test that may run low level PHP functions that cannot
+     * be tested, for example, a DB call
+     * @param string $message a message to provide on skipping
+     * @throws Snap_SkipException
+     **/
+    protected function skip($message = null) {
+        if ($message === null) {
+            throw new Snap_SkipException('Test is skipped.');
+        }
+        throw new Snap_SkipException($message);
     }
     
     /**

@@ -51,13 +51,21 @@ class Snap_UnitTestException extends Snap_Exception {
  * Not implemented exception
  * thrown when a test method has not been implemented
  */
-class Snap_NotImplementedException extends Snap_UnitTestException {}
+class Snap_NotImplementedException extends Snap_UnitTestException {
+    public function __construct($message) {
+        parent::__construct('not_implemented', $message);
+    }
+}
 
 /**
  * Skip test exception
  * Thrown when a test method is deliberately skipped
  **/
-class Snap_SkipException extends Snap_UnitTestException {}
+class Snap_SkipException extends Snap_UnitTestException {
+    public function __construct($message) {
+        parent::__construct('skipped', $message);
+    }
+}
 
 /**
  * Call Count Exceptions
