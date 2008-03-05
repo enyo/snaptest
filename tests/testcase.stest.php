@@ -280,3 +280,29 @@ class Snap_UnitTestCase_AssertRegex_Test extends Snap_UnitTestCase {
     }
 }
 
+// this is a test object that demonstrates calling skip during setup
+class Snap_UnitTestCase_Calling_Skip_In_Setup_Test_Object extends Snap_UnitTestCase {
+    public function setUp() {
+        $this->skip('foo');
+    }
+    public function tearDown() {}
+    public function ftestSetupSkipExample() {
+        return $this->assertTrue(true);
+    }
+}
+class Snap_UnitTestCase_Calling_Skip_In_Setup extends Snap_UnitTestCase {
+    public function setUp() {
+        $this->reporter = $this->mock('Snap_UnitTestReporterInterface')->construct();
+        $test = new Snap_UnitTestCase_Calling_Skip_In_Setup_Test_Object();
+        $test->runTests($this->reporter, 'ftestSetupSkip');
+    }
+    public function tearDown() {
+        unset($this->reporter);
+    }
+    public function testCallingSkipNotRecordedAsDefect() {
+        return $this->assertCallCount($this->reporter, 'recordTestDefect', 0);
+    }
+    public function testCallingSkipRecordsTestSkip() {
+        return $this->assertCallCount($this->reporter, 'recordTestSkip', 1);
+    }
+}

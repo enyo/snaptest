@@ -3,7 +3,7 @@
 /**
  * Text Output Unit Test Reporter
  */
-class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter {
+class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter implements Snap_UnitTestReporterInterface {
 
     protected $type_mapping = array(
         'pass'      => true,

@@ -3,7 +3,7 @@
 /**
  * Serialized Reports Output, used in aggregation
  */
-class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter {
+class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter implements Snap_UnitTestReporterInterface {
 
     /**
      * generate a text based report of the output data

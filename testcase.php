@@ -3,7 +3,7 @@
 class Snap_PassedTestAssertion {}
 
 interface Snap_RunnableTestCaseInterface {
-    public function runTests(Snap_UnitTestReporter $reporter);
+    public function runTests(Snap_UnitTestReporterInterface $reporter);
 }
 
 abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
@@ -311,8 +311,9 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * if an error is encountered in setup or teardown, the result is scrapped
      * as a defective test
      * @param Snap_UnitTestReporter $reporter
+     * @param string $prefix if provided, the prefix used will be matched instead of "test*"
      **/
-    public function runTests(Snap_UnitTestReporter $reporter) {
+    public function runTests(Snap_UnitTestReporterInterface $reporter, $prefix = 'test') {
     
         // reflect the class
         $reflected_class = new ReflectionClass($this);
@@ -339,7 +340,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
         
         foreach ($public_methods as $method) {
                 
-            if (!preg_match('/^test/i', $method)) {
+            if (!preg_match('/^'.$prefix.'/i', $method)) {
                 continue;
             }
             
@@ -352,7 +353,13 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
                 $this->setUp();
             }
             catch (Exception $e) {
-                $reporter->recordTestDefect($e);
+                // skip exceptions, even in setup are allowed
+                if ($e instanceof Snap_SkipException) {
+                    $reporter->recordTestSkip($e);
+                }
+                else {
+                    $reporter->recordTestDefect($e);
+                }
                 continue;
             }
             

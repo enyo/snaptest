@@ -1,6 +1,26 @@
 <?php
 
-abstract class Snap_UnitTestReporter {
+interface Snap_UnitTestReporterInterface {
+    public function __construct();
+    public function createReport();
+    public function recordTestPass($class, $method);
+    public function recordTestCaseComplete($class);
+    public function recordTestException(Snap_UnitTestException $e);
+    public function recordTestNotImplemented(Snap_UnitTestException $e);
+    public function recordTestSkip(Snap_UnitTestException $e);
+    public function recordUnhandledException(Exception $e);
+    public function recordTestDefect(Exception $e);
+    public function recordPHPError($errstr, $errfile, $errline, $trace);
+    public function generateReport($reports);
+    public function announceTestPass();
+    public function announceTestFail();
+    public function announceTestDefect();
+    public function announceTestSkip();
+    public function announceTestNotImplemented();
+    public function announceTestCaseComplete();
+}
+
+class Snap_UnitTestReporter {
 
     /**
      * contains the lines of the report as they occur
@@ -161,25 +181,6 @@ abstract class Snap_UnitTestReporter {
         
         return $output;
     }
-    
-    /**
-     * abstract function, generates the final report
-     */
-    abstract public function generateReport($reports);
-    
-    /**
-     * abstract function, handles announcing a test's completion to the output
-     * @param int $passes the number of passes
-     * @param int $defects the number of defects
-     * @param int $tests the number of tests
-     * @param string $classname the name of the test class
-     */
-    abstract public function announceTestPass();
-    abstract public function announceTestFail();
-    abstract public function announceTestDefect();
-    abstract public function announceTestSkip();
-    abstract public function announceTestNotImplemented();
-    abstract public function announceTestCaseComplete();
 
 }
 

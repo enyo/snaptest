@@ -274,7 +274,7 @@ class Snap_MockObject {
             }
             
             // skip all final methods
-            if ($method->isFinal()) {
+            if ($method->isFinal() && $this->isInherited()) {
                 // cannot be overridden
                 continue;
             }
@@ -381,7 +381,7 @@ class Snap_MockObject {
             $output .= '    if ($method_signature != null) {'.$endl;
             $output .= '        $this->'.$this->class_signature.'_tallyMethod($method_signature);'.$endl;
             $output .= '    }'.$endl;
-            $output .= '    if (in_array(\'__construct\', $parent_methods)) {'.$endl;
+            $output .= '    if (is_array($parent_methods) && in_array(\'__construct\', $parent_methods)) {'.$endl;
             $output .= '        return call_user_func_array(array($this, \'parent::__construct\'), $this->mock->constructor_args);'.$endl;
             $output .= '    }'.$endl;
             $output .= '}'.$endl;
