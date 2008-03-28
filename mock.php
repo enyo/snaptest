@@ -564,7 +564,9 @@ class Snap_MockObject {
             $default_value = ($param->isOptional()) ? '=' . var_export($param->getDefaultValue(), true) : '';
             $type = ($param->getClass()) ? $param->getClass()->getName().' ' : '';
 
-            $param_string .= $type .'$par'.$i.$default_value.',';
+            $ref = ($param->isPassedByReference()) ? '&' : '';
+
+            $param_string .= $type . $ref . '$par'.$i.$default_value.',';
         }
         
         $param_string = trim($param_string, ',');

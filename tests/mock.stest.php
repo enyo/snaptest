@@ -37,6 +37,10 @@ class Snap_MockObject_Mockable_Using_Interface implements Snap_MockObject_Mockab
     public function pubCallReturnTrueTwoTimesFromPro() {}
 }
 
+interface Snap_MockObject_MockableInterfaceWithReference {
+    public function pubReturnRef(&$ref);
+}
+
 class Snap_MockObject_Test_StubGeneration extends Snap_UnitTestCase {
 
     public function setUp() {
@@ -154,4 +158,15 @@ class Snap_MockObject_Test_MockGeneration extends Snap_UnitTestCase {
         return $this->assertEqual($count, 2);
     }
 
+}
+
+
+class Snap_MockObject_Test_MockGenerationWithReferenceInterface extends Snap_UnitTestCase {
+    public function setUp() {}
+    public function tearDown() {}
+    
+    public function testObjectMocksCorrectly() {
+        $obj = $this->mock('Snap_MockObject_MockableInterfaceWithReference')->construct();
+        return $this->assertIsA($obj, 'Snap_MockObject_MockableInterfaceWithReference');
+    }
 }
