@@ -41,6 +41,16 @@ interface Snap_MockObject_MockableInterfaceWithReference {
     public function pubReturnRef(&$ref);
 }
 
+class Snap_MockObject_Mockable_With_Protected_Members {
+    protected $foo;
+    public function __construct($foo) {
+        $this->foo = $foo;
+    }
+    public function getFoo() {
+        return $this->foo;
+    }
+}
+
 class Snap_MockObject_Test_StubGeneration extends Snap_UnitTestCase {
 
     public function setUp() {
@@ -168,5 +178,19 @@ class Snap_MockObject_Test_MockGenerationWithReferenceInterface extends Snap_Uni
     public function testObjectMocksCorrectly() {
         $obj = $this->mock('Snap_MockObject_MockableInterfaceWithReference')->construct();
         return $this->assertIsA($obj, 'Snap_MockObject_MockableInterfaceWithReference');
+    }
+}
+
+class Snap_MockObject_Test_MockGenerationWithInheritanceProtectedMembers extends Snap_UnitTestCase {
+    const foo_constructor = 'bar';
+    public function setUp() {}
+    public function tearDown() {}
+    
+    public function testObjectMemberAccessible() {
+        $foo = $this->mock('Snap_MockObject_Mockable_With_Protected_Members')
+                    ->requiresInheritance()
+                    ->construct(self::foo_constructor);
+
+        return $this->assertEqual($foo->getFoo(), self::foo_constructor);
     }
 }
