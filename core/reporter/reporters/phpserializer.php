@@ -10,7 +10,7 @@ class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter implemen
      * @return void
      */
     public function generateReport($reports) {
-        echo '===START===' . serialize($reports) . '===END===';
+        echo SNAPTEST_TOKEN_START . serialize($reports) . SNAPTEST_TOKEN_END;
     }
     
     public function announceTestPass() {}

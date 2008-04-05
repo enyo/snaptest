@@ -1,6 +1,6 @@
 <?php
 
-function SNAP_get_long_options() {
+function SNAP_get_long_options($request) {
     $sequentials = array();
     $arguments = array();
     
@@ -45,7 +45,19 @@ function SNAP_get_long_options() {
         $arguments[$idx] = $arg;
     }
     
-    return $arguments;
+    // now, satisfy out output
+    foreach ($request as $key => $default) {
+        if (isset($arguments[$key]) && $arguments[$key]) {
+            $request[$key] = $arguments[$key];
+            continue;
+        }
+        if (isset($arguments[$key]) && is_bool($default)) {
+            $request[$key] = true;
+            continue;
+        }
+    }
+    
+    return $request;
 }
 
 function SNAP_make_long_options($opts) {

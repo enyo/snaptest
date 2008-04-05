@@ -30,7 +30,6 @@ if (version_compare(phpversion(), '5.0.0') < 0) {
 
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'constants.php';
 
-define('SNAP_MANGLE_STRING', '__D_O_T__');
 if (!isset($argv) || !is_array($argv)) {
     define('SNAP_CGI_MODE', true);
 }
@@ -38,15 +37,21 @@ else {
     define ('SNAP_CGI_MODE', false);
 }
 
-$options = SNAP_get_long_options();
+$options = SNAP_get_long_options(array(
+    0           => '',
+    'out'       => 'text',
+    'php'       => 'php',
+    'ofile'     => tempnam('/tmp', 'SNAP'),
+    'match'     => '^.*\.stest\.php$',
+    'help'      => false,
+));
 
-$out_mode = (isset($options['out']) && $options['out']) ? $options['out'] : 'text';
-$php = (isset($options['php']) && $options['php']) ? $options['php'] : 'php';
-$ofile = (isset($options['ofile']) && $options['ofile']) ? $options['ofile'] : tempnam('/tmp', 'SNAP');
-$xtn = (isset($options['match']) && $options['match']) ? $options['match'] : '^.*\.stest\.php$';
-$help = (isset($options['help'])) ? true : false;
-
-$path = (isset($options[0]) && $options[0]) ? $options[0] : '';
+$out_mode   = $options['out'];
+$php        = $options['php'];
+$ofile      = $options['ofile'];
+$xtn        = $options['match'];
+$help       = $options['help'];
+$path       = $options[0];
 
 // help output if no path is specified
 if ($path == '' || $help) {
@@ -96,10 +101,10 @@ if (is_dir($path)) {
         // get the report data, and announce the results for that sub directory
         //$results = unserialize(trim($read));
         $matches = array();
-        preg_match('/===START===([\s\S]*)===END===/', $read, $matches);
+        preg_match('/'.SNAPTEST_TOKEN_START.'([\s\S]*)'.SNAPTEST_TOKEN_END.'/', $read, $matches);
 
         $results = (isset($matches[1])) ? unserialize($matches[1]) : false;
-        $problem_output = substr($read, 0, strpos($read, '===START==='));
+        $problem_output = substr($read, 0, strpos($read, SNAPTEST_TOKEN_START));
         
         if (!$results) {
             
