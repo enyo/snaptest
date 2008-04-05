@@ -10,7 +10,7 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter implements Snap_Un
         'case'      => true,
         'fail'      => false,
         'skip'      => true,
-        'notimplemented' => false,
+        'todo'      => false,
         'defect'    => false,
         'phperr'    => false,
     );
@@ -104,7 +104,7 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter implements Snap_Un
     // simulated TAP streaming does not do this
     public function announceTestPass() {}
     public function announceTestFail() {}
-    public function announceTestNotImplemented() {}    
+    public function announceTestTodo() {}    
     public function announceTestSkip() {}
     public function announceTestDefect() {}
     public function announceTestCaseComplete() {}

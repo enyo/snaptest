@@ -6,7 +6,7 @@ interface Snap_UnitTestReporterInterface {
     public function recordTestPass($class, $method);
     public function recordTestCaseComplete($class);
     public function recordTestException(Snap_UnitTestException $e);
-    public function recordTestNotImplemented(Snap_UnitTestException $e);
+    public function recordTestTodo(Snap_UnitTestException $e);
     public function recordTestSkip(Snap_UnitTestException $e);
     public function recordUnhandledException(Exception $e);
     public function recordTestDefect(Exception $e);
@@ -16,7 +16,7 @@ interface Snap_UnitTestReporterInterface {
     public function announceTestFail();
     public function announceTestDefect();
     public function announceTestSkip();
-    public function announceTestNotImplemented();
+    public function announceTestTodo();
     public function announceTestCaseComplete();
 }
 
@@ -69,10 +69,10 @@ class Snap_UnitTestReporter {
         $this->addReport($this->record('fail', $e->getUserMessage(), $this->cullTrace($e->getTrace())));
         $this->announceTestFail();
     }
-
-    public final function recordTestNotImplemented(Snap_UnitTestException $e) {
-        $this->addReport($this->record('notimplemented', $e->getUserMessage(), $this->cullTrace($e->getTrace())));        
-        $this->announceTestNotImplemented();
+    
+    public final function recordTestTodo(Snap_UnitTestException $e) {
+        $this->addReport($this->record('todo', $e->getUserMessage(), $this->cullTrace($e->getTrace())));        
+        $this->announceTestTodo();
     }
     
     public final function recordTestSkip(Snap_UnitTestException $e) {

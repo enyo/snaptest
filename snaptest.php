@@ -69,6 +69,7 @@ if (is_dir($path)) {
     $file_list = SNAP_recurse_directory($path, $xtn);
 
     $snap = new Snap_Tester($out_mode);
+
     $real_output = $snap->getOutput($out_mode);
     
     $report_list = array();
@@ -77,7 +78,7 @@ if (is_dir($path)) {
         $options = SNAP_make_long_options(array(
             'out'   => 'phpserializer',
             'php'   => $php,
-            1       => $file,
+            1       => realpath($file),
         ));
         
         if (SNAP_CGI_MODE) {
@@ -152,8 +153,8 @@ if (is_dir($path)) {
                 $real_output->announceTestDefect();
                 continue;
             }
-            elseif ($report['type'] == 'notimplemented') {
-                $real_output->announceTestNotImplemented();
+            elseif ($report['type'] == 'todo') {
+                $real_output->announceTestTodo();
                 continue;
             }
             elseif ($report['type'] == 'skip') {

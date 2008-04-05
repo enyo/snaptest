@@ -125,7 +125,6 @@ class Snap_Tester {
      * @throws Snap_Exception
      */
     protected function getTesterClass($name, $type) {
-        
         if ($type == 'reporter') {
             $suffix = 'UnitTestReporter';
         }
@@ -134,18 +133,18 @@ class Snap_Tester {
         }
 
         $class_name = 'Snap_'.ucwords(strtolower($name)).'_'.$suffix;
-        
+
         // if class does not exist, include
         if (!class_exists($class_name)) {
             $path = SNAPTEST_CORE . $type . DIRECTORY_SEPARATOR . $type.'s'.DIRECTORY_SEPARATOR.strtolower($name).'.php';
-            @include $path;
+            include $path;
         }
-        
+
         // if class still does not exist, this is an error
         if (!class_exists($class_name)) {
             throw new Snap_Exception('Handler '.$class_name.' is not found, tried path '.$path);
         }
-        
+
         return new $class_name();
     }
 

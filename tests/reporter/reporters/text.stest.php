@@ -25,12 +25,12 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
             $this->reporter->recordUnhandledException($e);
         }
         
-        // Not implemented exception
+        // Todo exception
         try {
-            throw new Snap_NotImplementedException('notimplemented_exception_msg');
+            throw new Snap_TodoException('todo_exception_msg');
         }
         catch (Exception $e) {
-            $this->reporter->recordTestNotImplemented($e);
+            $this->reporter->recordTestTodo($e);
         }
 
         // Skip exception
@@ -82,8 +82,8 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
         return $this->assertRegex($this->reporter_output, '/phperr_message/');
     }
 
-    public function testNotImplementedInReport() {
-        return $this->assertRegex($this->reporter_output, '/notimplemented_exception_msg/');
+    public function testTodoInReport() {
+        return $this->assertRegex($this->reporter_output, '/todo_exception_msg/');
     }
     public function testSkipInReport() {
         return $this->assertRegex($this->reporter_output, '/test_was_skipped_msg/');
@@ -96,7 +96,7 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
     const passes    = 4;
     const defects   = 2;
     const skips     = 3;
-    const notimplemented = 1;
+    const todo      = 1;
     const testcount = 7;
     
     public function setUp() {
@@ -111,7 +111,7 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
             array('type' => 'pass'),
             array('type' => 'fail'),
             array('type' => 'skip'),
-            array('type' => 'notimplemented'),
+            array('type' => 'todo'),
             array('type' => 'defect'),
             array('type' => 'defect'),
             array('type' => 'skip'),
@@ -142,8 +142,8 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
         return $this->assertRegex($this->reporter_output, '/^.*?total failures:.*?'.(self::testcount - self::passes - self::defects).'.*?$/im');
     }
 
-    public function testNotImplementedInReport() {
-        return $this->assertRegex($this->reporter_output, '/^.*?total not implemented:.*?'.self::notimplemented.'.*?$/im');
+    public function testTodoInReport() {
+        return $this->assertRegex($this->reporter_output, '/^.*?total todo:.*?'.self::todo.'.*?$/im');
     }
     
     public function testSkipsTotalInReport() {

@@ -265,13 +265,21 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * Force an exception stating that the test is not yet complete.
      * until a test is actually believed to be complete, this failure should be called
      * @param string $message the message to provide on skipping
-     * @throws Snap_NotImplementedException
+     * @throws Snap_TodoException
+     **/
+    protected function todo($message = null) {
+        if ($message === null) {
+            throw new Snap_TodoException('Test has not been fully implemented.');
+        }
+        throw new Snap_TodoException($message);
+    }
+
+    /**
+     * @deprecated
+     * @see self::todo()
      **/
     protected function notImplemented($message = null) {
-        if ($message === null) {
-            throw new Snap_NotImplementedException('Test has not been fully implemented.');
-        }
-        throw new Snap_NotImplementedException($message);
+        return $this->todo($message);
     }
 
     /**
@@ -368,8 +376,8 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
                 $result = $this->$method();
             }
             catch (Snap_UnitTestException $e) {
-                if ($e instanceof Snap_NotImplementedException) {
-                    $reporter->recordTestNotImplemented($e);
+                if ($e instanceof Snap_TodoException) {
+                    $reporter->recordTestTodo($e);
                 }
                 elseif ($e instanceof Snap_SkipException) {
                     $reporter->recordTestSkip($e);

@@ -19,7 +19,7 @@ class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter implemen
     
     public function announceTestDefect() {}
 
-    public function announceTestNotImplemented() {}
+    public function announceTestTodo() {}
     
     public function announceTestSkip() {}
     

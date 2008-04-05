@@ -14,7 +14,7 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
         $defect = 0;
         $fail   = 0;
         $error  = 0;
-        $notimplemented = 0;
+        $todo   = 0;
         $skip   = 0;
         
         $debugs = array();
@@ -41,8 +41,8 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
             elseif ($report['type'] == 'phperr') {
                 $error++;
             }
-            elseif ($report['type'] == 'notimplemented') {
-                $notimplemented++;
+            elseif ($report['type'] == 'todo') {
+                $todo++;
             }
             elseif ($report['type'] == 'skip') {
                 $skip++;
@@ -87,7 +87,7 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
         echo 'Total Defects:  '.$defect."\n";
         echo 'Total Failures: '.$fail."\n";
         echo 'Total Skips:    '.$skip."\n";
-        echo 'Total Not Implemented: '.$notimplemented."\n";        
+        echo 'Total Todo:     '.$todo."\n";        
         
         if ($error > 0) {
             echo "\n".'You have unchecked errors in your tests.  These errors should be'."\n";
@@ -113,8 +113,8 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
     public function announceTestDefect() {
         echo 'D';
     }
-    public function announceTestNotImplemented() {
-        echo 'N';
+    public function announceTestTodo() {
+        echo 'T';
     }
     public function announceTestSkip() {
         echo 'S';
