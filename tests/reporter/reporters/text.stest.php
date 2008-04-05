@@ -1,6 +1,7 @@
 <?php
 
-include_once SNAPTEST_ROOT.'reporters'.DIRECTORY_SEPARATOR.'text.php';
+require dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'path.php';
+include_once SNAPTEST_CORE . 'reporter' . DIRECTORY_SEPARATOR .'reporters'.DIRECTORY_SEPARATOR.'text.php';
 
 class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
     public function setUp() {

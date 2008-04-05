@@ -1,5 +1,7 @@
 <?php
 
+require dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'path.php';
+
 class Snap_UnitTestCase_AssertCount_Test extends Snap_UnitTestCase {
 
     public function setUp() {

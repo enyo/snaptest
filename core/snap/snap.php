@@ -3,19 +3,6 @@
 // turn on all errors.  everything. yes, everything
 //error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE | E_CORE_ERROR | E_CORE_WARNING);
 
-// include the required libraries
-include_once 'exceptions.php';
-include_once 'mock.php';
-include_once 'expectations.php';
-include_once 'reporter.php';
-include_once 'loader.php';
-include_once 'testcase.php';
-include_once 'file.php';
-
-if (!defined('SNAPTEST_ROOT')) {
-    define('SNAPTEST_ROOT', dirname(__FILE__) . DIRECTORY_SEPARATOR);
-}
-
 /**
  * Snap error handling function.  Takes care of PHP errors, and redirects to the current test
  * @param int $errno the error number
@@ -150,7 +137,7 @@ class Snap_Tester {
         
         // if class does not exist, include
         if (!class_exists($class_name)) {
-            $path = $type.'s'.DIRECTORY_SEPARATOR.strtolower($name).'.php';
+            $path = SNAPTEST_CORE . $type . DIRECTORY_SEPARATOR . $type.'s'.DIRECTORY_SEPARATOR.strtolower($name).'.php';
             @include $path;
         }
         

@@ -1,6 +1,6 @@
 <?php
 
-include_once SNAPTEST_ROOT.'expectations.php';
+require dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'path.php';
 
 /** 
  * Tests Snap_Anything_Expectation

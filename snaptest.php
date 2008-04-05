@@ -28,8 +28,7 @@ if (version_compare(phpversion(), '5.0.0') < 0) {
     exit;
 }
 
-require_once 'snap.php';
-require_once 'functions.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'constants.php';
 
 define('SNAP_MANGLE_STRING', '__D_O_T__');
 if (!isset($argv) || !is_array($argv)) {

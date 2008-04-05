@@ -1,6 +1,6 @@
 <?php
 
-include_once SNAPTEST_ROOT.'mock.php';
+require dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'path.php';
 
 class Snap_MockObject_Mockable {
     public function pubReturnTrue() {
