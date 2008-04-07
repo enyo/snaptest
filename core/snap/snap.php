@@ -63,7 +63,7 @@ class Snap_Tester {
         
         if ($input_handler == 'local') {
             $this->addTests($params);
-            continue;
+            return;
         }
 
         $c = $this->getTesterClass($input_handler, 'loader');
@@ -79,12 +79,18 @@ class Snap_Tester {
      * the results of running all tests are then logged into the reporter
      * and the output is generated
      */
-    public function runTests() {
+    public function runTests($match = null) {
     
         $this->tests = array_flip(array_flip($this->tests));
         foreach ($this->tests as $test_name) {
             $test = new $test_name();
-            $test->runTests($this->output);
+            
+            if ($match === null) {
+                $test->runTests($this->output);
+            }
+            else {
+                $test->runTests($this->output, $match);
+            }
         }
 
         $this->output->createReport();

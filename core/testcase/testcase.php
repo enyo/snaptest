@@ -319,9 +319,9 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * if an error is encountered in setup or teardown, the result is scrapped
      * as a defective test
      * @param Snap_UnitTestReporter $reporter
-     * @param string $prefix if provided, the prefix used will be matched instead of "test*"
+     * @param string $match if provided, the prefix used will be matched instead of "test*"
      **/
-    public function runTests(Snap_UnitTestReporterInterface $reporter, $prefix = 'test') {
+    public function runTests(Snap_UnitTestReporterInterface $reporter, $match = '^test') {
     
         // reflect the class
         $reflected_class = new ReflectionClass($this);
@@ -348,7 +348,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
         
         foreach ($public_methods as $method) {
                 
-            if (!preg_match('/^'.$prefix.'/i', $method)) {
+            if (!preg_match('/'.$match.'/i', $method)) {
                 continue;
             }
             

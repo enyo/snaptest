@@ -1,6 +1,7 @@
 <?php
 
 require dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'path.php';
+require SNAPTEST_LOADERS . 'file.php';
 
 class Snap_File_UnitTestLoader_Test extends Snap_UnitTestCase {
 

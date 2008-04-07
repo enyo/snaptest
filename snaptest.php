@@ -1,26 +1,5 @@
 <?php
 
-function SNAP_usage() {
-    echo "\n";
-    echo "Usage: snaptest.sh [--out=outmode] [--php=phppath] [--help] <path>\n";
-    echo "Usage: php snaptest.php [--out=outmode] [--php=phppath] [--help] <path>\n";
-    echo "\n";
-    echo "<path> :: The path to the test you want to run. Should be a file\n";
-    echo "ending in .php or a directory.\n";
-    echo "\n";
-    echo "--out=outmode :: sets the output handler to 'outmode'. The\n";
-    echo "output mode must be located in <snaptest>/outmode.php.\n";
-    echo "\n";
-    echo "--php=phppath :: set the php path for recursion. If not specified,\n";
-    echo "the call 'php' will be used, using whatever is in the current env\n";
-    echo "variable.\n";
-    echo "\n";
-    echo "--match=regex :: Specifies a PCRE regular expression to match. Files\n";
-    echo "that match this regular expression will be included by the test\n";
-    echo "harness.\n";
-    exit;
-}
-
 // requires PHP 5.2+
 if (version_compare(phpversion(), '5.0.0') < 0) {
     echo "\n";
@@ -30,153 +9,110 @@ if (version_compare(phpversion(), '5.0.0') < 0) {
 
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'constants.php';
 
-if (!isset($argv) || !is_array($argv)) {
-    define('SNAP_CGI_MODE', true);
-}
-else {
-    define ('SNAP_CGI_MODE', false);
-}
-
-$options = SNAP_get_long_options(array(
+$options = Snap_Request::getLongOptions(array(
     0           => '',
+    'mode'      => 'init',
     'out'       => 'text',
     'php'       => 'php',
-    'ofile'     => tempnam('/tmp', 'SNAP'),
     'match'     => '^.*\.stest\.php$',
     'help'      => false,
+    'test'      => '',
+    'analyze'   => false,
 ));
 
+$path       = realpath($options[0]);
 $out_mode   = $options['out'];
 $php        = $options['php'];
-$ofile      = $options['ofile'];
 $xtn        = $options['match'];
 $help       = $options['help'];
-$path       = $options[0];
+$test       = $options['test'];
+$analyze    = $options['analyze'];
 
 // help output if no path is specified
-if ($path == '' || $help) {
-    SNAP_usage();
+if ((!$path || $help) && (!$test)) {
+    echo SNAP_usage();
+    exit;
 }
 
+// analyze subprocess
+if ($analyze) {
+    $analyzer = new Snap_FileAnalyzer();
+    $results = $analyzer->analyzeFile($path);
+    echo serialize($results);
+    echo SNAP_STREAM_ENDING_TOKEN;
+    exit;
+}
 
-// if (substr($path, 0, 1) != '/') {
-//     $path = dirname(__FILE__).DIRECTORY_SEPARATOR.$path;
-// }
-// 
-// $path = '/'.trim($path, '/');
+// test subprocess
+if ($test) {
+    // new reporter in phpserializer mode
+    $snap = new Snap_Tester('phpserializer');
+    
+    // unencode
+    $test = Snap_Request::decodeTestKey($test);
+    
+    // include the file, so that all base components are there
+    require_once($test['file']);
+    
+    // add the class now that it exists
+    $snap->addInput('local', $test['class']);
+    
+    // run tests with an exact match on the test name
+    $snap->runTests('^'.$test['method'].'$');
+    echo SNAP_STREAM_ENDING_TOKEN;
+    exit;
+}
 
+// generate list of files to test
 if (is_dir($path)) {
     $file_list = SNAP_recurse_directory($path, $xtn);
-
-    $snap = new Snap_Tester($out_mode);
-
-    $real_output = $snap->getOutput($out_mode);
-    
-    $report_list = array();
-
-    foreach($file_list as $file) {
-        $options = SNAP_make_long_options(array(
-            'out'   => 'phpserializer',
-            'php'   => $php,
-            1       => realpath($file),
-        ));
-        
-        if (SNAP_CGI_MODE) {
-            $exec = $php .' -q ' . __FILE__ . ' ' . $options;
-        }
-        else {
-            $exec = $php . ' ' . __FILE__ . ' ' . $options . ' 2>&1';
-        }
-
-        $exec_handle = popen($exec, "r");
-        if ($exec_handle === false) {
-            continue;
-        }
-        
-        // get the contents of the stream off of STDIN
-        $read = stream_get_contents($exec_handle);
-        
-        // close the resource
-        pclose($exec_handle);
-
-        // get the report data, and announce the results for that sub directory
-        //$results = unserialize(trim($read));
-        $matches = array();
-        preg_match('/'.SNAPTEST_TOKEN_START.'([\s\S]*)'.SNAPTEST_TOKEN_END.'/', $read, $matches);
-
-        $results = (isset($matches[1])) ? unserialize($matches[1]) : false;
-        $problem_output = substr($read, 0, strpos($read, SNAPTEST_TOKEN_START));
-        
-        if (!$results) {
-            
-            if (!$read) {
-                $read = 'No error output captured. Please ensure your PHP environment allows output of errors.';
-            }
-            
-            $report_list[] = array(
-                'type' => 'fatal',
-                'message' => ($problem_output) ? $problem_output : $file . ' had a fatal error: '.$read,
-                'skip_details' => true,
-            );
-            
-            $real_output->announceTestFail();
-            
-            unset($matches);
-            unset($read);
-            continue;
-        }
-        else {
-            if (strlen($problem_output) > 0) {
-                $report_list[] = array(
-                    'type' => 'debug',
-                    'message' => $problem_output,
-                    'file' => $file,
-                    'skip_details' => true,
-                );
-            }
-        }
-        
-        // cleanup that string
-        unset($matches);
-        unset($read);
-
-        foreach ($results as $report) {
-            $report_list[] = $report;
-            if ($report['type'] == 'case') {
-                continue;
-            }
-            elseif ($report['type'] == 'pass') {
-                $real_output->announceTestPass();
-                continue;
-            }
-            elseif ($report['type'] == 'defect') {
-                $real_output->announceTestDefect();
-                continue;
-            }
-            elseif ($report['type'] == 'todo') {
-                $real_output->announceTestTodo();
-                continue;
-            }
-            elseif ($report['type'] == 'skip') {
-                $real_output->announceTestSkip();
-                continue;
-            }
-            else {
-                $real_output->announceTestFail();
-            }
-        }
-
-        // cleanup that unserialized thing
-        unset($results);
-    }
-    
-    // create the final proper output
-    $real_output->generateReport($report_list);
-
 }
 else {
-    // testing a single file
-    $snap = new Snap_Tester($out_mode);
-    $snap->addInput('file', $path);
-    $snap->runTests();
+    $file_list = array($path);
 }
+
+// start a dispatcher for multi-processing
+$dispatcher = new Snap_Dispatcher($php, __FILE__);
+
+// build master test list
+$analyzer = new Snap_FileAnalyzer();
+$master_test_list = $dispatcher->dispatch(array(
+    'keys'          => $file_list,
+    'dispatch'      => array(
+        'analyze'       => true,
+        1               => '$key',
+        ),
+    'onThreadComplete'  => array($analyzer, 'onThreadComplete'),
+    'onThreadFail'      => array($analyzer, 'onThreadFail'),
+    'onComplete'        => array($analyzer, 'onComplete'),
+));
+unset($analyzer);
+
+// build a master test key list
+$master_test_key_list = array();
+foreach ($master_test_list as $file => $classes) {
+    foreach ($classes as $klass => $tests) {
+        foreach ($tests as $test) {
+            $master_test_key_list[] = Snap_Request::makeTestKey($file, $klass, $test);
+        }
+    }
+}
+unset($master_test_list);
+
+// create a test aggregator for $outmode
+$reporter = new Snap_TestAggregator($out_mode);
+
+// dispatch the tests
+$dispatcher->dispatch(array(
+    'keys'          => $master_test_key_list,
+    'dispatch'      => array(
+        'test'          => '$key',
+        ),
+    'onThreadComplete'  => array($reporter, 'onThreadComplete'),
+    'onThreadFail'      => array($reporter, 'onThreadFail'),
+    'onComplete'        => array($reporter, 'onComplete'),
+));
+
+exit;
+
+
