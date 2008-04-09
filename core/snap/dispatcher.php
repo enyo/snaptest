@@ -33,17 +33,33 @@ class Snap_Dispatcher {
      * Under some OSes, additional prefixes may be needed for running
      * PHP properly in the background. If $use_prefix is true, then
      * those prefixes will be prepended to the PHP path.
-     * @param $use_prefix should any OS prefixes be used
+     * @param $use_prefix should any OS prefixes be used, including calls to "nice"
      * @return string
      **/
     protected function getPHP($use_prefix = true) {
-        if (substr(PHP_OS, 0, 3) == 'WIN' && $use_prefix) {
-            return 'start /b ' . $this->php;
+        if (!$use_prefix) {
+            return $this->php;
         }
+        
+        // windows gets a nice via /low
+        if (substr(PHP_OS, 0, 3) == 'WIN') {
+            return 'start /low /b ' . $this->php;
+        }
+
+        $php = $this->php;
+        
+        // cgi mode needs "quiet" flag
         if (SNAP_CGI_MODE) {
-            return $this->php . ' -q';
+            $php .= ' -q';
         }
-        return $this->php;
+        
+        // get snap NICE option if set and use it
+        $options = Snap_Request::getLongOptions(array('nice' => ''));
+        if ($options['nice']) {
+            $php = $options['nice'] . ' -n 15 ' . $php;
+        }
+
+        return $php;
     }
     
     /**

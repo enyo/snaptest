@@ -27,19 +27,48 @@ if [[ ! -x "$PHPX" ]] ; then
     fi
 fi
 
-if [[ ! -z PHPX ]] ; then
+if [[ ! -z $PHPX ]] ; then
     PHP=$PHPX
+fi
+
+# Auto Locate Nice
+NICEX=`which nice`
+if [[ ! -x "$NICEX" ]] ; then
+    NICEX=""
+    if [ -z $NICEX ] ; then
+        if [ -x "/usr/local/bin/nice" ] ; then
+            NICEX="/usr/local/bin/nice"
+        fi
+        if [ -x "/usr/bin/nice" ] ; then
+            NICEX="/usr/bin/nice"
+        fi
+        if [ -x "/opt/local/bin/nice" ] ; then
+            NICEX="/opt/local/bin/nice"
+        fi
+    fi
+fi
+
+if [[ ! -z $NICEX ]] ; then
+    NICE=$NICEX
 fi
 
 # parse the options
 CMD=""
-while getoptex "out. php. match. help;" "$@"
+while getoptex "out. php. nice. match. help;" "$@"
 do
     if [ "$OPTOPT" = "php" ] ; then
         if [ -x "$OPTARG" ] ; then
             PHP=$OPTARG
         else
             echo "The path of $OPTARG was not a valid php path."
+            exit 0
+        fi
+    fi
+    if [ "$OPTOPT" = "nice" ] ; then
+        if [ -x "$OPTARG" ] ; then
+            NICE=$OPTARG
+        else
+            echo "The path of $OPTARG was not a valid nice path."
             exit 0
         fi
     fi
@@ -77,13 +106,15 @@ CGI=`$PHP -v | grep cgi | wc -l | sed "s/[^0-9]//g"`
 
 # run php on the snaptest.php file with the commands
 if [ "$CGI" = "0" ] ; then
-    CMD="$PHP -q $FPATH/snaptest.php --php=$PHP $CMD $PTH"
+    CMD="$PHP -q $FPATH/snaptest.php --php=$PHP --nice=$NICE $CMD $PTH"
 else
     # if we are running in CGI mode, we need to mangle our . characters
     # otherwise PHP mangles them in the request
     PHPSAFE=`echo "$PHP" | sed "s/\./__D_O_T__/g"`
     CMDSAFE=`echo "$CMD" | sed "s/\./__D_O_T__/g"`
     PTHSAFE=`echo "$PTH" | sed "s/\./__D_O_T__/g"`
-    CMD="$PHP -q $FPATH/snaptest.php --php=$PHPSAFE $CMDSAFE $PTHSAFE"
+    NICESAFE=`echo "$NICE" | sed "s/\./__D_O_T__/g"`
+
+    CMD="$PHP -q $FPATH/snaptest.php --php=$PHPSAFE --nice=$NICESAFE $CMDSAFE $PTHSAFE"
 fi
 $CMD

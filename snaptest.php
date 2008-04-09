@@ -14,6 +14,7 @@ $options = Snap_Request::getLongOptions(array(
     'mode'      => 'init',
     'out'       => 'text',
     'php'       => 'php',
+    'nice'      => '',
     'match'     => '^.*\.stest\.php$',
     'help'      => false,
     'test'      => '',
