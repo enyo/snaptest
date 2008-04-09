@@ -11,7 +11,6 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'constants.php';
 
 $options = Snap_Request::getLongOptions(array(
     0           => '',
-    'mode'      => 'init',
     'out'       => 'text',
     'php'       => 'php',
     'nice'      => '',
@@ -21,7 +20,7 @@ $options = Snap_Request::getLongOptions(array(
     'analyze'   => false,
 ));
 
-$path       = realpath($options[0]);
+$path       = $options[0];
 $out_mode   = $options['out'];
 $php        = $options['php'];
 $xtn        = $options['match'];
@@ -34,6 +33,9 @@ if ((!$path || $help) && (!$test)) {
     echo SNAP_usage();
     exit;
 }
+
+// okay, there is some sort of path, get a realpath for it
+$path = realpath($path);
 
 // analyze subprocess
 if ($analyze) {

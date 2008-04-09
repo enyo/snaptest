@@ -5,24 +5,64 @@
  * @return string
  **/
 function SNAP_usage() {
+    // get the available output modes in SNAPTEST_REPORTERS
+    $handle = opendir(SNAPTEST_REPORTERS);
+    $outmodes = array();
+    while (false !== ($file = readdir($handle))) {
+    
+        // skip files starting with .
+        if (substr($file, 0, 1) == '.') {
+            continue;
+        }
+
+        // skip directories
+        if (is_dir($file)) {
+            continue;
+        }
+    
+        // skip things not ending in .php
+        if (substr($file, -4) != '.php') {
+            continue;
+        }
+        
+        $outmodes[] = str_replace('.php', '', $file);
+    }
+    unset($handle);
+    
+    $outmodes = "    * " . implode("\n    * ", $outmodes);
+    
 return <<<SNAPDOC
 
-Usage: snaptest.sh [--out=outmode] [--php=phppath] [--help] <path>
-Usage: php snaptest.php [--out=outmode] [--php=phppath] [--help] <path>
+Usage: snaptest.sh [--out=outmode] [--php=phppath] [--nice=nicepath]
+                   [--help] <path>
+Usage: php snaptest.php [--out=outmode] [--php=phppath] [--nice=nicepath]
+                   [--help] <path>
 
-<path> :: The path to the test you want to run. Should be a file
-ending in .php or a directory.
+<path> :: The path to the test you want to run.
 
 --out=outmode :: sets the output handler to 'outmode'. The
-output mode must be located in <snaptest>/outmode.php.
+output mode must be located in <snaptest>/core/reporter/reporters/
+The following are available:
+$outmodes
 
 --php=phppath :: set the php path for recursion. If not specified,
 the call 'php' will be used, using whatever is in the current env
-variable.
+variable. If running snaptest.sh the shell will try and autodetect the
+location for you.
 
 --match=regex :: Specifies a PCRE regular expression to match. Files
 that match this regular expression will be included by the test
-harness.
+harness. By default, SnapTest looks for the pattern ^.*\.stest\.php$
+
+--nice=nicepath :: set the path to GNU Nice. If not specified, nice will
+not be used. If running snaptest.sh, the shell will try and autodetect
+the location for you. --nice is ignored in Windows.
+
+--help :: display this message
+
+Additional information can always be found on the SnapTest home page:
+http://snaptest.googlecode.com
+
 SNAPDOC;
 }
 
