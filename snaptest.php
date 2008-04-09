@@ -100,7 +100,7 @@ foreach ($master_test_list as $file => $classes) {
 unset($master_test_list);
 
 // create a test aggregator for $outmode
-$reporter = new Snap_TestAggregator($out_mode);
+$reporter = new Snap_TestAggregator($out_mode, count($master_test_key_list));
 
 // dispatch the tests
 $dispatcher->dispatch(array(

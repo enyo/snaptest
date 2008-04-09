@@ -104,20 +104,20 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
         }
     }
     
-    public function announceTestPass() {
+    public function announceTestPass($report) {
         echo '.';
     }
-    public function announceTestFail() {
+    public function announceTestFail($report) {
         echo 'F';
     }
-    public function announceTestDefect() {
+    public function announceTestDefect($report) {
         echo 'D';
     }
-    public function announceTestTodo() {
+    public function announceTestTodo($report) {
         echo 'T';
     }
-    public function announceTestSkip() {
+    public function announceTestSkip($report) {
         echo 'S';
     }
-    public function announceTestCaseComplete() {}
+    public function announceTestCaseComplete($report) {}
 }

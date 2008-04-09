@@ -12,12 +12,12 @@ interface Snap_UnitTestReporterInterface {
     public function recordTestDefect(Exception $e);
     public function recordPHPError($errstr, $errfile, $errline, $trace);
     public function generateReport($reports);
-    public function announceTestPass();
-    public function announceTestFail();
-    public function announceTestDefect();
-    public function announceTestSkip();
-    public function announceTestTodo();
-    public function announceTestCaseComplete();
+    public function announceTestPass($report);
+    public function announceTestFail($report);
+    public function announceTestDefect($report);
+    public function announceTestSkip($report);
+    public function announceTestTodo($report);
+    public function announceTestCaseComplete($report);
 }
 
 class Snap_UnitTestReporter {
@@ -45,20 +45,22 @@ class Snap_UnitTestReporter {
      * @param string Method name
      **/
     public final function recordTestPass($class_name, $method_name) {
-        $this->reports[] = array(
+        $report = array(
             'type'      => 'pass',
             'function'  => $method_name,
             'class'     => $class_name,
         );
-        $this->announceTestPass();
+        $this->reports[] = $report;
+        $this->announceTestPass($report);
     }
     
     public final function recordTestCaseComplete($class_name) {
-        $this->reports[] = array(
+        $report = array(
             'type'      => 'case',
             'class'     => $class_name,
         );
-        $this->announceTestCaseComplete();
+        $this->reports[] = $report;
+        $this->announceTestCaseComplete($report);
     }
 
     /**
@@ -66,18 +68,21 @@ class Snap_UnitTestReporter {
      * @param UnitTestException $e
      */
     public final function recordTestException(Snap_UnitTestException $e) {
-        $this->addReport($this->record('fail', $e->getUserMessage(), $this->cullTrace($e->getTrace())));
-        $this->announceTestFail();
+        $report = $this->record('fail', $e->getUserMessage(), $this->cullTrace($e->getTrace()));
+        $this->addReport($report);
+        $this->announceTestFail($report);
     }
     
     public final function recordTestTodo(Snap_UnitTestException $e) {
-        $this->addReport($this->record('todo', $e->getUserMessage(), $this->cullTrace($e->getTrace())));        
-        $this->announceTestTodo();
+        $report = $this->record('todo', $e->getUserMessage(), $this->cullTrace($e->getTrace()));
+        $this->addReport($report);        
+        $this->announceTestTodo($report);
     }
     
     public final function recordTestSkip(Snap_UnitTestException $e) {
-        $this->addReport($this->record('skip', $e->getUserMessage(), $this->cullTrace($e->getTrace())));        
-        $this->announceTestSkip();
+        $report = $this->record('skip', $e->getUserMessage(), $this->cullTrace($e->getTrace()));
+        $this->addReport($report);        
+        $this->announceTestSkip($report);
     }
     
     /**
@@ -85,8 +90,9 @@ class Snap_UnitTestReporter {
      * @param Exception $e
      */
     public final function recordUnhandledException(Exception $e) {
-        $this->addReport($this->record('exception', 'Unhandled exception of type '.get_class($e).' with message: '.$e->getMessage(), $this->cullTrace($e->getTrace())));
-        $this->announceTestFail();
+        $report = $this->record('exception', 'Unhandled exception of type '.get_class($e).' with message: '.$e->getMessage(), $this->cullTrace($e->getTrace()));
+        $this->addReport($report);
+        $this->announceTestFail($report);
     }
     
     /**
@@ -95,12 +101,14 @@ class Snap_UnitTestReporter {
      */
     public final function recordTestDefect(Exception $e) {
         if (method_exists($e, 'getUserMessage')) {
-            $this->addReport($this->record('defect', $e->getUserMessage(), $this->cullTrace($e->getTrace())));
+            $report = $this->record('defect', $e->getUserMessage(), $this->cullTrace($e->getTrace()));
+            $this->addReport($report);
         }
         else {
-            $this->addReport($this->record('defect', $e->getMessage(), $this->cullTrace($e->getTrace())));
+            $report = $this->record('defect', $e->getMessage(), $this->cullTrace($e->getTrace()));
+            $this->addReport($report);
         }
-        $this->announceTestDefect();
+        $this->announceTestDefect($report);
     }
     
     /**
@@ -117,8 +125,9 @@ class Snap_UnitTestReporter {
         // file trace is worthless
         $trace['file'] = $errfile;
         
-        $this->addReport($this->record('phperr', $errstr, $trace, $errline));
-        $this->announceTestFail();
+        $report = $this->record('phperr', $errstr, $trace, $errline);
+        $this->addReport($report);
+        $this->announceTestFail($report);
     }
     
     /**

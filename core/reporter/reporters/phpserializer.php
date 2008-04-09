@@ -13,15 +13,15 @@ class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter implemen
         echo SNAPTEST_TOKEN_START . serialize($reports) . SNAPTEST_TOKEN_END;
     }
     
-    public function announceTestPass() {}
+    public function announceTestPass($report) {}
     
-    public function announceTestFail() {}
+    public function announceTestFail($report) {}
     
-    public function announceTestDefect() {}
+    public function announceTestDefect($report) {}
 
-    public function announceTestTodo() {}
+    public function announceTestTodo($report) {}
     
-    public function announceTestSkip() {}
+    public function announceTestSkip($report) {}
     
-    public function announceTestCaseComplete() {}
+    public function announceTestCaseComplete($report) {}
 }

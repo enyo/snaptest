@@ -14,11 +14,18 @@ class Snap_TestAggregator {
      * Constructor- defines an output mode
      * @param $outmode a string of the final output mode
      **/
-    public function __construct($outmode) {
+    public function __construct($outmode, $test_count) {
         $st = new Snap_Tester($outmode);
         $this->reporter = $st->getOutput($outmode);
         $this->report_list = array();
         $this->case_list = array();
+        
+        // tap compliance requires this stated upfront
+        if ($outmode == 'tap') {
+            echo "\n";
+            echo "TAP version 13\n";
+            echo "1..{$test_count}\n";
+        }
     }
     
     /**
@@ -44,13 +51,13 @@ class Snap_TestAggregator {
                 $data = 'No error output captured. Please ensure your PHP environment allows output of errors.';
             }
             
-            $this->report_list[] = array(
+            $report = array(
                 'type' => 'fatal',
                 'message' => ($problem_output) ? $problem_output : $file . ' had a fatal error: '.$data,
                 'skip_details' => true,
             );
-            
-            $this->reporter->announceTestFail();
+            $this->report_list[] = $report;
+            $this->reporter->announceTestFail($report);
         }
         else {
             if (strlen($problem_output) > 0) {
@@ -76,23 +83,23 @@ class Snap_TestAggregator {
             // always add this report
             $this->report_list[] = $report;
             if ($report['type'] == 'pass') {
-                $this->reporter->announceTestPass();
+                $this->reporter->announceTestPass($report);
                 continue;
             }
             elseif ($report['type'] == 'defect') {
-                $this->reporter->announceTestDefect();
+                $this->reporter->announceTestDefect($report);
                 continue;
             }
             elseif ($report['type'] == 'todo') {
-                $this->reporter->announceTestTodo();
+                $this->reporter->announceTestTodo($report);
                 continue;
             }
             elseif ($report['type'] == 'skip') {
-                $this->reporter->announceTestSkip();
+                $this->reporter->announceTestSkip($report);
                 continue;
             }
             else {
-                $this->reporter->announceTestFail();
+                $this->reporter->announceTestFail($report);
             }
         }
     }
@@ -114,13 +121,13 @@ class Snap_TestAggregator {
             $data = 'No error output captured. Please ensure your PHP environment allows output of errors.';
         }
         
-        $this->report_list[] = array(
+        $report = array(
             'type' => 'fatal',
             'message' => $file . ' had a fatal error: '.$data,
             'skip_details' => true,
         );
-        
-        $this->reporter->announceTestFail();
+        $this->report_list[] = $report;
+        $this->reporter->announceTestFail($report);
     }
     
     /**
