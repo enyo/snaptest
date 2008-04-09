@@ -5,13 +5,11 @@
  */
 class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter implements Snap_UnitTestReporterInterface {
 
-    /**
-     * generate a text based report of the output data
-     * @return void
-     */
-    public function generateReport($reports) {
-        echo SNAPTEST_TOKEN_START . serialize($reports) . SNAPTEST_TOKEN_END;
+    public function generateHeader() {
+        echo SNAPTEST_TOKEN_START;
     }
+    
+    public function announceTestCount($test_count) {}
     
     public function announceTestPass($report) {}
     
@@ -24,4 +22,12 @@ class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter implemen
     public function announceTestSkip($report) {}
     
     public function announceTestCaseComplete($report) {}
+    
+    public function generateReport($reports) {
+        echo serialize($reports);
+    }
+    
+    public function generateFooter() {
+        echo SNAPTEST_TOKEN_END;
+    }
 }

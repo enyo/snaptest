@@ -1,7 +1,7 @@
 <?php
 
 interface Snap_UnitTestReporterInterface {
-    public function __construct();
+    public function __construct($test_count = null);
     public function createReport();
     public function recordTestPass($class, $method);
     public function recordTestCaseComplete($class);
@@ -12,6 +12,9 @@ interface Snap_UnitTestReporterInterface {
     public function recordTestDefect(Exception $e);
     public function recordPHPError($errstr, $errfile, $errline, $trace);
     public function generateReport($reports);
+    public function generateHeader();
+    public function generateFooter();
+    public function announceTestCount($test_count);
     public function announceTestPass($report);
     public function announceTestFail($report);
     public function announceTestDefect($report);
@@ -31,8 +34,10 @@ class Snap_UnitTestReporter {
     /**
      * report constructor, initializes all the variables
      */
-    public function __construct() {
+    public function __construct($test_count = null) {
         $this->reports = array();
+        $this->generateHeader();
+        $this->announceTestCount($test_count);
     }
     
     public final function createReport() {

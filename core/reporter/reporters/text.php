@@ -3,11 +3,35 @@
  * Text Output Unit Test Reporter
  */
 class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_UnitTestReporterInterface {
-
-    /**
-     * generate a text based report of the output data
-     * @return void
-     */
+    
+    protected $has_errors = false;
+    
+    public function generateHeader() {}
+    
+    public function announceTestCount($test_count) {}
+    
+    public function announceTestPass($report) {
+        echo '.';
+    }
+    
+    public function announceTestFail($report) {
+        echo 'F';
+    }
+    
+    public function announceTestDefect($report) {
+        echo 'D';
+    }
+    
+    public function announceTestTodo($report) {
+        echo 'T';
+    }
+    
+    public function announceTestSkip($report) {
+        echo 'S';
+    }
+    
+    public function announceTestCaseComplete($report) {}
+    
     public function generateReport($reports) {
         $cases  = 0;
         $pass   = 0;
@@ -39,7 +63,7 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
                 $defect++;
             }
             elseif ($report['type'] == 'phperr') {
-                $error++;
+                $this->has_errors = true;
             }
             elseif ($report['type'] == 'todo') {
                 $todo++;
@@ -88,8 +112,10 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
         echo 'Total Failures: '.$fail."\n";
         echo 'Total Skips:    '.$skip."\n";
         echo 'Total Todo:     '.$todo."\n";        
-        
-        if ($error > 0) {
+    }
+    
+    public function generateFooter() {
+        if ($this->has_errors) {
             echo "\n".'You have unchecked errors in your tests.  These errors should be'."\n";
             echo 'removed, or acknowledged with $this->willError() in their respective'."\n";
             echo 'tests.'."\n";
@@ -104,20 +130,5 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
         }
     }
     
-    public function announceTestPass($report) {
-        echo '.';
-    }
-    public function announceTestFail($report) {
-        echo 'F';
-    }
-    public function announceTestDefect($report) {
-        echo 'D';
-    }
-    public function announceTestTodo($report) {
-        echo 'T';
-    }
-    public function announceTestSkip($report) {
-        echo 'S';
-    }
-    public function announceTestCaseComplete($report) {}
+
 }

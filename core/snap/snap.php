@@ -44,9 +44,9 @@ class Snap_Tester {
      * the array of tests to run
      * @param string $output the output handler name
      */
-    public function __construct($output_type) {
+    public function __construct($output_type, $test_count = null) {
         $this->tests = array();
-        $this->setOutput($output_type);
+        $this->setOutput($output_type, $test_count);
     }
     
     /**
@@ -67,11 +67,20 @@ class Snap_Tester {
         }
 
         $c = $this->getTesterClass($input_handler, 'loader');
+        $c = new $c();
         foreach($params as $item) {
             $c->add($item);
         }
         
         $this->addTests($c->getTests());
+    }
+    
+    /**
+     * Get the output class
+     * @return Snap_UnitTestReporter
+     **/
+    public function getOutput() {
+        return $this->output;
     }
     
     /**
@@ -86,14 +95,16 @@ class Snap_Tester {
             $test = new $test_name();
             
             if ($match === null) {
-                $test->runTests($this->output);
+                $test->runTests($this->getOutput());
             }
             else {
-                $test->runTests($this->output, $match);
+                $test->runTests($this->getOutput(), $match);
             }
         }
 
-        $this->output->createReport();
+        $this->getOutput()->createReport();
+
+        $this->getOutput()->generateFooter();
         
         return true;
     }
@@ -102,17 +113,9 @@ class Snap_Tester {
      * set the output handler
      * @param string $output_type the name of an output handler
      */
-    protected function setOutput($output_type) {
-        $this->output = $this->getTesterClass($output_type, 'reporter');
-    }
-    
-    /**
-     * Get an output class instance. Useful for aggregating multiple tests
-     * @param $name the name of the class
-     * @return Snap_UnitTestReporter
-     **/
-    public function getOutput($name) {
-        return $this->getTesterClass($name, 'reporter');
+    protected function setOutput($output_type, $test_count) {
+        $output = $this->getTesterClass($output_type, 'reporter');
+        $this->output = new $output($test_count);
     }
     
     /**
@@ -127,7 +130,7 @@ class Snap_Tester {
      * resolves a tester to the proper name, serves as a factory method
      * @param string $name the name of the handler to load
      * @param string $type the type of handler, input or output
-     * @return Snap_UnitTestReporter or Snap_UnitTestLoader
+     * @return string a valid classname
      * @throws Snap_Exception
      */
     protected function getTesterClass($name, $type) {
@@ -151,7 +154,7 @@ class Snap_Tester {
             throw new Snap_Exception('Handler '.$class_name.' is not found, tried path '.$path);
         }
 
-        return new $class_name();
+        return $class_name;
     }
 
 }

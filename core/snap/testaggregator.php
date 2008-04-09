@@ -15,17 +15,10 @@ class Snap_TestAggregator {
      * @param $outmode a string of the final output mode
      **/
     public function __construct($outmode, $test_count) {
-        $st = new Snap_Tester($outmode);
-        $this->reporter = $st->getOutput($outmode);
+        $st = new Snap_Tester($outmode, $test_count);
+        $this->reporter = $st->getOutput();
         $this->report_list = array();
         $this->case_list = array();
-        
-        // tap compliance requires this stated upfront
-        if ($outmode == 'tap') {
-            echo "\n";
-            echo "TAP version 13\n";
-            echo "1..{$test_count}\n";
-        }
     }
     
     /**
@@ -137,5 +130,6 @@ class Snap_TestAggregator {
      **/
     public function onComplete() {
         $this->reporter->generateReport($this->report_list);
+        $this->reporter->generateFooter();
     }
 }
