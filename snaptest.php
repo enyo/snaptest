@@ -7,6 +7,8 @@ if (version_compare(phpversion(), '5.0.0') < 0) {
     exit;
 }
 
+define('SNAPTEST_CLI_INTERFACE', true);
+
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'constants.php';
 
 $options = Snap_Request::getLongOptions(array(

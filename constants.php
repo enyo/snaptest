@@ -3,6 +3,7 @@
 if (!defined('SNAPTEST_ROOT')) {
     define('SNAPTEST_ROOT', dirname(__FILE__) . DIRECTORY_SEPARATOR);
     define('SNAPTEST_CORE', SNAPTEST_ROOT . 'core' . DIRECTORY_SEPARATOR);
+    define('SNAPTEST_UTIL', SNAPTEST_CORE . 'util' . DIRECTORY_SEPARATOR);
     define('SNAPTEST_LOADERS', SNAPTEST_CORE . 'loader' . DIRECTORY_SEPARATOR . 'loaders' . DIRECTORY_SEPARATOR);
     define('SNAPTEST_REPORTERS', SNAPTEST_CORE . 'reporter' . DIRECTORY_SEPARATOR . 'reporters' . DIRECTORY_SEPARATOR);
     
@@ -22,10 +23,14 @@ if (!defined('SNAPTEST_ROOT')) {
 
     // include the required libraries
     include_once SNAPTEST_CORE . 'functions.php';
-    include_once SNAPTEST_CORE . 'snap' . DIRECTORY_SEPARATOR . 'analyzer.php';
-    include_once SNAPTEST_CORE . 'snap' . DIRECTORY_SEPARATOR . 'request.php';
-    include_once SNAPTEST_CORE . 'snap' . DIRECTORY_SEPARATOR . 'dispatcher.php';
-    include_once SNAPTEST_CORE . 'snap' . DIRECTORY_SEPARATOR . 'testaggregator.php';
+    
+    if (defined('SNAPTEST_CLI_INTERFACE')) {
+        include_once SNAPTEST_UTIL . 'analyzer' . DIRECTORY_SEPARATOR . 'analyzer.php';
+        include_once SNAPTEST_UTIL . 'request' . DIRECTORY_SEPARATOR . 'request.php';
+        include_once SNAPTEST_UTIL . 'dispatcher' . DIRECTORY_SEPARATOR . 'dispatcher.php';
+        include_once SNAPTEST_UTIL . 'testaggregator' . DIRECTORY_SEPARATOR . 'testaggregator.php';
+    }
+
     include_once SNAPTEST_CORE . 'snap' . DIRECTORY_SEPARATOR . 'snap.php';
     
     include_once SNAPTEST_CORE . 'exceptions' . DIRECTORY_SEPARATOR . 'exceptions.php';
