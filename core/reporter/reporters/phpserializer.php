@@ -5,9 +5,7 @@
  */
 class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter implements Snap_UnitTestReporterInterface {
 
-    public function generateHeader() {
-        echo SNAPTEST_TOKEN_START;
-    }
+    public function generateHeader() {}
     
     public function announceTestCount($test_count) {}
     
@@ -24,10 +22,8 @@ class Snap_PHPSerializer_UnitTestReporter extends Snap_UnitTestReporter implemen
     public function announceTestCaseComplete($report) {}
     
     public function generateReport($reports) {
-        echo serialize($reports);
+        echo SNAPTEST_TOKEN_START . serialize($reports) . SNAPTEST_TOKEN_END;
     }
     
-    public function generateFooter() {
-        echo SNAPTEST_TOKEN_END;
-    }
+    public function generateFooter() {}
 }
