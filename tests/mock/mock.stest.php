@@ -51,6 +51,15 @@ class Snap_MockObject_Mockable_With_Protected_Members {
     }
 }
 
+class Snap_MockObject_Mockable_With_Static_Members {
+    protected static function getTrue() {
+        return true;
+    }
+    public static function getProtectedTrue() {
+        return self::getTrue();
+    }
+}
+
 class Snap_MockObject_Test_StubGeneration extends Snap_UnitTestCase {
 
     public function setUp() {
@@ -192,5 +201,24 @@ class Snap_MockObject_Test_MockGenerationWithInheritanceProtectedMembers extends
                     ->construct(self::foo_constructor);
 
         return $this->assertEqual($foo->getFoo(), self::foo_constructor);
+    }
+}
+
+class Snap_MockObject_Test_MockGenerationWithStaticMethods extends Snap_UnitTestCase {
+    public function setUp() {
+        $this->mocked_obj = $this->mock('Snap_MockObject_Mockable_With_Static_Members')
+                                 ->requiresInheritance()
+                                 ->construct();
+    }
+    public function tearDown() {
+        unset($this->mocked_obj);
+    }
+    
+    public function testStaticClassIsMocked() {
+        return $this->assertIsA($this->mocked_obj, 'Snap_MockObject_Mockable_With_Static_Members');
+    }
+    
+    public function testProtectedMethodCallsCopiedCorrectly() {
+        return $this->assertTrue(call_user_func_array(array(get_class($this->mocked_obj), 'getProtectedTrue'), array()));
     }
 }

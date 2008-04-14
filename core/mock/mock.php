@@ -246,6 +246,15 @@ class Snap_MockObject {
             $mock_class .= '_if';
         }
         
+        // add iterations until we get a unique name for mock_class
+        $mock_class_test = $mock_class;
+        $class_counter = 1;
+        while (class_exists($mock_class_test)) {
+            $mock_class_test = $mock_class . '_' . $class_counter;
+            $class_counter++;
+        }
+        $mock_class = $mock_class_test;
+        
         $constructor_method_name = $this->class_signature.'_runConstructor';
         $setmock_method_name = $this->class_signature.'_injectMock';
         $this->constructor_args = func_get_args();
@@ -363,10 +372,16 @@ class Snap_MockObject {
         // attach header to the output
         $output .= $class_header;
         $output .= 'public $mock;'.$endl;
+        $output .= 'public static $mock_static;'.$endl;
         
         // special mock setter method
         $output .= 'public function '.$setmock_method_name.'($mock) {'.$endl;
         $output .= '    $this->mock = $mock;'.$endl;
+        $output .= '}'.$endl;
+        
+        // special static mock setter method
+        $output .= 'public static function '.$setmock_method_name.'_static($mock) {'.$endl;
+        $output .= '    self::$mock_static = $mock;'.$endl;
         $output .= '}'.$endl;
 
         // add a runConstructor call if this is refection+extension
@@ -388,87 +403,20 @@ class Snap_MockObject {
         }
         
         // add the handler for all methods
-        $output .= 'public function '.$this->class_signature.'_invokeMethod($method_name, $method_params) {'.$endl;
-        $output .= '    $method_signature = $this->'.$this->class_signature.'_findSignature($method_name, $method_params);'.$endl;
-        $output .= '    $default_signature = $this->'.$this->class_signature.'_findSignature($method_name, array());'.$endl;
-        $output .= '    if ($method_signature != $default_signature) {'.$endl;
-        $output .= '        $this->'.$this->class_signature.'_tallyMethod($default_signature, false);'.$endl;
-        $output .= '    }'.$endl;
-        $output .= '    // if we have a match, tally on it'.$endl;
-        $output .= '    if ($method_signature != null) {'.$endl;
-        $output .= '        $call_count = $this->'.$this->class_signature.'_tallyMethod($method_signature);'.$endl;
-        $output .= '        // if we have a return value, return that'.$endl;
-        $output .= '        if (isset($this->mock->methods[$method_signature][\'returns\'][$call_count])) {'.$endl;
-        $output .= '            return $this->mock->methods[$method_signature][\'returns\'][$call_count];'.$endl;
-        $output .= '        }'.$endl;
-        $output .= '        if (isset($this->mock->methods[$method_signature][\'returns\'][\'default\'])) {'.$endl;
-        $output .= '            return $this->mock->methods[$method_signature][\'returns\'][\'default\'];'.$endl;
-        $output .= '        }'.$endl;
-        $output .= '    }'.$endl;
-        $output .= '    // if we have a return value for the default signature, return that (option 2)'.$endl;
-        $output .= '    if (isset($this->mock->methods[$default_signature][\'returns\'][$call_count])) {'.$endl;
-        $output .= '        return $this->mock->methods[$default_signature][\'returns\'][$call_count];'.$endl;
-        $output .= '    }'.$endl;
-        $output .= '    if (isset($this->mock->methods[$default_signature][\'returns\'][\'default\'])) {'.$endl;
-        $output .= '        return $this->mock->methods[$default_signature][\'returns\'][\'default\'];'.$endl;
-        $output .= '    }'.$endl;
-        $output .= '    // if this is an inherited method, return parent method call'.$endl;
-        $output .= '    if ($this->mock->isInherited()) {'.$endl;
-        $output .= '        return call_user_func_array(array($this, \'parent::\'.$method_name), $method_params);'.$endl;
-        $output .= '    }'.$endl;
-        $output .= '}'.$endl;
+        $output .= $this->buildInvokeMethod($this->class_signature, false);
+        $output .= $this->buildInvokeMethod($this->class_signature, true);
         
         // finds the signature for a method name and params
-        $output .= 'public function '.$this->class_signature.'_findSignature($method_name, $method_params = array()) {'.$endl;
-        $output .= '    if (!is_array($method_params)) {'.$endl;
-        $output .= '        $method_params = array();'.$endl;
-        $output .= '    }'.$endl;
-        $output .= '    if (!isset($this->mock->signatures[$method_name])) {'.$endl;
-        $output .= '        $this->mock->signatures[$method_name] = array();'.$endl;
-        $output .= '    }'.$endl;
-        $output .= '    $method_signature = null;'.$endl;
-        $output .= '    foreach ($this->mock->signatures[$method_name] as $signature => $details) {'.$endl;
-        $output .= '        $signature_params = $details[\'params\'];'.$endl;
-        $output .= '        // default params'.$endl;
-        $output .= '        if (count($signature_params) == 0) {'.$endl;
-        $output .= '            $default_method_signature = $signature;'.$endl;
-        $output .= '            continue;'.$endl;
-        $output .= '        }'.$endl;
-        $output .= '        // non default, if all params match, use it'.$endl;
-        $output .= '        $param_match = true;'.$endl;
-        $output .= '        foreach ($signature_params as $idx=>$param) {'.$endl;
-        $output .= '            // method param does not exist, just exit'.$endl;
-        $output .= '            if (!isset($method_params[$idx])) {'.$endl;
-        $output .= '                $param_match = false;'.$endl;
-        $output .= '                break;'.$endl;
-        $output .= '            }'.$endl;
-        $output .= '            // do match. On no matches, fail entire list'.$endl;
-        $output .= '            if (!$param->match($method_params[$idx])) {'.$endl;
-        $output .= '                $param_match = false;'.$endl;
-        $output .= '                break;'.$endl;
-        $output .= '            }'.$endl;
-        $output .= '        }'.$endl;
-        $output .= '        // if we match'.$endl;
-        $output .= '        if ($param_match) {'.$endl;
-        $output .= '            $method_signature = $signature;'.$endl;
-        $output .= '        }'.$endl;
-        $output .= '    }'.$endl;
-        $output .= '    // if there was a default, but no method match, use the default'.$endl;
-        $output .= '    if (isset($default_method_signature) && !isset($method_signature)) {'.$endl;
-        $output .= '        $method_signature = $default_method_signature;'.$endl;
-        $output .= '    }'.$endl;
-        $output .= '    return $method_signature;'.$endl;
-        $output .= '}'.$endl;
+        $output .= $this->buildFindSignature($this->class_signature, false);
+        $output .= $this->buildFindSignature($this->class_signature, true);
 
-        
         // tally method for counting
-        $output .= 'public function '.$this->class_signature.'_tallyMethod($method_signature, $is_execute = true) {'.$endl;
-        $output .= '    $this->mock->methods[$method_signature][\'count\']++;'.$endl;
-        $output .= '    if ($is_execute) {'.$endl;
-        $output .= '        $this->mock->methods[$method_signature][\'exec_count\']++;'.$endl;
-        $output .= '    }';
-        $output .= '    return $this->mock->methods[$method_signature][\'exec_count\'];'.$endl;
-        $output .= '}'.$endl;
+        $output .= $this->buildTallyMethod($this->class_signature, false);
+        $output .= $this->buildTallyMethod($this->class_signature, true);
+        
+        // build the getmock methods
+        $output .= $this->buildGetMock($this->class_signature, false);
+        $output .= $this->buildGetMock($this->class_signature, true);
         
         // add all public and protected methods
         $output .= $p_methods.$endl;
@@ -501,6 +449,7 @@ class Snap_MockObject {
     protected function buildClassInstantiation($mock_class, $setmock_method, $constructor_method) {
         global $SNAP_MockObject;
         $SNAP_MockObject = $this;
+        $setmock_method_static = $setmock_method . '_static';
         
         // make the arguments for the ready class
         $ready_class = '';
@@ -522,6 +471,7 @@ class Snap_MockObject {
         
         // inject the mock class
         $ready_class->$setmock_method($this);
+        call_user_func_array(array(get_class($ready_class), $setmock_method_static), array($this));
 
         // call a real constructor if required
         if ($this->isInherited() || $this->hasConstructor()) {
@@ -533,6 +483,135 @@ class Snap_MockObject {
         
         // return the ready class
         return $ready_class;
+    }
+    
+    protected function buildInvokeMethod($class_signature, $is_static) {
+        $endl = "\n";
+        $output = '';
+        
+        $func_name = 'public '.(($is_static) ? 'static ' : '').'function '.$class_signature.'_invokeMethod'.(($is_static) ? '_static' : '');
+        $find_signature = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_findSignature'.(($is_static) ? '_static' : '');
+        $tally_method = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_tallyMethod'.(($is_static) ? '_static' : '');
+        $get_mock = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_getMock'.(($is_static) ? '_static' : '');
+        $call_parent = ($is_static) ? 'return call_user_func_array(array(\'parent\', $method_name), $method_params);'
+                                    : 'return call_user_func_array(array($this, \'parent::\'.$method_name), $method_params);';
+        
+        $output .= $func_name . '($method_name, $method_params) {'.$endl;
+        $output .= '    $method_signature = '.$find_signature.'($method_name, $method_params);'.$endl;
+        $output .= '    $default_signature = '.$find_signature.'($method_name, array());'.$endl;
+        $output .= '    $mock = '.$get_mock.'();'.$endl;
+        $output .= '    if ($method_signature != $default_signature) {'.$endl;
+        $output .= '        '.$tally_method.'($default_signature, false);'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    // if we have a match, tally on it'.$endl;
+        $output .= '    if ($method_signature != null) {'.$endl;
+        $output .= '        $call_count = '.$tally_method.'($method_signature);'.$endl;
+        $output .= '        // if we have a return value, return that'.$endl;
+        $output .= '        if (isset($mock->methods[$method_signature][\'returns\'][$call_count])) {'.$endl;
+        $output .= '            return $mock->methods[$method_signature][\'returns\'][$call_count];'.$endl;
+        $output .= '        }'.$endl;
+        $output .= '        if (isset($mock->methods[$method_signature][\'returns\'][\'default\'])) {'.$endl;
+        $output .= '            return $mock->methods[$method_signature][\'returns\'][\'default\'];'.$endl;
+        $output .= '        }'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    // if we have a return value for the default signature, return that (option 2)'.$endl;
+        $output .= '    if (isset($mock->methods[$default_signature][\'returns\'][$call_count])) {'.$endl;
+        $output .= '        return $mock->methods[$default_signature][\'returns\'][$call_count];'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    if (isset($mock->methods[$default_signature][\'returns\'][\'default\'])) {'.$endl;
+        $output .= '        return $mock->methods[$default_signature][\'returns\'][\'default\'];'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    // if this is an inherited method, return parent method call'.$endl;
+        $output .= '    if ($mock->isInherited()) {'.$endl;
+        $output .= '        '.$call_parent.$endl;
+        $output .= '    }'.$endl;
+        $output .= '}'.$endl;
+        return $output;
+    }
+    
+    protected function buildFindSignature($class_signature, $is_static) {
+        $endl = "\n";
+        $output = '';
+        
+        $func_name = 'public '.(($is_static) ? 'static ' : '').'function '.$class_signature.'_findSignature'.(($is_static) ? '_static' : '');
+        $get_mock = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_getMock'.(($is_static) ? '_static' : '');
+        
+        $output .= $func_name.'($method_name, $method_params = array()) {'.$endl;
+        $output .= '    $mock = '.$get_mock.'();'.$endl;
+        $output .= '    if (!is_array($method_params)) {'.$endl;
+        $output .= '        $method_params = array();'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    if (!isset($mock->signatures[$method_name])) {'.$endl;
+        $output .= '        $mock->signatures[$method_name] = array();'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    $method_signature = null;'.$endl;
+        $output .= '    foreach ($mock->signatures[$method_name] as $signature => $details) {'.$endl;
+        $output .= '        $signature_params = $details[\'params\'];'.$endl;
+        $output .= '        // default params'.$endl;
+        $output .= '        if (count($signature_params) == 0) {'.$endl;
+        $output .= '            $default_method_signature = $signature;'.$endl;
+        $output .= '            continue;'.$endl;
+        $output .= '        }'.$endl;
+        $output .= '        // non default, if all params match, use it'.$endl;
+        $output .= '        $param_match = true;'.$endl;
+        $output .= '        foreach ($signature_params as $idx=>$param) {'.$endl;
+        $output .= '            // method param does not exist, just exit'.$endl;
+        $output .= '            if (!isset($method_params[$idx])) {'.$endl;
+        $output .= '                $param_match = false;'.$endl;
+        $output .= '                break;'.$endl;
+        $output .= '            }'.$endl;
+        $output .= '            // do match. On no matches, fail entire list'.$endl;
+        $output .= '            if (!$param->match($method_params[$idx])) {'.$endl;
+        $output .= '                $param_match = false;'.$endl;
+        $output .= '                break;'.$endl;
+        $output .= '            }'.$endl;
+        $output .= '        }'.$endl;
+        $output .= '        // if we match'.$endl;
+        $output .= '        if ($param_match) {'.$endl;
+        $output .= '            $method_signature = $signature;'.$endl;
+        $output .= '        }'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    // if there was a default, but no method match, use the default'.$endl;
+        $output .= '    if (isset($default_method_signature) && !isset($method_signature)) {'.$endl;
+        $output .= '        $method_signature = $default_method_signature;'.$endl;
+        $output .= '    }'.$endl;
+        $output .= '    return $method_signature;'.$endl;
+        $output .= '}'.$endl;
+        
+        return $output;
+    }
+    
+    protected function buildTallyMethod($class_signature, $is_static) {
+        $endl = "\n";
+        $output = '';
+        
+        $func_name = 'public '.(($is_static) ? 'static ' : '').'function '.$class_signature.'_tallyMethod'.(($is_static) ? '_static' : '');
+        $get_mock = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_getMock'.(($is_static) ? '_static' : '');
+        
+        $output .= $func_name.'($method_signature, $is_execute = true) {'.$endl;
+        $output .= '    $mock = '.$get_mock.'();'.$endl;
+        $output .= '    $mock->methods[$method_signature][\'count\']++;'.$endl;
+        $output .= '    if ($is_execute) {'.$endl;
+        $output .= '        $mock->methods[$method_signature][\'exec_count\']++;'.$endl;
+        $output .= '    }';
+        $output .= '    return $mock->methods[$method_signature][\'exec_count\'];'.$endl;
+        $output .= '}'.$endl;
+        
+        return $output;
+    }
+    
+    protected function buildGetMock($class_signature, $is_static) {
+        $endl = "\n";
+        $output = '';
+        
+        $func_name = 'public '.(($is_static) ? 'static ' : '').'function '.$class_signature.'_getMock'.(($is_static) ? '_static' : '');
+        $mock_location = ($is_static) ? 'self::$mock_static' : '$this->mock';
+        
+        $output .= $func_name.'() {'.$endl;
+        $output .= '    return '.$mock_location.';'.$endl;
+        $output .= '}'.$endl;
+        
+        return $output;
     }
     
     /**
@@ -558,6 +637,9 @@ class Snap_MockObject {
         // this is considered a normal method, we can use reflection to build it to
         // specification.
         $method = new ReflectionMethod($this->mocked_class, $method_name);
+        
+        // is this a static method
+        $is_static = $method->isStatic();
 
         $param_string = '';
         foreach ($method->getParameters() as $i => $param) {
@@ -573,10 +655,13 @@ class Snap_MockObject {
         
         $output  = '';
         $endl = "\n";
-        $output .= $scope.' function '.$method_name.'('.$param_string.') {'.$endl;
+        
+        $invoke_method = (($is_static) ? 'self::'.$this->class_signature : '$this->'.$this->class_signature).'_invokeMethod'.(($is_static) ? '_static' : '');
+        
+        $output .= $scope.(($is_static) ? ' static' : '').' function '.$method_name.'('.$param_string.') {'.$endl;
         if (!$method->isConstructor() && strtolower($method->getName()) != '__construct') {
             $output .= '    $args = func_get_args();'.$endl;
-            $output .= '    return $this->'.$this->class_signature.'_invokeMethod(\''.$method_name.'\', $args);'.$endl;
+            $output .= '    return '.$invoke_method.'(\''.$method_name.'\', $args);'.$endl;
         }
         else {
             // constructor takes the mock in question and loads it

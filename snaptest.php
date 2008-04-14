@@ -96,6 +96,9 @@ unset($analyzer);
 // build a master test key list
 $master_test_key_list = array();
 foreach ($master_test_list as $file => $classes) {
+    if ($classes == false) {
+        die ("File $file could not be read due to a fatal error.\n");
+    }
     foreach ($classes as $klass => $tests) {
         foreach ($tests as $test) {
             $master_test_key_list[] = Snap_Request::makeTestKey($file, $klass, $test);
