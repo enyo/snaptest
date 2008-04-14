@@ -44,6 +44,9 @@ class Snap_TestAggregator {
                 $data = 'No error output captured. Please ensure your PHP environment allows output of errors.';
             }
             
+            // remove start and end tokens
+            $data = str_replace(array(SNAPTEST_TOKEN_START, SNAPTEST_TOKEN_END), '', $data);
+            
             $report = array(
                 'type' => 'fatal',
                 'message' => ($problem_output) ? $problem_output : $file . ' had a fatal error: '.$data,
@@ -113,6 +116,9 @@ class Snap_TestAggregator {
         if (!$data) {
             $data = 'No error output captured. Please ensure your PHP environment allows output of errors.';
         }
+        
+        // remove start and end tokens
+        $data = str_replace(array(SNAPTEST_TOKEN_START, SNAPTEST_TOKEN_END), '', $data);
         
         $report = array(
             'type' => 'fatal',
