@@ -60,6 +60,12 @@ class Snap_MockObject_Mockable_With_Static_Members {
     }
 }
 
+class Snap_MockObject_Mockable_With_Static_Members_Extended extends Snap_MockObject_Mockable_With_Static_Members {
+    public static function getProtectedParentTrue() {
+        return parent::getProtectedTrue();
+    }
+}
+
 class Snap_MockObject_Test_StubGeneration extends Snap_UnitTestCase {
 
     public function setUp() {
@@ -219,6 +225,52 @@ class Snap_MockObject_Test_MockGenerationWithStaticMethods extends Snap_UnitTest
     }
     
     public function testProtectedMethodCallsCopiedCorrectly() {
-        return $this->assertTrue(call_user_func_array(array(get_class($this->mocked_obj), 'getProtectedTrue'), array()));
+        return $this->assertTrue(SNAP_calStatic($this->mocked_obj, 'getProtectedTrue'));
     }
 }
+
+class Snap_MockObject_Test_MockGenerationWithStaticMethodsAndOverriding extends Snap_UnitTestCase {
+    public function setUp() {
+        $this->mocked_obj = $this->mock('Snap_MockObject_Mockable_With_Static_Members')
+                                 ->requiresInheritance()
+                                 ->setReturnValue('getTrue', false)
+                                 ->construct();
+    }
+    public function tearDown() {
+        unset($this->mocked_obj);
+    }
+    
+    public function testStaticClassIsMocked() {
+        return $this->assertIsA($this->mocked_obj, 'Snap_MockObject_Mockable_With_Static_Members');
+    }
+    
+    public function testProtectedMethodCallsCopiedCorrectly() {
+        return $this->assertFalse(SNAP_calStatic($this->mocked_obj, 'getProtectedTrue'));
+    }
+}
+
+class Snap_MockObject_Test_MockGenerationWithStaticMethodsAndExtension extends Snap_UnitTestCase {
+    public function setUp() {
+        $this->mocked_obj = $this->mock('Snap_MockObject_Mockable_With_Static_Members_Extended')
+                                 ->setReturnValue('getTrue', false)
+                                 ->requiresInheritance()
+                                 ->construct();
+    }
+    public function tearDown() {
+        unset($this->mocked_obj);
+    }
+    
+    public function testStaticClassIsMocked() {
+        return $this->assertIsA($this->mocked_obj, 'Snap_MockObject_Mockable_With_Static_Members_Extended');
+    }
+    
+    public function testStaticClassExtendsCorrectly() {
+        return $this->assertIsA($this->mocked_obj, 'Snap_MockObject_Mockable_With_Static_Members');
+    }
+    
+    // Despite overriding getTrue, this is a call to parent::, so it should not be overriden
+    public function testProtectedMethodCallsCopiedCorrectly() {
+        return $this->assertTrue(SNAP_calStatic($this->mocked_obj, 'getProtectedParentTrue'));
+    }
+}
+

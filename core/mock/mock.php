@@ -1,6 +1,26 @@
 <?php
 
 /**
+ * Calls a static method on an object. Useful for simplifying call_user_func_array
+ * This takes advantage of the fact php static objects can exist as instances
+ * and uses call_user_func_array to create a static call based on the class
+ * This is especially useful when working with mocked static objects, where
+ * the name of the class is unknown
+ * @param $obj an instance of an object
+ **/
+function SNAP_calStatic($obj, $method, $params = array()) {
+    
+    $params = (is_array($params)) ? $params : array($params);
+    $obj_name = (is_object($obj)) ? get_class($obj) : strval($obj);
+    
+    if (!class_exists($obj_name)) {
+        throw new Snap_Exception('Static call on '.$obj_name.' when it is not an object.');
+    }
+
+    return call_user_func_array(array($obj_name, $method), $params);
+}
+
+/**
  * MockObject Base Class
  * Can create mock objects and assign expectations to them
  */
@@ -10,6 +30,7 @@ class Snap_MockObject {
     protected $interface_names;
     protected $mocked_class;
     protected $requires_magic_methods;
+    protected $requires_static_methods;
     protected $has_constructor;
     
     public $methods;
@@ -29,6 +50,7 @@ class Snap_MockObject {
         // $this->test = $test;
         $this->requires_inheritance = false;
         $this->requires_magic_methods = false;
+        $this->requires_static_methods = false;
         $this->has_constructor = false;
         $this->interface_names = array();
         $this->methods = array();
@@ -82,6 +104,23 @@ class Snap_MockObject {
      **/
     public function hasConstructor() {
         return $this->has_constructor;
+    }
+    
+    /**
+     * Specify this mock object requires static methods
+     * @return MockObject the mock setup object
+     **/
+    public function requiresStaticMethods() {
+        $this->requires_static_methods = true;
+        return $this;
+    }
+    
+    /**
+     * Returns if the mock object has static methods
+     * @return boolean TRUE if object has static methods
+     **/
+    public function hasStaticMethods() {
+        return $this->requires_static_methods;
     }
     
     /**
@@ -288,6 +327,11 @@ class Snap_MockObject {
                 continue;
             }
             
+            // if static methods are required, add a flag
+            if ($method->isStatic()) {
+                $this->requiresStaticMethods();
+            }
+            
             if ($method->isPublic()) {
                 $public_methods[] = $method->getName();
                 $this->listenTo($method->getName());
@@ -372,16 +416,10 @@ class Snap_MockObject {
         // attach header to the output
         $output .= $class_header;
         $output .= 'public $mock;'.$endl;
-        $output .= 'public static $mock_static;'.$endl;
         
         // special mock setter method
         $output .= 'public function '.$setmock_method_name.'($mock) {'.$endl;
         $output .= '    $this->mock = $mock;'.$endl;
-        $output .= '}'.$endl;
-        
-        // special static mock setter method
-        $output .= 'public static function '.$setmock_method_name.'_static($mock) {'.$endl;
-        $output .= '    self::$mock_static = $mock;'.$endl;
         $output .= '}'.$endl;
 
         // add a runConstructor call if this is refection+extension
@@ -404,22 +442,33 @@ class Snap_MockObject {
         
         // add the handler for all methods
         $output .= $this->buildInvokeMethod($this->class_signature, false);
-        $output .= $this->buildInvokeMethod($this->class_signature, true);
         
         // finds the signature for a method name and params
         $output .= $this->buildFindSignature($this->class_signature, false);
-        $output .= $this->buildFindSignature($this->class_signature, true);
-
+        
         // tally method for counting
         $output .= $this->buildTallyMethod($this->class_signature, false);
-        $output .= $this->buildTallyMethod($this->class_signature, true);
         
         // build the getmock methods
         $output .= $this->buildGetMock($this->class_signature, false);
-        $output .= $this->buildGetMock($this->class_signature, true);
         
         // add all public and protected methods
         $output .= $p_methods.$endl;
+        
+        // add all static output if required
+        if ($this->hasStaticMethods()) {
+            $output .= 'public static $mock_static;'.$endl;
+        
+            // special static mock setter method
+            $output .= 'public static function '.$setmock_method_name.'_static($mock) {'.$endl;
+            $output .= '    self::$mock_static = $mock;'.$endl;
+            $output .= '}'.$endl;
+            
+            $output .= $this->buildInvokeMethod($this->class_signature, true);
+            $output .= $this->buildFindSignature($this->class_signature, true);
+            $output .= $this->buildTallyMethod($this->class_signature, true);
+            $output .= $this->buildGetMock($this->class_signature, true);
+        }
         
         // ending } for class
         $output .= '}'.$endl;
@@ -471,7 +520,10 @@ class Snap_MockObject {
         
         // inject the mock class
         $ready_class->$setmock_method($this);
-        call_user_func_array(array(get_class($ready_class), $setmock_method_static), array($this));
+        
+        if ($this->hasStaticMethods()) {
+            call_user_func_array(array(get_class($ready_class), $setmock_method_static), array($this));
+        }
 
         // call a real constructor if required
         if ($this->isInherited() || $this->hasConstructor()) {
@@ -493,7 +545,7 @@ class Snap_MockObject {
         $find_signature = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_findSignature'.(($is_static) ? '_static' : '');
         $tally_method = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_tallyMethod'.(($is_static) ? '_static' : '');
         $get_mock = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_getMock'.(($is_static) ? '_static' : '');
-        $call_parent = ($is_static) ? 'return call_user_func_array(array(\'parent\', $method_name), $method_params);'
+        $call_parent = ($is_static) ? 'return call_user_func_array(array(\'self\', \''.$class_signature.'_\'.$method_name.\'_original\'), $method_params);'
                                     : 'return call_user_func_array(array($this, \'parent::\'.$method_name), $method_params);';
         
         $output .= $func_name . '($method_name, $method_params) {'.$endl;
@@ -648,13 +700,42 @@ class Snap_MockObject {
 
             $ref = ($param->isPassedByReference()) ? '&' : '';
 
-            $param_string .= $type . $ref . '$par'.$i.$default_value.',';
+            $param_string .= $type . $ref . '$'.$param->getName().$default_value.',';
         }
         
         $param_string = trim($param_string, ',');
         
         $output  = '';
         $endl = "\n";
+        
+        // if this is static, AND we need the original methods, copy them
+        // please replace with late static bindings once PHP 5.3 becomes
+        // a baseline
+        if ($is_static && $this->isInherited()) {
+            
+            $contents = file($method->getFileName());
+            $start_line = $method->getStartLine();
+            $end_line = $method->getEndLine();
+
+            $contents = implode("\n", array_slice($contents, $start_line - 1, $end_line - $start_line + 1));
+            
+            $matches = array();
+            preg_match('/.*?function[\s]+'.$method_name.'.*?\{([\s\S]*)\}/i', $contents, $matches);
+            
+            // map self:: and parent:: to proper things
+            $replaces = array(
+                // self is implied, since it's in the new class, it resolves correctly
+                'parent::' => get_parent_class($this->mocked_class).'::',
+            );
+            $contents = trim(str_replace(array_keys($replaces), array_values($replaces), $matches[1]));
+            
+            $output .= 'public static function '.$this->class_signature.'_'.$method_name.'_original('.$param_string.') {'.$endl;
+            
+            // add the original method's guts here
+            $output .= $endl.$contents.$endl;
+            
+            $output .= '}'.$endl;
+        }
         
         $invoke_method = (($is_static) ? 'self::'.$this->class_signature : '$this->'.$this->class_signature).'_invokeMethod'.(($is_static) ? '_static' : '');
         
