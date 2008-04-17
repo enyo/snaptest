@@ -43,7 +43,9 @@ $path = realpath($path);
 if ($analyze) {
     $analyzer = new Snap_FileAnalyzer();
     $results = $analyzer->analyzeFile($path);
+    echo SNAPTEST_TOKEN_START;
     echo serialize($results);
+    echo SNAPTEST_TOKEN_END;
     echo SNAP_STREAM_ENDING_TOKEN;
     exit;
 }

@@ -16,7 +16,17 @@ class Snap_FileAnalyzer {
      * @param $data the inspection of that file
      **/
     public function onThreadComplete($file, $data) {
-        $this->results[$file] = unserialize($data);
+        $matches = array();
+        preg_match('/'.SNAPTEST_TOKEN_START.'([\s\S]*)'.SNAPTEST_TOKEN_END.'/', $data, $matches);
+
+        $results = (isset($matches[1])) ? unserialize($matches[1]) : false;
+        $problem_output = substr($data, 0, strpos($data, SNAPTEST_TOKEN_START));
+        
+        if (!$results) {
+            $data = str_replace(array(SNAPTEST_TOKEN_START, SNAPTEST_TOKEN_END), '', $data);
+            return false;
+        }
+        $this->results[$file] = $results;
     }
     
     /**
