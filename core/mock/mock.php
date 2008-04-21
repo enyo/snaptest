@@ -129,6 +129,7 @@ class Snap_MockObject {
      **/
     public function requiresMagicMethods() {
         $this->requires_magic_methods = true;
+        return $this;
     }
     
     /**
@@ -146,6 +147,7 @@ class Snap_MockObject {
      **/
     public function requiresInterface($iface) {
         $this->interface_names[] = $iface;
+        return $this;
     }
     
     /**
@@ -264,83 +266,28 @@ class Snap_MockObject {
      * @throws Snap_UnitTestException
      */
     public function construct() {
-        // include once on matching file
-        // include_once str_replace('.test', '', __FILE__);
-        
-        // create the class
-        // $class_name = preg_replace('/^test_/', '', get_class($this));
-
-        
-        $keys = array_keys($this->methods);
-        sort($keys);
-        $this->class_signature = 'c'.md5(strtolower(serialize($keys)));
-        
-        $mock_class = 'mock_'.$this->mocked_class.'_'.$this->class_signature;
-        
-        // add suffixes if there is inheritance / interface
-        if ($this->isInherited()) {
-            $mock_class .= '_ri';
-        }
-        if (count($this->getInterfaces()) > 0) {
-            $mock_class .= '_if';
-        }
-        
-        // add iterations until we get a unique name for mock_class
-        $mock_class_test = $mock_class;
-        $class_counter = 1;
-        while (class_exists($mock_class_test)) {
-            $mock_class_test = $mock_class . '_' . $class_counter;
-            $class_counter++;
-        }
-        $mock_class = $mock_class_test;
+        $mock_class = $this->generateClassName();
         
         $constructor_method_name = $this->class_signature.'_runConstructor';
         $setmock_method_name = $this->class_signature.'_injectMock';
         $this->constructor_args = func_get_args();
         
-        // reflect the class
-        $reflected_class = new ReflectionClass($this->mocked_class);
-        
         // get the public methods
-        $public_methods = array();
-        $protected_methods = array();
-        foreach ($reflected_class->getMethods() as $method) {
-            if ($method->isConstructor() || strtolower($method->getName()) == '__construct') {
-                // special constructor stuff here
-                $public_methods[] = $method->getName();
-                $this->listenTo($method->getName());
-                $this->requiresConstructor();
-                continue;
+        $class_list = array_unique(array_merge(array($this->mocked_class), $this->interface_names));
+        $method_list = $this->locateAllMethods($class_list);
+
+        // listen to all methods. If there are protected methods, and we are inherited
+        // listen to those
+        foreach ($method_list as $method => $data) {
+            if ($data['scope'] == 'public') {
+                $this->listenTo($method);
             }
-            
-            // skip all other magic methods
-            if (strpos($method->getName(), '__') === 0) {
-                if (strtolower($method->getName()) == '__call') {
-                    $this->requiresMagicMethods();
-                }
-                continue;
-            }
-            
-            // skip all final methods
-            if ($method->isFinal() && $this->isInherited()) {
-                // cannot be overridden
-                continue;
-            }
-            
-            // if static methods are required, add a flag
-            if ($method->isStatic()) {
-                $this->requiresStaticMethods();
-            }
-            
-            if ($method->isPublic()) {
-                $public_methods[] = $method->getName();
-                $this->listenTo($method->getName());
-            }
-            if ($method->isProtected() && $this->isInherited()) {
-                $protected_methods[] = $method->getName();
-                $this->listenTo($method->getName());
+            elseif ($data['scope'] == 'protected' && $this->isInherited()) {
+                $this->listenTo($method);
             }
         }
+        
+
         
         // sanity check. Make sure each logged method we put expectations on
         // is in our public or protected list. If not, setting up this object
@@ -352,12 +299,12 @@ class Snap_MockObject {
             }
             
             // if in public, we are okay
-            if (is_array($public_methods) && in_array($method_name, $public_methods)) {
+            if (isset($method_list[$method_name]) && $method_list[$method_name]['scope'] == 'public') {
                 continue;
             }
             
             // if in protected, and we are requiring inheritance, we are okay
-            if ($this->isInherited() && is_array($protected_methods) && in_array($method_name, $protected_methods)) {
+            if (isset($method_list[$method_name]) && $method_list[$method_name]['scope'] == 'protected' && $this->isInherited()) {
                 continue;
             }
             
@@ -365,12 +312,16 @@ class Snap_MockObject {
             // we also need to listen to it
             if ($this->hasMagicMethods()) {
                 $this->listenTo($method_name);
-                if (is_array($public_methods) && !in_array($method_name, $public_methods)) {
-                    $public_methods[] = $method_name;
+                if (!isset($method_list[$method_name])) {
+                    // add to the stack
+                    $method_list[$method_name] = array(
+                        'scope' => 'public',
+                        'class' => $this->mocked_class,
+                    );
                 }
                 continue;
             }
-            
+
             // now we're in trouble. We throw an exception, as they
             // called on something that is not mockable
             throw new Snap_UnitTestException('setup_invalid_method', $this->mocked_class.'::'.$method_name.' cannot have expects or return values. It might be private or final.');
@@ -387,15 +338,13 @@ class Snap_MockObject {
         // it's call count, then try/catch the method, returning
         // it's value
         $p_methods = '';
-        foreach ($public_methods as $method) {
-            $p_methods .= $this->buildMethod($method, 'public');
-        }
-        
-        // if this needs inheritance, protected methods may need to be
-        // punched out as well
-        if ($this->isInherited()) {
-            foreach($protected_methods as $method) {
-                $p_methods .= $this->buildMethod($method, 'protected');
+        foreach ($method_list as $method_name => $data) {
+            if ($data['scope'] == 'public') {
+                $p_methods .= $this->buildMethod($data['class'], $method_name, 'public');
+                continue;
+            }
+            if ($data['scope'] == 'protected' && $this->isInherited()) {
+                $p_methods .= $this->buildMethod($data['class'], $method_name, 'protected');
             }
         }
         
@@ -484,6 +433,94 @@ class Snap_MockObject {
         
         // create the ready class
         return $this->buildClassInstantiation($mock_class, $setmock_method_name, $constructor_method_name);
+    }
+    
+    protected function generateClassName() {
+        $keys = array_keys($this->methods);
+        sort($keys);
+        $this->class_signature = 'c'.md5(strtolower(serialize($keys)));
+        
+        $mock_class = 'mock_'.$this->mocked_class.'_'.$this->class_signature;
+        
+        // add suffixes if there is inheritance / interface
+        if ($this->isInherited()) {
+            $mock_class .= '_ri';
+        }
+        if (count($this->getInterfaces()) > 0) {
+            $mock_class .= '_if';
+        }
+        
+        // add iterations until we get a unique name for mock_class
+        $mock_class_test = $mock_class;
+        $class_counter = 1;
+        while (class_exists($mock_class_test)) {
+            $mock_class_test = $mock_class . '_' . $class_counter;
+            $class_counter++;
+        }
+        
+        return $mock_class_test;
+    }
+    
+    protected function locateAllMethods($class_list) {
+        $methods = array();
+
+        foreach ($class_list as $class_name) {
+            // reflect the class
+            $reflected_class = new ReflectionClass($class_name);
+            foreach ($reflected_class->getMethods() as $method) {
+                if ($method->isConstructor() || strtolower($method->getName()) == '__construct') {
+                    // special constructor stuff here
+                    $methods[$method->getName()] = array(
+                        'class' => $class_name,
+                        'scope' => 'public',
+                    );
+                    $this->requiresConstructor();
+                    continue;
+                }
+
+                // __call magic method
+                if (strtolower($method->getName()) == '__call') {
+                    $this->requiresMagicMethods();
+                }
+
+                // skip all other magic methods
+                if (strpos($method->getName(), '__') === 0) {
+                    continue;
+                }
+            
+                // skip all final methods
+                if ($method->isFinal() && $this->isInherited()) {
+                    // cannot be overridden
+                    continue;
+                }
+            
+                // if static methods are required, add a flag
+                if ($method->isStatic()) {
+                    $this->requiresStaticMethods();
+                }
+            
+                if ($method->isPublic()) {
+                    $methods[$method->getName()] = array(
+                        'class' => $class_name,
+                        'scope' => 'public',
+                    );
+                }
+                if ($method->isProtected()) {
+                    $methods[$method->getName()] = array(
+                        'class' => $class_name,
+                        'scope' => 'protected',
+                    );
+                }
+                if ($method->isPrivate()) {
+                    $methods[$method->getName()] = array(
+                        'class' => $class_name,
+                        'scope' => 'private',
+                    );
+                }
+            }
+        }
+
+        return $methods;
     }
     
     /**
@@ -672,8 +709,8 @@ class Snap_MockObject {
      * @param string $method_name
      * @return string php eval ready output
      */
-    protected function buildMethod($method_name, $scope) {
-        if (!method_exists($this->mocked_class, $method_name) && $this->hasMagicMethods()) {
+    protected function buildMethod($class_name, $method_name, $scope) {
+        if (!method_exists($class_name, $method_name) && $this->hasMagicMethods()) {
             // magic method code!
             // if the method doesn't exist, and this class has magic methods, we have to
             // assume this was a magic method.
@@ -688,7 +725,7 @@ class Snap_MockObject {
         
         // this is considered a normal method, we can use reflection to build it to
         // specification.
-        $method = new ReflectionMethod($this->mocked_class, $method_name);
+        $method = new ReflectionMethod($class_name, $method_name);
         
         // is this a static method
         $is_static = $method->isStatic();
