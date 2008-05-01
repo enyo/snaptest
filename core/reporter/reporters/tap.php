@@ -6,14 +6,14 @@
 class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter implements Snap_UnitTestReporterInterface {
 
     protected $type_mapping = array(
-        'pass'      => true,
-        'case'      => true,
-        'fail'      => false,
-        'skip'      => true,
-        'todo'      => false,
-        'defect'    => false,
-        'phperr'    => false,
-        'fatal'     => false,
+        'pass'      => TRUE,
+        'case'      => TRUE,
+        'fail'      => FALSE,
+        'skip'      => TRUE,
+        'todo'      => FALSE,
+        'defect'    => FALSE,
+        'phperr'    => FALSE,
+        'fatal'     => FALSE,
     );
     
     protected $phperr = 0;

@@ -143,7 +143,7 @@ class Snap_Request {
             
                 $opt_pair = explode('=', substr($arg, 2), 2);
                 $opt_name = $opt_pair[0];
-                $opt_value = (isset($opt_pair[1])) ? $opt_pair[1] : true;
+                $opt_value = (isset($opt_pair[1])) ? $opt_pair[1] : TRUE;
                 $arguments[$opt_name] = trim($opt_value, '"\'');
             }
         }
@@ -159,7 +159,7 @@ class Snap_Request {
                 continue;
             }
             if (isset($arguments[$key]) && is_bool($default)) {
-                $request[$key] = true;
+                $request[$key] = TRUE;
                 continue;
             }
         }

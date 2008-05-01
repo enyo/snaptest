@@ -10,7 +10,7 @@ abstract class Snap_Expectation {
      * Constructor which holds internal data
      * @param mixed $data the incoming data
      */
-    public function __construct($data = null) {
+    public function __construct($data = NULL) {
         $this->data = $data;
     }
     
@@ -28,7 +28,7 @@ abstract class Snap_Expectation {
  * An anything expectation, will always match
  */
 class Snap_Anything_Expectation extends Snap_Expectation {
-    public function match($statement) { return true; }
+    public function match($statement) { return TRUE; }
 }
 
 /**
@@ -36,7 +36,7 @@ class Snap_Anything_Expectation extends Snap_Expectation {
  */
 class Snap_Object_Expectation extends Snap_Expectation {
     public function match($obj) {
-        return ($obj instanceof $this->data) ? true : false;
+        return ($obj instanceof $this->data) ? TRUE : FALSE;
     }
 }
 
@@ -49,23 +49,23 @@ class Snap_Equals_Expectation extends Snap_Expectation {
     /**
      * matches an incoming item against the constructor data
      * @param mixed $in the incoming item to match
-     * @return bool true if matched
+     * @return bool TRUE if matched
      */
     public function match($in) {
-        return ($in == $this->data) ? true : false;
+        return ($in == $this->data) ? TRUE : FALSE;
     }
 }
 
 /**
- * Snap Same Expectation. Must pass a === check
+ * Snap Identical Expectation. Must pass a === check
  */
-class Snap_Same_Expectation extends Snap_Expectation {
+class Snap_Identical_Expectation extends Snap_Expectation {
 
     /**
      * matches against a strict equals ===
      */
     public function match($in) {
-        return ($in === $this->data) ? true : false;
+        return ($in === $this->data) ? TRUE : FALSE;
     }
 }
 
@@ -80,7 +80,7 @@ class Snap_Regex_Expectation extends Snap_Expectation {
      * @see Snap_Expectation::match()
      */
     public function match($statement) {
-        return (preg_match($this->data, $statement)) ? true : false;
+        return (preg_match($this->data, $statement)) ? TRUE : FALSE;
     }
 }
 

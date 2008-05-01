@@ -19,12 +19,12 @@ class Snap_FileAnalyzer {
         $matches = array();
         preg_match('/'.SNAPTEST_TOKEN_START.'([\s\S]*)'.SNAPTEST_TOKEN_END.'/', $data, $matches);
 
-        $results = (isset($matches[1])) ? unserialize($matches[1]) : false;
+        $results = (isset($matches[1])) ? unserialize($matches[1]) : FALSE;
         $problem_output = substr($data, 0, strpos($data, SNAPTEST_TOKEN_START));
         
         if (!$results) {
             $data = str_replace(array(SNAPTEST_TOKEN_START, SNAPTEST_TOKEN_END), '', $data);
-            return false;
+            return FALSE;
         }
         $this->results[$file] = $results;
     }
@@ -35,7 +35,7 @@ class Snap_FileAnalyzer {
      * @param $data the data up to the point of failure
      **/
     public function onThreadFail($file, $data) {
-        $this->results[$file] = false;
+        $this->results[$file] = FALSE;
     }
     
     /**

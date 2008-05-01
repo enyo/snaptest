@@ -36,7 +36,7 @@ class Snap_TestAggregator {
         $matches = array();
         preg_match('/'.SNAPTEST_TOKEN_START.'([\s\S]*)'.SNAPTEST_TOKEN_END.'/', $data, $matches);
 
-        $results = (isset($matches[1])) ? unserialize($matches[1]) : false;
+        $results = (isset($matches[1])) ? unserialize($matches[1]) : FALSE;
         $problem_output = substr($data, 0, strpos($data, SNAPTEST_TOKEN_START));
         
         if (!$results) {
@@ -50,7 +50,7 @@ class Snap_TestAggregator {
             $report = array(
                 'type' => 'fatal',
                 'message' => ($problem_output) ? $problem_output : $file . ' had a fatal error: '.$data,
-                'skip_details' => true,
+                'skip_details' => TRUE,
             );
             $this->report_list[] = $report;
             $this->reporter->announceTestFail($report);
@@ -61,7 +61,7 @@ class Snap_TestAggregator {
                     'type' => 'debug',
                     'message' => $problem_output,
                     'file' => $file,
-                    'skip_details' => true,
+                    'skip_details' => TRUE,
                 );
             }
         }
@@ -71,7 +71,7 @@ class Snap_TestAggregator {
             if ($report['type'] == 'case') {
                 if (!isset($this->case_list[$report['class']])) {
                     $this->report_list[] = $report;
-                    $this->case_list[$report['class']] = true;
+                    $this->case_list[$report['class']] = TRUE;
                 }
                 continue;
             }
@@ -123,7 +123,7 @@ class Snap_TestAggregator {
         $report = array(
             'type' => 'fatal',
             'message' => $file . ' had a fatal error: '.$data,
-            'skip_details' => true,
+            'skip_details' => TRUE,
         );
         $this->report_list[] = $report;
         $this->reporter->announceTestFail($report);

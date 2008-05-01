@@ -31,12 +31,12 @@ class Snap_Dispatcher {
     /**
      * Returns the path to PHP
      * Under some OSes, additional prefixes may be needed for running
-     * PHP properly in the background. If $use_prefix is true, then
+     * PHP properly in the background. If $use_prefix is TRUE, then
      * those prefixes will be prepended to the PHP path.
      * @param $use_prefix should any OS prefixes be used, including calls to "nice"
      * @return string
      **/
-    protected function getPHP($use_prefix = true) {
+    protected function getPHP($use_prefix = TRUE) {
         if (!$use_prefix) {
             return $this->php;
         }
@@ -115,7 +115,7 @@ class Snap_Dispatcher {
      **/
     protected function createHandle($call) {
         // add our php path to the $call
-        $call['php'] = $this->getPHP(false);
+        $call['php'] = $this->getPHP(FALSE);
     
         $options = $this->makeLongOptions($call);
     
@@ -137,8 +137,8 @@ class Snap_Dispatcher {
     public function dispatch($options) {
         $key_list = $options['keys'];
 
-        $socket_list = array_fill(0, $this->getMaxChildren(), false);
-        $threads_processing = false;
+        $socket_list = array_fill(0, $this->getMaxChildren(), FALSE);
+        $threads_processing = FALSE;
         while (count($key_list) || $threads_processing) {
             // there are files to process
             // look for an empty socket
@@ -149,7 +149,7 @@ class Snap_Dispatcher {
                         $data = fread($socket_list[$i]['handle'], 1024);
                     }
                     else {
-                        $data = null;
+                        $data = NULL;
                     }
 
                     if ($data) {
@@ -158,7 +158,7 @@ class Snap_Dispatcher {
                         
                         // is ending token found?
                         $end = strpos($socket_list[$i]['stream'], SNAP_STREAM_ENDING_TOKEN);
-                        if ($end !== false) {
+                        if ($end !== FALSE) {
                             // if so, capture output up to ending token, trim
                             $output = trim(substr($socket_list[$i]['stream'], 0, $end));
                             
@@ -167,7 +167,7 @@ class Snap_Dispatcher {
                             
                             // clear the socket
                             $this->closeHandle($socket_list[$i]['handle']);
-                            $socket_list[$i] = false;
+                            $socket_list[$i] = FALSE;
                         }
                         else {
                             // we're not done yet... continue to next $i
@@ -180,7 +180,7 @@ class Snap_Dispatcher {
                         
                         // array_push($key_list, $socket_list[$i]['key']);
                         $this->closeHandle($socket_list[$i]['handle']);
-                        $socket_list[$i] = false;
+                        $socket_list[$i] = FALSE;
                     }
                 }
         
@@ -224,11 +224,11 @@ class Snap_Dispatcher {
             // check if any threads are processing, and set appropriately
             for ($i = 0; $i < $this->getMaxChildren(); $i++) {
                 if ($socket_list[$i]) {
-                    $threads_processing = true;
+                    $threads_processing = TRUE;
                     break;
                 }
                 else {
-                    $threads_processing = false;
+                    $threads_processing = FALSE;
                 }
             }
         }

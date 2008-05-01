@@ -9,7 +9,7 @@
  * @param string $errstr the string of the error
  * @param string $errfile the file the error was in
  * @param int $errline the line triggered the error
- * @return false
+ * @return TRUE
  */
 function SNAP_error_handler($errno, $errstr, $errfile, $errline) {
 
@@ -17,7 +17,7 @@ function SNAP_error_handler($errno, $errstr, $errfile, $errline) {
     global $SNAP_Current_Test_Running;
     
     if ($SNAP_Current_Test_Running->canError()) {
-        return true;
+        return TRUE;
     }
     
     $trace = debug_backtrace();
@@ -26,7 +26,7 @@ function SNAP_error_handler($errno, $errstr, $errfile, $errline) {
     $SNAP_Current_Reporter_Running->recordPHPError($errstr, $errfile, $errline, $trace);
     
     // let it go through to php log
-    return true;
+    return TRUE;
 }
 
 /**
@@ -44,7 +44,7 @@ class Snap_Tester {
      * the array of tests to run
      * @param string $output the output handler name
      */
-    public function __construct($output_type, $test_count = null) {
+    public function __construct($output_type, $test_count = NULL) {
         $this->tests = array();
         $this->setOutput($output_type, $test_count);
     }
@@ -88,13 +88,13 @@ class Snap_Tester {
      * the results of running all tests are then logged into the reporter
      * and the output is generated
      */
-    public function runTests($match = null) {
+    public function runTests($match = NULL) {
     
         $this->tests = array_flip(array_flip($this->tests));
         foreach ($this->tests as $test_name) {
             $test = new $test_name();
             
-            if ($match === null) {
+            if ($match === NULL) {
                 $test->runTests($this->getOutput());
             }
             else {
@@ -106,7 +106,7 @@ class Snap_Tester {
 
         $this->getOutput()->generateFooter();
         
-        return true;
+        return TRUE;
     }
     
     /**
@@ -167,7 +167,7 @@ class Snap_Tester {
 // constant, so that any module can read it.
 $handle = opendir(SNAPTEST_ROOT.'addons');
 $addon_report = array();
-while (false !== ($file = readdir($handle))) {
+while (FALSE !== ($file = readdir($handle))) {
     
     // skip files starting with .
     if (substr($file, 0, 1) == '.') {
@@ -205,4 +205,4 @@ unset($addon_report);
 
 // ensure after init errors are proper
 error_reporting(E_ALL);
-ini_set('display_errors', true);
+ini_set('display_errors', TRUE);

@@ -7,7 +7,7 @@ if (version_compare(phpversion(), '5.0.0') < 0) {
     exit;
 }
 
-define('SNAPTEST_CLI_INTERFACE', true);
+define('SNAPTEST_CLI_INTERFACE', TRUE);
 
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'constants.php';
 
@@ -17,9 +17,9 @@ $options = Snap_Request::getLongOptions(array(
     'php'       => 'php',
     'nice'      => '',
     'match'     => '^.*\.stest\.php$',
-    'help'      => false,
+    'help'      => FALSE,
     'test'      => '',
-    'analyze'   => false,
+    'analyze'   => FALSE,
 ));
 
 $path       = $options[0];
@@ -86,7 +86,7 @@ $analyzer = new Snap_FileAnalyzer();
 $master_test_list = $dispatcher->dispatch(array(
     'keys'          => $file_list,
     'dispatch'      => array(
-        'analyze'       => true,
+        'analyze'       => TRUE,
         1               => '$key',
         ),
     'onThreadComplete'  => array($analyzer, 'onThreadComplete'),
@@ -98,7 +98,7 @@ unset($analyzer);
 // build a master test key list
 $master_test_key_list = array();
 foreach ($master_test_list as $file => $classes) {
-    if ($classes == false) {
+    if ($classes == FALSE) {
         die ("File $file could not be read due to a fatal error.\n");
     }
     foreach ($classes as $klass => $tests) {

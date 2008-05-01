@@ -58,9 +58,9 @@ class Snap_Equals_Expectation_Test extends Snap_UnitTestCase {
 
 
 /**
- * Tests Snap_Same_Expectation
+ * Tests Snap_Identical_Expectation
  */
-class Snap_Same_Expectation_Test extends Snap_UnitTestCase {
+class Snap_Identical_Expectation_Test extends Snap_UnitTestCase {
 
     const expect = 1;
     const actual = '1';
@@ -70,18 +70,18 @@ class Snap_Same_Expectation_Test extends Snap_UnitTestCase {
     public function tearDown() {}
     
     public function testIsAnInstanceOfSnapExpectation() {
-        $expectation = new Snap_Same_Expectation(self::expect);
+        $expectation = new Snap_Identical_Expectation(self::expect);
         return $this->assertTrue($expectation instanceof Snap_Expectation);
     }
     
     public function testLooseTypeFails() {
-        $expectation = new Snap_Same_Expectation(self::expect);
+        $expectation = new Snap_Identical_Expectation(self::expect);
         $response = $expectation->match(self::actual);
         return $this->assertFalse($response);
     }
     
     public function testStrictTypeMatches() {
-        $expectation = new Snap_Same_Expectation(self::expect);
+        $expectation = new Snap_Identical_Expectation(self::expect);
         $response = $expectation->match(self::expect);
         return $this->assertTrue($response);
     }
@@ -107,24 +107,24 @@ class Snap_Object_Expectation_Test extends Snap_UnitTestCase {
     }
     
     public function testIsAnInstanceOfSnapExpectation() {
-        $expectation = new Snap_Same_Expectation($this->expect);
+        $expectation = new Snap_Identical_Expectation($this->expect);
         return $this->assertTrue($expectation instanceof Snap_Expectation);
     }
     
     public function testNonObjectFails() {
-        $expectation = new Snap_Same_Expectation($this->expect);
+        $expectation = new Snap_Identical_Expectation($this->expect);
         $response = $expectation->match($this->non_object);
         return $this->assertFalse($response);
     }
     
     public function testWrongObjectFails() {
-        $expectation = new Snap_Same_Expectation($this->expect);
+        $expectation = new Snap_Identical_Expectation($this->expect);
         $response = $expectation->match($this->wrong_object);
         return $this->assertFalse($response);
     }
     
     public function testStrictTypeMatches() {
-        $expectation = new Snap_Same_Expectation($this->expect);
+        $expectation = new Snap_Identical_Expectation($this->expect);
         $response = $expectation->match($this->expect);
         return $this->assertTrue($response);
     }

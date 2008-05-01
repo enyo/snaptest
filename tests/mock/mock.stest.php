@@ -4,7 +4,7 @@ require dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'path.php';
 
 class Snap_MockObject_Mockable {
     public function pubReturnTrue() {
-        return true;
+        return TRUE;
     }
     public function pubCallReturnTrueThreeTimes() {
         $this->pubReturnTrue();
@@ -17,7 +17,7 @@ class Snap_MockObject_Mockable {
     }
 
     protected function proReturnTrue() {
-        return true;
+        return TRUE;
     }
     protected function proCallReturnTrueTwoTimes() {
         $this->proReturnTrue();
@@ -53,7 +53,7 @@ class Snap_MockObject_Mockable_With_Protected_Members {
 
 class Snap_MockObject_Mockable_With_Static_Members {
     protected static function getTrue() {
-        return true;
+        return TRUE;
     }
     public static function getProtectedTrue() {
         return self::getTrue();
@@ -159,7 +159,7 @@ class Snap_MockObject_Test_MockGeneration extends Snap_UnitTestCase {
     public function setUp() {
         $this->mock = new Snap_MockObject('Snap_MockObject_Mockable');
         $this->mock_generated = $this->mock->requiresInheritance()
-                                            ->setReturnValue('pubReturnTrue', false)
+                                            ->setReturnValue('pubReturnTrue', FALSE)
                                             ->construct();
         $this->mock_generated->pubCallReturnTrueThreeTimes();
     }
@@ -233,7 +233,7 @@ class Snap_MockObject_Test_MockGenerationWithStaticMethodsAndOverriding extends 
     public function setUp() {
         $this->mocked_obj = $this->mock('Snap_MockObject_Mockable_With_Static_Members')
                                  ->requiresInheritance()
-                                 ->setReturnValue('getTrue', false)
+                                 ->setReturnValue('getTrue', FALSE)
                                  ->construct();
     }
     public function tearDown() {
@@ -252,7 +252,7 @@ class Snap_MockObject_Test_MockGenerationWithStaticMethodsAndOverriding extends 
 class Snap_MockObject_Test_MockGenerationWithStaticMethodsAndExtension extends Snap_UnitTestCase {
     public function setUp() {
         $this->mocked_obj = $this->mock('Snap_MockObject_Mockable_With_Static_Members_Extended')
-                                 ->setReturnValue('getTrue', false)
+                                 ->setReturnValue('getTrue', FALSE)
                                  ->requiresInheritance()
                                  ->construct();
     }

@@ -37,7 +37,7 @@ class Snap_FileUtil_Test_makeFile extends Snap_UnitTestCase {
     }
     
     public function testPathIsFilename() {
-        return $this->assertTrue((strlen($this->path) > 0) ? true : false);
+        return $this->assertTrue((strlen($this->path) > 0) ? TRUE : FALSE);
     }
     
     public function testFileExists() {

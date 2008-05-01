@@ -4,7 +4,7 @@
  */
 class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_UnitTestReporterInterface {
     
-    protected $has_errors = false;
+    protected $has_errors = FALSE;
     
     public function generateHeader() {}
     
@@ -63,7 +63,7 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
                 $defect++;
             }
             elseif ($report['type'] == 'phperr') {
-                $this->has_errors = true;
+                $this->has_errors = TRUE;
             }
             elseif ($report['type'] == 'todo') {
                 $todo++;

@@ -1,7 +1,7 @@
 <?php
 
 interface Snap_UnitTestReporterInterface {
-    public function __construct($test_count = null);
+    public function __construct($test_count = NULL);
     public function createReport();
     public function recordTestPass($class, $method);
     public function recordTestCaseComplete($class);
@@ -34,7 +34,7 @@ class Snap_UnitTestReporter {
     /**
      * report constructor, initializes all the variables
      */
-    public function __construct($test_count = null) {
+    public function __construct($test_count = NULL) {
         $this->reports = array();
         $this->generateHeader();
         $this->announceTestCount($test_count);
@@ -143,7 +143,7 @@ class Snap_UnitTestReporter {
     protected final function cullTrace($trace) {
         $file = '';
         
-        while (true) {
+        while (TRUE) {
             if (!isset($trace[0])) {
                 break;
             }

@@ -24,7 +24,7 @@ class Snap_UnitTestException extends Snap_Exception {
      * @param string $code the short key code
      * @param string $message the message (long description)
      */
-    public function __construct($code, $message = null) {
+    public function __construct($code, $message = NULL) {
         parent::__construct($code);
         $this->setUserMessage($message);
     }
@@ -268,10 +268,10 @@ class Snap_AssertCompareUnitTestException extends Snap_UnitTestException {
         
         switch (strtolower($code)) {
             case 'assert_true':
-                $prefix = 'True assertion got false.';
+                $prefix = 'TRUE assertion got FALSE.';
                 break;
             case 'assert_false':
-                $prefix = 'False assertion got true.';
+                $prefix = 'FALSE assertion got TRUE.';
                 break;
             case 'assert_equal':
                 $prefix = 'Equal (==) assertion failed.';
@@ -284,10 +284,10 @@ class Snap_AssertCompareUnitTestException extends Snap_UnitTestException {
                 $prefix = 'Identical (===) assertion failed.';
                 break;
             case 'assert_null':
-                $prefix = 'Null assertion failed.';
+                $prefix = 'NULL assertion failed.';
                 break;
             case 'assert_not_null':
-                $prefix = 'Not Null assertion failed.';
+                $prefix = 'Not NULL assertion failed.';
                 break;
             default:
                 $prefix = 'Unkown assertion.';
@@ -315,7 +315,7 @@ class Snap_AssertCompareUnitTestException extends Snap_UnitTestException {
         ob_end_clean();
         $explain = trim(str_replace(array("\r\n", "\r"), "\n", $explain));
         
-        $explain = (strpos($explain, "\n") === false) ? $explain : trim(substr($explain, 0, strpos($explain, "\n"))).'...';
+        $explain = (strpos($explain, "\n") === FALSE) ? $explain : trim(substr($explain, 0, strpos($explain, "\n"))).'...';
         
         return $explain;
     }

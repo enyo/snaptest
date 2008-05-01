@@ -10,7 +10,7 @@ class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
 
         // throw assert
         try {
-            throw new Snap_AssertIdenticalUnitTestException('assert_true', 'test_exception', false, true);
+            throw new Snap_AssertIdenticalUnitTestException('assert_true', 'test_exception', FALSE, TRUE);
         }
         catch (Exception $e) {
             $this->reporter->recordTestException($e);

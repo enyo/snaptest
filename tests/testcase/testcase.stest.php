@@ -25,7 +25,7 @@ class Snap_UnitTestCase_AssertCount_Test extends Snap_UnitTestCase {
     public function onlyCalledOnce() {}
     public function onlyCalledTwice() {}
     public function onlyCalledThrice() {}
-    public function calledOnceWithParam($p = true) {}
+    public function calledOnceWithParam($p = TRUE) {}
     
     public function assertCallCountFailure() {
         return $this->assertCallCount($this->injected_mock, 'onlyCalledOnce', 2);
@@ -64,7 +64,7 @@ class Snap_UnitTestCase_AssertTrue_Test extends Snap_UnitTestCase {
      */
     public function testFailingAssertTrueThrowsException() {
         try {
-            $this->assertTrue(false);
+            $this->assertTrue(FALSE);
         }
         catch (Snap_AssertIdenticalUnitTestException $e) {
             return new Snap_PassedTestAssertion();
@@ -73,7 +73,7 @@ class Snap_UnitTestCase_AssertTrue_Test extends Snap_UnitTestCase {
     
     public function testSuccessfulAssertTrueReturnsAssertionObject() {
         try {
-            $result = $this->assertTrue(true);
+            $result = $this->assertTrue(TRUE);
             if ($result instanceof Snap_PassedTestAssertion) {
                 return $result;
             }
@@ -82,7 +82,7 @@ class Snap_UnitTestCase_AssertTrue_Test extends Snap_UnitTestCase {
             throw $e;
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
 }
 
@@ -106,7 +106,7 @@ class Snap_UnitTestCase_AssertIsA_Test extends Snap_UnitTestCase {
             throw $e;
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
     
     public function testFailingAssertIsAThrowsException() {
@@ -115,10 +115,10 @@ class Snap_UnitTestCase_AssertIsA_Test extends Snap_UnitTestCase {
             $this->assertIsA($tester, 'Exception');
         }
         catch (Snap_AssertInstanceOfUnitTestException $e) {
-            return $this->assertTrue(true);
+            return $this->assertTrue(TRUE);
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
 }
 
@@ -131,19 +131,19 @@ class Snap_UnitTestCase_AssertFalse_Test extends Snap_UnitTestCase {
      * assert false testing can now use IsA tests
      */
     public function testAssertFalseReturnsPassedTest() {
-        $result = $this->assertFalse(false);
+        $result = $this->assertFalse(FALSE);
         return $this->assertIsA($result, 'Snap_PassedTestAssertion');
     }
     
     public function testFailingAssertFalseThrowsException() {
         try {
-            $this->assertFalse(true);
+            $this->assertFalse(TRUE);
         }
         catch (Snap_AssertIdenticalUnitTestException $e) {
-            return $this->assertTrue(true);
+            return $this->assertTrue(TRUE);
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
 }
     
@@ -163,10 +163,10 @@ class Snap_UnitTestCase_AssertEqual_Test extends Snap_UnitTestCase {
             $this->assertEqual(2, 3);
         }
         catch (Snap_AssertEqualUnitTestException $e) {
-            return $this->assertTrue(true);
+            return $this->assertTrue(TRUE);
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
 }
     
@@ -185,10 +185,10 @@ class Snap_UnitTestCase_AssertNotEqual_Test extends Snap_UnitTestCase {
             $this->assertNotEqual(3, 3);
         }
         catch (Snap_AssertNotEqualUnitTestException $e) {
-            return $this->assertTrue(true);
+            return $this->assertTrue(TRUE);
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
 }
     
@@ -198,19 +198,19 @@ class Snap_UnitTestCase_AssertIdentical_Test extends Snap_UnitTestCase {
     public function tearDown() {}
     
     public function testAssertIdenticalReturnsPassedTest() {
-        $result = $this->assertIdentical(true, true);
+        $result = $this->assertIdentical(TRUE, TRUE);
         return $this->assertIsA($result, 'Snap_PassedTestAssertion');
     }
     
     public function testFailingAssertIdenticalThrowsException() {
         try {
-            $this->assertIdentical(1, true);
+            $this->assertIdentical(1, TRUE);
         }
         catch (Snap_AssertIdenticalUnitTestException $e) {
-            return $this->assertTrue(true);
+            return $this->assertTrue(TRUE);
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
 }
     
@@ -220,7 +220,7 @@ class Snap_UnitTestCase_AssertNull_Test extends Snap_UnitTestCase {
     public function tearDown() {}
     
     public function testAssertNullReturnsPassedTest() {
-        $result = $this->assertNull(null);
+        $result = $this->assertNull(NULL);
         return $this->assertIsA($result, 'Snap_PassedTestAssertion');
     }
     
@@ -229,10 +229,10 @@ class Snap_UnitTestCase_AssertNull_Test extends Snap_UnitTestCase {
             $this->assertNull(0);
         }
         catch (Snap_AssertIdenticalUnitTestException $e) {
-            return $this->assertTrue(true);
+            return $this->assertTrue(TRUE);
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
 }
     
@@ -249,13 +249,13 @@ class Snap_UnitTestCase_AssertNotNull_Test extends Snap_UnitTestCase {
     
     public function testFailingAssertNotNullThrowsException() {
         try {
-            $this->assertNotNull(null);
+            $this->assertNotNull(NULL);
         }
         catch (Snap_AssertNotSameUnitTestException $e) {
-            return $this->assertTrue(true);
+            return $this->assertTrue(TRUE);
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
 }
 
@@ -275,10 +275,10 @@ class Snap_UnitTestCase_AssertRegex_Test extends Snap_UnitTestCase {
             $this->assertRegex('foobarbaz', '/quuz/');
         }
         catch (Snap_AssertRegexUnitTestException $e) {
-            return $this->assertTrue(true);
+            return $this->assertTrue(TRUE);
         }
         
-        return $this->assertTrue(false);
+        return $this->assertTrue(FALSE);
     }
 }
 
@@ -289,7 +289,7 @@ class Snap_UnitTestCase_Calling_Skip_In_Setup_Test_Object extends Snap_UnitTestC
     }
     public function tearDown() {}
     public function ftestSetupSkipExample() {
-        return $this->assertTrue(true);
+        return $this->assertTrue(TRUE);
     }
 }
 class Snap_UnitTestCase_Calling_Skip_In_Setup extends Snap_UnitTestCase {

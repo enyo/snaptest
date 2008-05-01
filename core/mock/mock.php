@@ -48,10 +48,10 @@ class Snap_MockObject {
     */
     public function __construct($class_name) {
         // $this->test = $test;
-        $this->requires_inheritance = false;
-        $this->requires_magic_methods = false;
-        $this->requires_static_methods = false;
-        $this->has_constructor = false;
+        $this->requires_inheritance = FALSE;
+        $this->requires_magic_methods = FALSE;
+        $this->requires_static_methods = FALSE;
+        $this->has_constructor = FALSE;
         $this->interface_names = array();
         $this->methods = array();
         $this->signatures = array();
@@ -77,7 +77,7 @@ class Snap_MockObject {
      * @return MockObject the mock setup object
      */
     public function requiresInheritance() {
-        $this->requires_inheritance = true;
+        $this->requires_inheritance = TRUE;
         return $this;
     }
     
@@ -94,7 +94,7 @@ class Snap_MockObject {
      * @return MockObject the mock setup object
      **/
     public function requiresConstructor() {
-        $this->has_constructor = true;
+        $this->has_constructor = TRUE;
         return $this;
     }
     
@@ -111,7 +111,7 @@ class Snap_MockObject {
      * @return MockObject the mock setup object
      **/
     public function requiresStaticMethods() {
-        $this->requires_static_methods = true;
+        $this->requires_static_methods = TRUE;
         return $this;
     }
     
@@ -128,7 +128,7 @@ class Snap_MockObject {
      * @return MockObject the mock setup object
      **/
     public function requiresMagicMethods() {
-        $this->requires_magic_methods = true;
+        $this->requires_magic_methods = TRUE;
         return $this;
     }
     
@@ -378,9 +378,9 @@ class Snap_MockObject {
             $output .= '    $method_signature = $this->'.$this->class_signature.'_findSignature(\'__construct\', $this->mock->constructor_args);'.$endl;
             $output .= '    $default_signature = $this->'.$this->class_signature.'_findSignature(\'__construct\', array());'.$endl;
             $output .= '    if ($method_signature != $default_signature) {'.$endl;
-            $output .= '        $this->'.$this->class_signature.'_tallyMethod($default_signature, false);'.$endl;
+            $output .= '        $this->'.$this->class_signature.'_tallyMethod($default_signature, FALSE);'.$endl;
             $output .= '    }'.$endl;
-            $output .= '    if ($method_signature != null) {'.$endl;
+            $output .= '    if ($method_signature != NULL) {'.$endl;
             $output .= '        $this->'.$this->class_signature.'_tallyMethod($method_signature);'.$endl;
             $output .= '    }'.$endl;
             $output .= '    if (is_array($parent_methods) && in_array(\'__construct\', $parent_methods)) {'.$endl;
@@ -390,16 +390,16 @@ class Snap_MockObject {
         }
         
         // add the handler for all methods
-        $output .= $this->buildInvokeMethod($this->class_signature, false);
+        $output .= $this->buildInvokeMethod($this->class_signature, FALSE);
         
         // finds the signature for a method name and params
-        $output .= $this->buildFindSignature($this->class_signature, false);
+        $output .= $this->buildFindSignature($this->class_signature, FALSE);
         
         // tally method for counting
-        $output .= $this->buildTallyMethod($this->class_signature, false);
+        $output .= $this->buildTallyMethod($this->class_signature, FALSE);
         
         // build the getmock methods
-        $output .= $this->buildGetMock($this->class_signature, false);
+        $output .= $this->buildGetMock($this->class_signature, FALSE);
         
         // add all public and protected methods
         $output .= $p_methods.$endl;
@@ -413,10 +413,10 @@ class Snap_MockObject {
             $output .= '    self::$mock_static = $mock;'.$endl;
             $output .= '}'.$endl;
             
-            $output .= $this->buildInvokeMethod($this->class_signature, true);
-            $output .= $this->buildFindSignature($this->class_signature, true);
-            $output .= $this->buildTallyMethod($this->class_signature, true);
-            $output .= $this->buildGetMock($this->class_signature, true);
+            $output .= $this->buildInvokeMethod($this->class_signature, TRUE);
+            $output .= $this->buildFindSignature($this->class_signature, TRUE);
+            $output .= $this->buildTallyMethod($this->class_signature, TRUE);
+            $output .= $this->buildGetMock($this->class_signature, TRUE);
         }
         
         // ending } for class
@@ -590,10 +590,10 @@ class Snap_MockObject {
         $output .= '    $default_signature = '.$find_signature.'($method_name, array());'.$endl;
         $output .= '    $mock = '.$get_mock.'();'.$endl;
         $output .= '    if ($method_signature != $default_signature) {'.$endl;
-        $output .= '        '.$tally_method.'($default_signature, false);'.$endl;
+        $output .= '        '.$tally_method.'($default_signature, FALSE);'.$endl;
         $output .= '    }'.$endl;
         $output .= '    // if we have a match, tally on it'.$endl;
-        $output .= '    if ($method_signature != null) {'.$endl;
+        $output .= '    if ($method_signature != NULL) {'.$endl;
         $output .= '        $call_count = '.$tally_method.'($method_signature);'.$endl;
         $output .= '        // if we have a return value, return that'.$endl;
         $output .= '        if (isset($mock->methods[$method_signature][\'returns\'][$call_count])) {'.$endl;
@@ -633,7 +633,7 @@ class Snap_MockObject {
         $output .= '    if (!isset($mock->signatures[$method_name])) {'.$endl;
         $output .= '        $mock->signatures[$method_name] = array();'.$endl;
         $output .= '    }'.$endl;
-        $output .= '    $method_signature = null;'.$endl;
+        $output .= '    $method_signature = NULL;'.$endl;
         $output .= '    foreach ($mock->signatures[$method_name] as $signature => $details) {'.$endl;
         $output .= '        $signature_params = $details[\'params\'];'.$endl;
         $output .= '        // default params'.$endl;
@@ -642,16 +642,16 @@ class Snap_MockObject {
         $output .= '            continue;'.$endl;
         $output .= '        }'.$endl;
         $output .= '        // non default, if all params match, use it'.$endl;
-        $output .= '        $param_match = true;'.$endl;
+        $output .= '        $param_match = TRUE;'.$endl;
         $output .= '        foreach ($signature_params as $idx=>$param) {'.$endl;
         $output .= '            // method param does not exist, just exit'.$endl;
         $output .= '            if (!isset($method_params[$idx])) {'.$endl;
-        $output .= '                $param_match = false;'.$endl;
+        $output .= '                $param_match = FALSE;'.$endl;
         $output .= '                break;'.$endl;
         $output .= '            }'.$endl;
         $output .= '            // do match. On no matches, fail entire list'.$endl;
         $output .= '            if (!$param->match($method_params[$idx])) {'.$endl;
-        $output .= '                $param_match = false;'.$endl;
+        $output .= '                $param_match = FALSE;'.$endl;
         $output .= '                break;'.$endl;
         $output .= '            }'.$endl;
         $output .= '        }'.$endl;
@@ -677,7 +677,7 @@ class Snap_MockObject {
         $func_name = 'public '.(($is_static) ? 'static ' : '').'function '.$class_signature.'_tallyMethod'.(($is_static) ? '_static' : '');
         $get_mock = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_getMock'.(($is_static) ? '_static' : '');
         
-        $output .= $func_name.'($method_signature, $is_execute = true) {'.$endl;
+        $output .= $func_name.'($method_signature, $is_execute = TRUE) {'.$endl;
         $output .= '    $mock = '.$get_mock.'();'.$endl;
         $output .= '    $mock->methods[$method_signature][\'count\']++;'.$endl;
         $output .= '    if ($is_execute) {'.$endl;
@@ -732,7 +732,7 @@ class Snap_MockObject {
 
         $param_string = '';
         foreach ($method->getParameters() as $i => $param) {
-            $default_value = ($param->isOptional()) ? '=' . var_export($param->getDefaultValue(), true) : '';
+            $default_value = ($param->isOptional()) ? '=' . var_export($param->getDefaultValue(), TRUE) : '';
             $type = ($param->getClass()) ? $param->getClass()->getName().' ' : '';
 
             $ref = ($param->isPassedByReference()) ? '&' : '';

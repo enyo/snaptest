@@ -8,7 +8,7 @@ function SNAP_usage() {
     // get the available output modes in SNAPTEST_REPORTERS
     $handle = opendir(SNAPTEST_REPORTERS);
     $outmodes = array();
-    while (false !== ($file = readdir($handle))) {
+    while (FALSE !== ($file = readdir($handle))) {
     
         // skip files starting with .
         if (substr($file, 0, 1) == '.') {
@@ -82,7 +82,7 @@ function SNAP_recurse_directory($path, $xtn) {
     $file_list = array();
     
     $handle = opendir($path);
-    while (false !== ($file = readdir($handle))) {
+    while (FALSE !== ($file = readdir($handle))) {
         if (substr($file, 0, 1) == '.') {
             continue;
         }

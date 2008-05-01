@@ -8,10 +8,10 @@ if (!defined('SNAPTEST_ROOT')) {
     define('SNAPTEST_REPORTERS', SNAPTEST_CORE . 'reporter' . DIRECTORY_SEPARATOR . 'reporters' . DIRECTORY_SEPARATOR);
     
     if (!isset($argv) || !is_array($argv)) {
-        define('SNAP_CGI_MODE', true);
+        define('SNAP_CGI_MODE', TRUE);
     }
     else {
-        define ('SNAP_CGI_MODE', false);
+        define ('SNAP_CGI_MODE', FALSE);
     }
     
     define('SNAPTEST_TOKEN_START', '===START===');

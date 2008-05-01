@@ -30,7 +30,7 @@ class Snap_FileUtil {
      */
     public function makeFile() {
         $path = tempnam('/tmp', 'snap');
-        if ($path === false) {
+        if ($path === FALSE) {
             throw new Snap_UnitTestException('tmp_not_writable');
         }
         

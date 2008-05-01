@@ -47,7 +47,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param $mock a mock object to test for
      * @param array a set of parameteres to create a signature with
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws Snap_AssertCallCountException
      **/
     protected function assertCallCount($object, $method_name, $expected_count, $method_params = array(), $msg = '') {
@@ -66,7 +66,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param $mock a mock object to test for
      * @param array a set of parameteres to create a signature with
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws Snap_AssertCallCountException
      **/
     protected function assertMinimumCallCount($object, $method_name, $expected_count, $method_params = array(), $msg = '') {
@@ -85,7 +85,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param $mock a mock object to test for
      * @param array a set of parameteres to create a signature with
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws Snap_AssertCallCountException
      **/
     protected function assertMaximumCallCount($object, $method_name, $expected_count, $method_params = array(), $msg = '') {
@@ -100,30 +100,30 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
     }
 
     /**
-     * assert that the incoming value is true
+     * assert that the incoming value is TRUE
      * @param mixed $value
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws AssertIdenticalUnitTestException
      **/
     protected function assertTrue($value, $msg = '') {
-        if ($value !== true) {
-            throw new Snap_AssertIdenticalUnitTestException('assert_true', $msg, $value, true);
+        if ($value !== TRUE) {
+            throw new Snap_AssertIdenticalUnitTestException('assert_true', $msg, $value, TRUE);
         }
         
         return new Snap_PassedTestAssertion();
     }
 
     /**
-     * assert that the incoming value is false
+     * assert that the incoming value is FALSE
      * @param mixed $value
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws AssertIdenticalUnitTestException
      **/    
     protected function assertFalse($value, $msg = '') {
-        if ($value !== false) {
-            throw new Snap_AssertIdenticalUnitTestException('assert_false', $msg, $value, false);
+        if ($value !== FALSE) {
+            throw new Snap_AssertIdenticalUnitTestException('assert_false', $msg, $value, FALSE);
         }
         
         return new Snap_PassedTestAssertion();
@@ -134,7 +134,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param mixed $expected the value it should be
      * @param mixed $actual the value actually testing
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws AssertEqualUnitTestException
      **/
     protected function assertEqual($actual, $expected, $msg = '') {
@@ -150,7 +150,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param mixed $expected the value it should be
      * @param mixed $actual the value actually testing
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws AssertNotEqualUnitTestException
      **/
     protected function assertNotEqual($actual, $expected, $msg = '') {
@@ -166,7 +166,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param mixed $expected the value it should be
      * @param mixed $actual the value actually testing
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws AssertIdenticalUnitTestException
      **/
     protected function assertIdentical($actual, $expected, $msg = '') {
@@ -178,30 +178,30 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
     }
     
     /**
-     * assert that the incoming value is null
+     * assert that the incoming value is NULL
      * @param mixed $value the value to test
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws AssertIdenticalUnitTestException
      **/
     protected function assertNull($value, $msg = '') {
-        if ($value !== null) {
-            throw new Snap_AssertIdenticalUnitTestException('assert_null', $msg, $value, null);
+        if ($value !== NULL) {
+            throw new Snap_AssertIdenticalUnitTestException('assert_null', $msg, $value, NULL);
         }
         
         return new Snap_PassedTestAssertion();
     }
 
     /**
-     * assert that the incoming value is not null
+     * assert that the incoming value is not NULL
      * @param mixed $value the value to test
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws AssertNotSameUnitTestException
      **/
     protected function assertNotNull($value, $msg = '') {
-        if ($value === null) {
-            throw new Snap_AssertNotSameUnitTestException('assert_not_null', $msg, $value, null);
+        if ($value === NULL) {
+            throw new Snap_AssertNotSameUnitTestException('assert_not_null', $msg, $value, NULL);
         }
         
         return new Snap_PassedTestAssertion();
@@ -212,7 +212,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param object $object the object to test
      * @param mixed $classname the class or class name to test
      * @param string $msg the user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws AssertInstanceOfUnitTestException
      **/
     protected function assertIsA($object, $classname, $msg = '') {
@@ -228,7 +228,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param string $regex the regulr expression to test
      * @param mixed $value the value to test
      * @param string $msg user message on failure
-     * @return boolean true
+     * @return boolean TRUE
      * @throws AssertRegexUnitTestException
      **/
     protected function assertRegex($value, $regex, $msg = '') {
@@ -251,7 +251,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * specify that calling this test will cause a PHP error under normal circumstances
      **/
     protected function willError() {
-        $this->willError = true;
+        $this->willError = TRUE;
     }
     
     /**
@@ -267,7 +267,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param string $message the message to provide on skipping
      * @throws Snap_TodoException
      **/
-    protected function todo($message = null) {
+    protected function todo($message = NULL) {
         if ($message === null) {
             throw new Snap_TodoException('Test has not been fully implemented.');
         }
@@ -278,7 +278,7 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @deprecated
      * @see self::todo()
      **/
-    protected function notImplemented($message = null) {
+    protected function notImplemented($message = NULL) {
         return $this->todo($message);
     }
 
@@ -289,8 +289,8 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param string $message a message to provide on skipping
      * @throws Snap_SkipException
      **/
-    protected function skip($message = null) {
-        if ($message === null) {
+    protected function skip($message = NULL) {
+        if ($message === NULL) {
             throw new Snap_SkipException('Test is skipped.');
         }
         throw new Snap_SkipException($message);
@@ -352,9 +352,9 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
                 continue;
             }
             
-            $this->willThrow = null;
-            $this->willError = false;
-            $result = false;
+            $this->willThrow = NULL;
+            $this->willError = FALSE;
+            $result = FALSE;
             
             // run setup
             try {
