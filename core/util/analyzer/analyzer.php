@@ -35,7 +35,7 @@ class Snap_FileAnalyzer {
      * @param $data the data up to the point of failure
      **/
     public function onThreadFail($file, $data) {
-        $this->results[$file] = FALSE;
+        $this->results[$file] = trim($data);
     }
     
     /**

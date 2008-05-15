@@ -225,7 +225,7 @@ class Snap_MockObject_Test_MockGenerationWithStaticMethods extends Snap_UnitTest
     }
     
     public function testProtectedMethodCallsCopiedCorrectly() {
-        return $this->assertTrue(SNAP_calStatic($this->mocked_obj, 'getProtectedTrue'));
+        return $this->assertTrue(SNAP_callStatic($this->mocked_obj, 'getProtectedTrue'));
     }
 }
 
@@ -245,7 +245,7 @@ class Snap_MockObject_Test_MockGenerationWithStaticMethodsAndOverriding extends 
     }
     
     public function testProtectedMethodCallsCopiedCorrectly() {
-        return $this->assertFalse(SNAP_calStatic($this->mocked_obj, 'getProtectedTrue'));
+        return $this->assertFalse(SNAP_callStatic($this->mocked_obj, 'getProtectedTrue'));
     }
 }
 
@@ -270,7 +270,7 @@ class Snap_MockObject_Test_MockGenerationWithStaticMethodsAndExtension extends S
     
     // Despite overriding getTrue, this is a call to parent::, so it should not be overriden
     public function testProtectedMethodCallsCopiedCorrectly() {
-        return $this->assertTrue(SNAP_calStatic($this->mocked_obj, 'getProtectedParentTrue'));
+        return $this->assertTrue(SNAP_callStatic($this->mocked_obj, 'getProtectedParentTrue'));
     }
 }
 

@@ -98,8 +98,8 @@ unset($analyzer);
 // build a master test key list
 $master_test_key_list = array();
 foreach ($master_test_list as $file => $classes) {
-    if ($classes == FALSE) {
-        die ("File $file could not be read due to a fatal error.\n");
+    if (!is_array($classes)) {
+        die ("File $file could not be read due to a fatal error:\n".$classes."\n");
     }
     foreach ($classes as $klass => $tests) {
         foreach ($tests as $test) {
