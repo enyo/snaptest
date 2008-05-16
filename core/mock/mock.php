@@ -217,7 +217,7 @@ class Snap_MockObject {
     public function getTally($method_name, $method_params = array()) {
         $method_params = $this->handleMethodParameters($method_params);
         $method_signature = $this->getMethodSignature($method_name, $method_params);
-        return (isset($this->methods[$method_signature]['count'])) ? $this->methods[$method_signature]['count'] : 0;
+        return $this->mockGetTallyCount($method_signature);
     }
     
     /**
@@ -395,7 +395,7 @@ class Snap_MockObject {
         // get all matching signatures
         $sigs = $this->mockFindSignatures($method_name, $method_params);
         $sigs_default = $this->mockFindDefaultSignature($method_name);
-        
+
         // tally all methods
         foreach ($sigs as $sig) {
             $this->mockTallyMethod($sig);
@@ -412,6 +412,11 @@ class Snap_MockObject {
             if (isset($this->methods[$sig]['returns']['default'])) {
                 $returns_at_default[] = $sig;
             }
+        }
+        
+        if (defined('LOL')) {
+            var_dump($returns_at_call_count);
+            var_dump($returns_at_default);
         }
         
         // > 1 return is an exception
@@ -433,7 +438,7 @@ class Snap_MockObject {
         
         // exactly one is a match
         if (count($returns_at_default) == 1) {
-            return $returns_at_default[0];
+            return $this->methods[$returns_at_default[0]]['returns']['default'];
         }
         
         // no specialized returns. Check now, for a call count at the default
@@ -446,10 +451,11 @@ class Snap_MockObject {
         if (isset($this->methods[$sigs_default]['returns']['default'])) {
             return $this->methods[$sigs_default]['returns']['default'];
         }
-        
+
         // no default. If it is inherited, fall to original
         if ($this->isInherited()) {
             $method_call = $this->class_signature.'_'.$method_name.'_original';
+
             if ($this->hasStaticMethods()) {
                 if (method_exists(get_class($this->constructed_object), $method_call)) {
                     return call_user_func_array(array(get_class($this->constructed_object), $method_call), $method_params);
@@ -655,7 +661,7 @@ class Snap_MockObject {
             preg_match('/.*?function[\s]+'.$method_name.'.*?\{([\s\S]*)\}/i', $contents, $matches);
             
             // no matches, this was an interface
-            if (!$matches) {
+            if (!is_array($matches) || !isset($matches[1])) {
                 $matches = array('1' => '');
             }
             
@@ -729,6 +735,13 @@ class Snap_MockObject {
             // reflect the class
             $reflected_class = new ReflectionClass($class_name);
             foreach ($reflected_class->getMethods() as $method) {
+                
+                // if we have already set this method, and the current class is an interface
+                // do not process this method
+                if (isset($methods[$method->getName()]) && $reflected_class->isInterface()) {
+                    continue;
+                }
+                
                 if ($method->isConstructor() || strtolower($method->getName()) == '__construct') {
                     // special constructor stuff here
                     $methods[$method->getName()] = array(
