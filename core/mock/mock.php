@@ -330,10 +330,16 @@ class Snap_MockObject {
         // attach header to the output
         $output .= $class_header;
         $output .= 'public $mock;'.$endl;
+        $output .= 'public static $mock_static;'.$endl;
         
         // special mock setter method
         $output .= 'public function '.$setmock_method_name.'($mock) {'.$endl;
         $output .= '    $this->mock = $mock;'.$endl;
+        $output .= '}'.$endl;
+        
+        // special static mock setter method
+        $output .= 'public static function '.$setmock_method_name.'_static($mock) {'.$endl;
+        $output .= '    self::$mock_static = $mock;'.$endl;
         $output .= '}'.$endl;
 
         // add a runConstructor call if this is refection+extension
@@ -346,27 +352,17 @@ class Snap_MockObject {
             $output .= '}'.$endl;
         }
         
-        // add the handler for all methods
-        $output .= $this->buildInvokeMethod($this->class_signature, FALSE);
-        
         // build the getmock methods
-        $output .= $this->buildGetMock($this->class_signature, FALSE);
+        $output .= 'public static function '.$this->class_signature.'_getMock_static() {'.$endl;
+        $output .= '    return self::$mock_static;'.$endl;
+        $output .= '}'.$endl;
+        
+        $output .= 'public function '.$this->class_signature.'_getMock() {'.$endl;
+        $output .= '    return $this->mock;'.$endl;
+        $output .= '}'.$endl;
         
         // add all public and protected methods
         $output .= $p_methods.$endl;
-        
-        // add all static output if required
-        if ($this->hasStaticMethods()) {
-            $output .= 'public static $mock_static;'.$endl;
-        
-            // special static mock setter method
-            $output .= 'public static function '.$setmock_method_name.'_static($mock) {'.$endl;
-            $output .= '    self::$mock_static = $mock;'.$endl;
-            $output .= '}'.$endl;
-            
-            $output .= $this->buildInvokeMethod($this->class_signature, TRUE);
-            $output .= $this->buildGetMock($this->class_signature, TRUE);
-        }
         
         // ending } for class
         $output .= '}'.$endl;
@@ -502,6 +498,16 @@ class Snap_MockObject {
         return $method_params;
     }
     
+    /**
+     * Finds a signature for a method name and param list
+     * this is the reverse of the logSignature() method. Instead of recoding
+     * the signature, this instead finds a parameter match and then tests
+     * every expectation to see if the signature is a match.
+     * All matching signatures are returned.
+     * @param string $method_name the name of the method to search
+     * @param array $method_params an array of parameters that came from the invocation
+     * @return array all matching signatures
+     **/
     protected function mockFindSignatures($method_name, $method_params = array()) {
         if (!is_array($method_params)) {
             $method_params = array();
@@ -544,6 +550,15 @@ class Snap_MockObject {
         return $sigs;
     }
 
+    /**
+     * Finds the default signature for a supplied method name
+     * similar in concept to the mockFindSignatures() method, this call
+     * instead looks for the default registered signature for a method. This
+     * method has 0 parameters in its match stack.
+     * The matching signature is returned.
+     * @param string $method_name the method name to search
+     * @return string the matching signature, or NULL if no method found
+     **/
     protected function mockFindDefaultSignature($method_name) {
         if (!isset($this->signatures[$method_name])) {
             return NULL;
@@ -555,6 +570,10 @@ class Snap_MockObject {
         }
     }
     
+    /**
+     * Adds to the tally of a method signature call
+     * @param string $method_signature a method signature to tally
+     **/
     protected function mockTallyMethod($method_signature) {
         if (!isset($this->methods[$method_signature]['count'])) {
             $this->methods[$method_signature]['count'] = 0;
@@ -562,57 +581,26 @@ class Snap_MockObject {
         $this->methods[$method_signature]['count']++;
     }
     
+    /**
+     * Gets the tally of a method signature
+     * @param string $method_signature the method signature
+     * @return int the number of times a signature has been called
+     **/
     protected function mockGetTallyCount($method_signature) {
-        return $this->methods[$method_signature]['count'];
-    }
-    
-    protected function buildInvokeMethod($class_signature, $is_static) {
-        $endl = "\n";
-        $output = '';
-        
-        $func_name = 'public '.(($is_static) ? 'static ' : '').'function '.$class_signature.'_invokeMethod'.(($is_static) ? '_static' : '');
-        $get_mock = (($is_static) ? 'self::'.$class_signature : '$this->'.$class_signature).'_getMock'.(($is_static) ? '_static' : '');
-        
-        $output .= $func_name . '($method_name, $method_params) {'.$endl;
-        $output .= '    $mock = '.$get_mock.'();'.$endl;
-        $output .= '    return $mock->invokeMethod($method_name, $method_params);'.$endl;
-        $output .= '}'.$endl;
-        return $output;
-    }
-    
-    protected function buildGetMock($class_signature, $is_static) {
-        $endl = "\n";
-        $output = '';
-        
-        $func_name = 'public '.(($is_static) ? 'static ' : '').'function '.$class_signature.'_getMock'.(($is_static) ? '_static' : '');
-        $mock_location = ($is_static) ? 'self::$mock_static' : '$this->mock';
-        
-        $output .= $func_name.'() {'.$endl;
-        $output .= '    return '.$mock_location.';'.$endl;
-        $output .= '}'.$endl;
-        
-        return $output;
+        return (isset($this->methods[$method_signature]['count'])) ? $this->methods[$method_signature]['count'] : 0;
     }
     
     /**
      * Build an output block for a public method
      * calls the invokeMethod call for that public method
-     * @param string $method_name
-     * @return string php eval ready output
+     * @param string $class_name the class name to get the method from
+     * @param string $method_name the method name to build
+     * @param string $scope the scope to build the method in
+     * @return string php eval ready output of a method
      */
     protected function buildMethod($class_name, $method_name, $scope) {
-        if (!method_exists($class_name, $method_name) && $this->hasMagicMethods()) {
-            // magic method code!
-            // if the method doesn't exist, and this class has magic methods, we have to
-            // assume this was a magic method.
-            $output = '';
-            $endl = "\n";
-            $output .= $scope.' function '.$method_name.'() {'.$endl;
-            $output .= '    $args = func_get_args();'.$endl;
-            $output .= '    return $this->'.$this->class_signature.'_invokeMethod(\''.$method_name.'\', $args);'.$endl;
-            $output .= '}'.$endl;
-            return $output;
-        }
+        $output  = '';
+        $endl = "\n";
         
         // this is considered a normal method, we can use reflection to build it to
         // specification.
@@ -620,7 +608,23 @@ class Snap_MockObject {
         
         // is this a static method
         $is_static = $method->isStatic();
+        
+        $get_mock = (($is_static) ? 'self::'.$this->class_signature : '$this->'.$this->class_signature).'_getMock'.(($is_static) ? '_static' : '');
+        
+        // magic method code!
+        // if the method doesn't exist, and this class has magic methods, we have to
+        // assume this was a magic method.
+        // __call, __set, and __get are only available on an instance method
+        // and cannot be static
+        if (!method_exists($class_name, $method_name) && $this->hasMagicMethods()) {
+            $output .= $scope.' function '.$method_name.'() {'.$endl;
+            $output .= '    $args = func_get_args();'.$endl;
+            $output .= '    return '.$get_mock.'()->invokeMethod(\''.$method_name.'\', $args);'.$endl;
+            $output .= '}'.$endl;
+            return $output;
+        }
 
+        // build a param string
         $param_string = '';
         foreach ($method->getParameters() as $i => $param) {
             $default_value = ($param->isOptional()) ? '=' . var_export($param->getDefaultValue(), TRUE) : '';
@@ -630,40 +634,30 @@ class Snap_MockObject {
 
             $param_string .= $type . $ref . '$'.$param->getName().$default_value.',';
         }
-        
         $param_string = trim($param_string, ',');
         
-        $output  = '';
-        $endl = "\n";
+        // build the output for a normal object, if it isn't a constructor
+        // if it is a constructor, use a special global for setting it
+        $output .= $scope.(($is_static) ? ' static' : '').' function '.$method_name.'('.$param_string.') {'.$endl;
+        if (!$method->isConstructor() && strtolower($method->getName()) != '__construct') {
+            $output .= '    $args = func_get_args();'.$endl;
+            $output .= '    return '.$get_mock.'()->invokeMethod(\''.$method_name.'\', $args);'.$endl;
+        }
+        else {
+            // constructor takes the mock in question and loads it
+            $output .= '    global $SNAP_MockObject;'.$endl;
+            $output .= '    $this->mock = $SNAP_MockObject;'.$endl;
+            $output .= '    self::$mock_static = $SNAP_MockObject;'.$endl;
+        }
+        $output .= '}'.$endl;
         
         // if this is static, AND we need the original methods, copy them
         // please replace with late static bindings once PHP 5.3 becomes
         // a baseline
         if ($this->isInherited()) {            
             if ($is_static) {
-                $contents = file($method->getFileName());
-                $start_line = $method->getStartLine();
-                $end_line = $method->getEndLine();
-                $contents = implode("\n", array_slice($contents, $start_line - 1, $end_line - $start_line + 1));
-            
-                $matches = array();
-                preg_match('/.*?function[\s]+'.$method_name.'.*?\{([\s\S]*)\}/i', $contents, $matches);
-            
-                // no matches, this was an interface
-                if (!is_array($matches) || !isset($matches[1])) {
-                    $matches = array('1' => '');
-                }
-            
-                // map self:: and parent:: to proper things
-                $replaces = array(
-                    // self is implied, since it's in the new class, it resolves correctly
-                    'parent::' => get_parent_class($this->mocked_class).'::',
-                );
-            
-                $contents = trim(str_replace(array_keys($replaces), array_values($replaces), $matches[1]));
-                
                 $output .= 'public static function '.$this->class_signature.'_'.$method_name.'_original('.$param_string.') {'.$endl;
-                $output .= $contents.$endl;
+                $output .= $this->extractMethodBody($method).$endl;
                 $output .= '}'.$endl;
             }
             else {
@@ -673,22 +667,47 @@ class Snap_MockObject {
             }
         }
         
-        $invoke_method = (($is_static) ? 'self::'.$this->class_signature : '$this->'.$this->class_signature).'_invokeMethod'.(($is_static) ? '_static' : '');
-        
-        $output .= $scope.(($is_static) ? ' static' : '').' function '.$method_name.'('.$param_string.') {'.$endl;
-        if (!$method->isConstructor() && strtolower($method->getName()) != '__construct') {
-            $output .= '    $args = func_get_args();'.$endl;
-            $output .= '    return '.$invoke_method.'(\''.$method_name.'\', $args);'.$endl;
-        }
-        else {
-            // constructor takes the mock in question and loads it
-            $output .= '    global $SNAP_MockObject;'.$endl;
-            $output .= '    $this->mock = $SNAP_MockObject;'.$endl;
-        }
-        $output .= '}'.$endl;
         return $output;
     }
     
+    /**
+     * A utility method to extract the method body from a ReflectionMethod
+     * @param ReflectionMethod $method the method to copy
+     * @return string the method's contents re-scoped
+     **/
+    protected function extractMethodBody($method) {
+        $contents = file($method->getFileName());
+        $method_name = $method->getName();
+        $start_line = $method->getStartLine();
+        $end_line = $method->getEndLine();
+        $contents = implode("\n", array_slice($contents, $start_line - 1, $end_line - $start_line + 1));
+    
+        $matches = array();
+        preg_match('/.*?function[\s]+'.$method_name.'.*?\{([\s\S]*)\}/i', $contents, $matches);
+    
+        // no matches, this was an interface
+        if (!is_array($matches) || !isset($matches[1])) {
+            $matches = array('1' => '');
+        }
+    
+        // map self:: and parent:: to proper things
+        $replaces = array(
+            // self is implied, since it's in the new class, it resolves correctly
+            'parent::' => get_parent_class($this->mocked_class).'::',
+        );
+    
+        $contents = trim(str_replace(array_keys($replaces), array_values($replaces), $matches[1]));
+        
+        return $contents;
+    }
+    
+    /**
+     * Generates a unique class name based on the method signatures supplied.
+     * Uses a basic md5() with class_exists checks to create a unique class
+     * name for every instance of an object. It additionally attaches
+     * "helper" tags to the end (_ri _if) to help with debugging purposes.
+     * @return string the class name for this mock object
+     **/
     protected function generateClassName() {
         $keys = array_keys($this->methods);
         sort($keys);
@@ -715,6 +734,15 @@ class Snap_MockObject {
         return $mock_class_test;
     }
     
+    /**
+     * Finds all methods for all supplied classes, favoring their concrete location
+     * this loops through all methods in all classes, building out a structured
+     * array of class / method / scope.
+     * In order to ensure the most concrete class is used, interface references
+     * are replaced by the mock_class name's instances.
+     * @param array $class_list an array of classes
+     * @return array a multi-dimensional array of methods and their properties
+     **/
     protected function locateAllMethods($class_list) {
         $methods = array();
 
@@ -836,6 +864,7 @@ class Snap_MockObject {
         // return the ready class
         return $ready_class;
     }
+    
 }
 
 
