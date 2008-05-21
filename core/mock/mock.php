@@ -602,6 +602,21 @@ class Snap_MockObject {
         $output  = '';
         $endl = "\n";
         
+        // magic method code!
+        // if the method doesn't exist, and this class has magic methods, we have to
+        // assume this was a magic method.
+        // __call, __set, and __get are only available on an instance method
+        // and cannot be static
+        if (!method_exists($class_name, $method_name) && $this->hasMagicMethods()) {
+            $get_mock = '$this->'.$this->class_signature.'_getMock';
+            
+            $output .= $scope.' function '.$method_name.'() {'.$endl;
+            $output .= '    $args = func_get_args();'.$endl;
+            $output .= '    return '.$get_mock.'()->invokeMethod(\''.$method_name.'\', $args);'.$endl;
+            $output .= '}'.$endl;
+            return $output;
+        }
+        
         // this is considered a normal method, we can use reflection to build it to
         // specification.
         $method = new ReflectionMethod($class_name, $method_name);
@@ -609,20 +624,8 @@ class Snap_MockObject {
         // is this a static method
         $is_static = $method->isStatic();
         
+        // build the mock call
         $get_mock = (($is_static) ? 'self::'.$this->class_signature : '$this->'.$this->class_signature).'_getMock'.(($is_static) ? '_static' : '');
-        
-        // magic method code!
-        // if the method doesn't exist, and this class has magic methods, we have to
-        // assume this was a magic method.
-        // __call, __set, and __get are only available on an instance method
-        // and cannot be static
-        if (!method_exists($class_name, $method_name) && $this->hasMagicMethods()) {
-            $output .= $scope.' function '.$method_name.'() {'.$endl;
-            $output .= '    $args = func_get_args();'.$endl;
-            $output .= '    return '.$get_mock.'()->invokeMethod(\''.$method_name.'\', $args);'.$endl;
-            $output .= '}'.$endl;
-            return $output;
-        }
 
         // build a param string
         $param_string = '';
