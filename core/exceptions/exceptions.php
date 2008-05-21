@@ -48,17 +48,6 @@ class Snap_UnitTestException extends Snap_Exception {
 }
 
 /**
- * Not implemented exception
- * thrown when a test method has not been implemented
- * @deprecated
- */
-class Snap_NotImplementedException extends Snap_UnitTestException {
-    public function __construct($message) {
-        parent::__construct('not_implemented', $message);
-    }
-}
-
-/**
  * todo exception
  * thrown when a test method has not been implemented
  **/

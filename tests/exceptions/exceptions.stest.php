@@ -37,12 +37,6 @@ class Snap_UnitTestException_Test extends Snap_UnitTestCase {
 
 }
 
-/**
- * Test Snap_NotImplementedException
- * has no tests, is a direct extention
- */
-// class Snap_NotImplementedException_Test extends Snap_UnitTestCase {}
-
 
 /**
  * Tests Snap_AssertCallCountUnitTestException

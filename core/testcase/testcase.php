@@ -275,14 +275,6 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
     }
 
     /**
-     * @deprecated
-     * @see self::todo()
-     **/
-    protected function notImplemented($message = NULL) {
-        return $this->todo($message);
-    }
-
-    /**
      * Force an exception saying the test was explicitly skipped
      * this allows you to skip a test that may run low level PHP functions that cannot
      * be tested, for example, a DB call
