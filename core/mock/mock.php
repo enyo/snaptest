@@ -32,6 +32,7 @@ class Snap_MockObject {
     protected $requires_magic_methods;
     protected $requires_static_methods;
     protected $requires_inheritance;
+    protected $use_extends;
     
     protected $methods;
     protected $signatures;
@@ -53,6 +54,7 @@ class Snap_MockObject {
         $this->requires_inheritance = FALSE;
         $this->requires_magic_methods = FALSE;
         $this->requires_static_methods = FALSE;
+        $this->use_extends = FALSE;
         $this->has_constructor = FALSE;
         $this->interface_names = array();
         $this->methods = array();
@@ -66,6 +68,9 @@ class Snap_MockObject {
         $reflected_class = new ReflectionClass($this->mocked_class);
         if ($reflected_class->isInterface()) {
             $this->interface_names[] = $class_name;
+        }
+        else {
+            $this->use_extends = TRUE;
         }
         
         if (count($reflected_class->getInterfaces()) > 0) {
@@ -162,6 +167,14 @@ class Snap_MockObject {
     }
     
     /**
+     * Specify an original class that this is to use / extend
+     * @return boolean TRUE if we are mocking a class and therefore need extends
+     **/
+    public function useExtends() {
+        return $this->use_extends;
+    }
+    
+    /**
      * Set the return value for a method call of the specified params
      * @param string $method_name name of method to call
      * @param mixed $return_value the value to return when the method is called
@@ -241,12 +254,7 @@ class Snap_MockObject {
         // listen to all methods. If there are protected methods, and we are inherited
         // listen to those
         foreach ($method_list as $method => $data) {
-            if ($data['scope'] == 'public') {
-                $this->listenTo($method);
-            }
-            elseif ($data['scope'] == 'protected' && $this->isInherited()) {
-                $this->listenTo($method);
-            }
+            $this->listenTo($method);
         }
         
 
@@ -260,14 +268,12 @@ class Snap_MockObject {
                 continue;
             }
             
-            // if in public, we are okay
-            if (isset($method_list[$method_name]) && $method_list[$method_name]['scope'] == 'public') {
-                continue;
-            }
-            
-            // if in protected, and we are requiring inheritance, we are okay
-            if (isset($method_list[$method_name]) && $method_list[$method_name]['scope'] == 'protected' && $this->isInherited()) {
-                continue;
+            // if in public, private, or protected we are okay
+            if (isset($method_list[$method_name])) {
+                $scope = $method_list[$method_name]['scope'];
+                if ($scope == 'public' || $scope == 'private' || $scope == 'protected') {
+                    continue;
+                }
             }
             
             // if magic methods are enabled for this class, we are okay
@@ -286,7 +292,7 @@ class Snap_MockObject {
 
             // now we're in trouble. We throw an exception, as they
             // called on something that is not mockable
-            throw new Snap_UnitTestException('setup_invalid_method', $this->mocked_class.'::'.$method_name.' cannot have expects or return values. It might be private or final.');
+            throw new Snap_UnitTestException('setup_invalid_method', $this->mocked_class.'::'.$method_name.' cannot have expects or return values. It might be of type "final".');
         }
         
         // if the class exists with everything intact, no need to eval from here on out
@@ -301,12 +307,9 @@ class Snap_MockObject {
         // it's value
         $p_methods = '';
         foreach ($method_list as $method_name => $data) {
-            if ($data['scope'] == 'public') {
-                $p_methods .= $this->buildMethod($data['class'], $method_name, 'public');
+            if ($data['scope'] == 'public' || $data['scope'] == 'protected' || $data['scope'] == 'private') {
+                $p_methods .= $this->buildMethod($data['class'], $method_name, $data['scope']);
                 continue;
-            }
-            if ($data['scope'] == 'protected' && $this->isInherited()) {
-                $p_methods .= $this->buildMethod($data['class'], $method_name, 'protected');
             }
         }
         
@@ -316,7 +319,7 @@ class Snap_MockObject {
         
         // class header
         $class_header = 'class '.$mock_class;
-        if ($this->isInherited()) {
+        if ($this->useExtends()) {
             $class_header .= ' extends '.$this->mocked_class;
         }
         if (count($this->getInterfaces()) > 0) {
@@ -368,14 +371,6 @@ class Snap_MockObject {
         // ending } for class
         $output .= '}'.$endl;
         
-        // if (defined('LOCALDEBUG')) {
-        //     echo $output;
-        // }
-        // echo "\n\n----------\n\n";
-        //var_dump($this->methods);
-        //echo "\n\n----------\n\n";
-        // var_dump($this->signatures);
-        
         eval($output);
         $this->mock_output = $output;
         
@@ -414,11 +409,6 @@ class Snap_MockObject {
             }
         }
         
-        if (defined('LOL')) {
-            var_dump($returns_at_call_count);
-            var_dump($returns_at_default);
-        }
-        
         // > 1 return is an exception
         if (count($returns_at_call_count) > 1) {
             // error here
@@ -446,7 +436,7 @@ class Snap_MockObject {
         if (isset($this->methods[$sigs_default]['returns'][$this->mockGetTallyCount($sigs_default)])) {
             return $this->methods[$sigs_default]['returns'][$this->mockGetTallyCount($sigs_default)];
         }
-        
+
         // no call count default look for a really default
         if (isset($this->methods[$sigs_default]['returns']['default'])) {
             return $this->methods[$sigs_default]['returns']['default'];
@@ -649,41 +639,38 @@ class Snap_MockObject {
         // if this is static, AND we need the original methods, copy them
         // please replace with late static bindings once PHP 5.3 becomes
         // a baseline
-        if ($this->isInherited()) {
-            
-            $contents = file($method->getFileName());
-            $start_line = $method->getStartLine();
-            $end_line = $method->getEndLine();
-
-            $contents = implode("\n", array_slice($contents, $start_line - 1, $end_line - $start_line + 1));
-            
-            $matches = array();
-            preg_match('/.*?function[\s]+'.$method_name.'.*?\{([\s\S]*)\}/i', $contents, $matches);
-            
-            // no matches, this was an interface
-            if (!is_array($matches) || !isset($matches[1])) {
-                $matches = array('1' => '');
-            }
-            
-            // map self:: and parent:: to proper things
-            $replaces = array(
-                // self is implied, since it's in the new class, it resolves correctly
-                'parent::' => get_parent_class($this->mocked_class).'::',
-            );
-            
-            $contents = trim(str_replace(array_keys($replaces), array_values($replaces), $matches[1]));
-            
+        if ($this->isInherited()) {            
             if ($is_static) {
+                $contents = file($method->getFileName());
+                $start_line = $method->getStartLine();
+                $end_line = $method->getEndLine();
+                $contents = implode("\n", array_slice($contents, $start_line - 1, $end_line - $start_line + 1));
+            
+                $matches = array();
+                preg_match('/.*?function[\s]+'.$method_name.'.*?\{([\s\S]*)\}/i', $contents, $matches);
+            
+                // no matches, this was an interface
+                if (!is_array($matches) || !isset($matches[1])) {
+                    $matches = array('1' => '');
+                }
+            
+                // map self:: and parent:: to proper things
+                $replaces = array(
+                    // self is implied, since it's in the new class, it resolves correctly
+                    'parent::' => get_parent_class($this->mocked_class).'::',
+                );
+            
+                $contents = trim(str_replace(array_keys($replaces), array_values($replaces), $matches[1]));
+                
                 $output .= 'public static function '.$this->class_signature.'_'.$method_name.'_original('.$param_string.') {'.$endl;
+                $output .= $contents.$endl;
+                $output .= '}'.$endl;
             }
             else {
                 $output .= 'public function '.$this->class_signature.'_'.$method_name.'_original('.$param_string.') {'.$endl;
+                $output .= '    return parent::'.$method_name.'('.$param_string.');'.$endl;
+                $output .= '}'.$endl;
             }
-            
-            // add the original method's guts here
-            $output .= $endl.$contents.$endl;
-            
-            $output .= '}'.$endl;
         }
         
         $invoke_method = (($is_static) ? 'self::'.$this->class_signature : '$this->'.$this->class_signature).'_invokeMethod'.(($is_static) ? '_static' : '');
@@ -763,7 +750,7 @@ class Snap_MockObject {
                 }
             
                 // skip all final methods
-                if ($method->isFinal() && $this->isInherited()) {
+                if ($method->isFinal()) {
                     // cannot be overridden
                     continue;
                 }

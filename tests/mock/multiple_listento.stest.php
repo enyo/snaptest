@@ -6,13 +6,13 @@
  * no idea the proper fix
  **/
 
-class failing_FooBar {
+class Mockable_Simple_Object {
     public function foo($s) {}
 }
 
-class failing extends Snap_UnitTestCase {
+class MockObject_Call_Count_Test extends Snap_UnitTestCase {
     public function setUp() {    
-        $mock = $this->mock('failing_FooBar')
+        $mock = $this->mock('Mockable_Simple_Object')
                     ->listenTo('foo', array(
                         new Snap_Regex_Expectation('/a/')
                         ))

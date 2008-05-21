@@ -83,16 +83,16 @@ class Snap_MockObject_Test_StubGeneration extends Snap_UnitTestCase {
         return $this->assertIsA($this->mock, 'Snap_MockObject');
     }
     
-    public function testGeneratedMockHasNoParentClass() {
-        return $this->assertFalse(get_parent_class($this->mock_generated));
+    public function testGeneratedMockHasParentClass() {
+        return $this->assertEqual(get_parent_class($this->mock_generated), 'Snap_MockObject_Mockable');
     }
     
     public function testPublicMethodsAreCopied() {
         return $this->assertTrue(method_exists($this->mock_generated, 'pubReturnTrue'));
     }
     
-    public function testProtectedMethodsAreNotCopied() {
-        return $this->assertFalse(method_exists($this->mock_generated, 'proReturnTrue'));
+    public function testProtectedMethodsAreCopied() {
+        return $this->assertTrue(method_exists($this->mock_generated, 'proReturnTrue'));
     }
     
     public function testCalledMethodsCanBeTallied() {
