@@ -441,7 +441,6 @@ class Snap_MockObject {
         // no default. If it is inherited, fall to original
         if ($this->isInherited()) {
             $method_call = $this->class_signature.'_'.$method_name.'_original';
-
             if ($this->hasStaticMethods()) {
                 if (method_exists(get_class($this->constructed_object), $method_call)) {
                     return call_user_func_array(array(get_class($this->constructed_object), $method_call), $method_params);
@@ -628,7 +627,8 @@ class Snap_MockObject {
         $get_mock = (($is_static) ? 'self::'.$this->class_signature : '$this->'.$this->class_signature).'_getMock'.(($is_static) ? '_static' : '');
 
         // build a param string
-        $param_string = '';
+        $param_string = ''; // with defaults
+        $original_param_string = ''; // without
         foreach ($method->getParameters() as $i => $param) {
             $default_value = ($param->isOptional()) ? '=' . var_export($param->getDefaultValue(), TRUE) : '';
             $type = ($param->getClass()) ? $param->getClass()->getName().' ' : '';
@@ -636,8 +636,10 @@ class Snap_MockObject {
             $ref = ($param->isPassedByReference()) ? '&' : '';
 
             $param_string .= $type . $ref . '$'.$param->getName().$default_value.',';
+            $original_param_string .= $type . $ref . '$'.$param->getName().',';
         }
         $param_string = trim($param_string, ',');
+        $original_param_string = trim($original_param_string, ',');
         
         // build the output for a normal object, if it isn't a constructor
         // if it is a constructor, use a special global for setting it
@@ -665,7 +667,7 @@ class Snap_MockObject {
             }
             else {
                 $output .= 'public function '.$this->class_signature.'_'.$method_name.'_original('.$param_string.') {'.$endl;
-                $output .= '    return parent::'.$method_name.'('.$param_string.');'.$endl;
+                $output .= '    return parent::'.$method_name.'('.$original_param_string.');'.$endl;
                 $output .= '}'.$endl;
             }
         }
