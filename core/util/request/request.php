@@ -5,6 +5,8 @@
  **/
 class Snap_Request {
     
+    static $base;
+    
     /**
      * Unmangles a request from the shell script when PHP is in CGI Mode
      * Under CGI mode, any dots (.) are replaced with the constant
@@ -165,5 +167,28 @@ class Snap_Request {
         }
     
         return $request;
+    }
+    
+    /**
+     * Sets the URL Base
+     * @param string $base the base URL
+     **/
+    public function setURLBase($base) {
+        self::$base = $base;
+    }
+    
+    /**
+     * Make a URL used in the web interface
+     * This takes the web interface URL constructs and creates a proper URL for
+     * the key/value pairs
+     * @param array $options the key/value pairs to attach
+     * @return string a fully qualified URL
+     **/
+    public function makeURL($options) {
+        $out = array();
+        foreach ($options as $key => $value) {
+            $out[] = $key.'='.$value;
+        }
+        return self::$base . '?' . implode('&', $out);
     }
 }
