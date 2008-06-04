@@ -19,11 +19,19 @@ $packages = array(
         SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'yui' . DIRECTORY_SEPARATOR .'base-min.css',
         SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'snaptest.css',
     ),
+    'corner.gif' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners.gif'),
 );
 
 $content_types = array(
-    'js'    => 'text/javascript',
-    'css'   => 'text/css',
+    'js'            => 'text/javascript',
+    'css'           => 'text/css',
+    'corner.gif'    => 'image/gif',
+);
+
+$replacements = array(
+    'css'   => array(
+        '{IMG}' => SNAP_WI_URL_PATH.'?mode=resource&file='
+    ),
 );
 
 // get the option
@@ -50,6 +58,11 @@ header('Content-type: '.(isset($content_types[$file]) ? $content_types[$file] : 
 
 // output every file in the package
 $files = $packages[$file];
-foreach ($files as $file) {
-    readfile($file);
+foreach ($files as $fname) {
+    if (!isset($replacements[$file])) {
+        readfile($fname);
+    }
+    else {
+        echo str_replace(array_keys($replacements[$file]), array_values($replacements[$file]), file_get_contents($fname));
+    }
 }

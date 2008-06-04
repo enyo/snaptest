@@ -9,13 +9,17 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		return fileToId(file)+"_"+klass;
 	};
 	
+	var klassToIdGroup = function(file, klass) {
+		return klassToId(file, klass)+"_GROUP";
+	};
+	
 	var testToId = function(file, klass, test) {
 		return klassToId(file, klass)+"_"+test;
-	}
+	};
 	
 	var testResultsToId = function(file, klass, test) {
-		return testToId(file, klass, test)+"_results";
-	}
+		return testToId(file, klass, test)+"_RESULTS";
+	};
 	
 	var makeCheckbox = function(file, klass, test) {
 		// IE requires a checkbox to be made differently. Boo.
@@ -103,6 +107,23 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		return div;
 	};
 	
+	var attachCorners = function(div) {
+		var tl = document.createElement("div");
+		var tr = document.createElement("div");
+		var bl = document.createElement("div");
+		var br = document.createElement("div");
+		
+		YAHOO.util.Dom.addClass(tl, "rc_tl");
+		YAHOO.util.Dom.addClass(tr, "rc_tr");
+		YAHOO.util.Dom.addClass(bl, "rc_bl");
+		YAHOO.util.Dom.addClass(br, "rc_br");
+		
+		div.appendChild(tl);
+		div.appendChild(tr);
+		div.appendChild(bl);
+		div.appendChild(br);
+	};
+	
 	var clear = function() {
 		var test_container = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.TEST_CONTAINER);
 		while (test_container.firstChild) {
@@ -143,11 +164,17 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		// alert('adding '+file+'::'+klass+'::'+test);
 		
 		if (!YAHOO.util.Dom.get(klassToId(file, klass))) {
+			var div = document.createElement("div");
+			div.id = klassToIdGroup(file, klass);
+			YAHOO.util.Dom.addClass(div, "file_group");
+			
 			var ul = document.createElement("ul");
 			
 			var li = document.createElement("li");
 			
 			var cb = makeCheckbox(file, klass);
+			
+			YAHOO.util.Dom.addClass(cb, "file_group_box");
 			
 			var p = document.createElement("p");
 			
@@ -156,13 +183,15 @@ YAHOO.SnapTest.DisplayManager = (function() {
 			var dl = document.createElement("dl");
 			dl.id = klassToId(file, klass);
 			
-			file_container.appendChild(ul);
-				ul.appendChild(li);
-					li.appendChild(makeFoldingControl());
-					li.appendChild(cb);
-					li.appendChild(p);
-						p.appendChild(txt);
-					li.appendChild(dl);
+			file_container.appendChild(div);
+				attachCorners(div);
+				div.appendChild(ul);
+					ul.appendChild(li);
+						li.appendChild(makeFoldingControl());
+						li.appendChild(cb);
+						li.appendChild(p);
+							p.appendChild(txt);
+						li.appendChild(dl);
 		}
 		
 		// now we can add the test
@@ -170,6 +199,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		
 		var dt = document.createElement("dt");
 		dt.id = testToId(file, klass, test);
+		YAHOO.util.Dom.addClass(dt, testToId(file, klass, test));
+		YAHOO.util.Dom.addClass(dt, "test");
 		
 		var cb = makeCheckbox(file, klass, test);
 		
@@ -194,11 +225,15 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		var result_node = YAHOO.util.Dom.get(result_container);
 		
 		YAHOO.util.Dom.addClass(test_container, results.type);
+		YAHOO.util.Dom.addClass(test_container, "complete");
 		YAHOO.util.Dom.addClass(result_container, results.type);
 		
 		while (result_node.firstChild) {
 			result_node.removeChild(result_node.firstChild);
 		}
+		
+		checkTests(YAHOO.util.Dom.get(klassToId(file, klass)));
+		checkTests(YAHOO.util.Dom.get(klassToIdGroup(file, klass)));
 		
 		// pass are skipped
 		if (results.type == "pass") {
@@ -243,6 +278,38 @@ YAHOO.SnapTest.DisplayManager = (function() {
 				dt_file.appendChild(dt_file_txt);
 			dl.appendChild(dd_file);
 				dd_file.appendChild(dd_file_txt);
+	};
+	
+	var checkTests = function(node) {
+		// get all tests under that
+		var nodes = YAHOO.util.Dom.getElementsByClassName("test", null, node);
+		var nodes_length = nodes.length;
+		
+		var pass = true;
+		var fail = false;
+		var complete = true;
+		for (var i = 0; i < nodes_length; i++) {
+			if (!YAHOO.util.Dom.hasClass(nodes[i], "complete")) {
+				pass = false;
+				complete = false;
+				break;
+			}
+			if (!YAHOO.util.Dom.hasClass(nodes[i], "pass")) {
+				pass = false;
+				fail = true;
+				break;
+			}
+		}
+
+		if (complete) {
+			YAHOO.util.Dom.addClass(node, "complete");
+		}		
+		if (pass) {
+			YAHOO.util.Dom.addClass(node, "pass");
+		}
+		if (fail) {
+			YAHOO.util.Dom.addClass(node, "warning");
+		}
 	};
 	
 	var showMessage = function(msg) {
