@@ -37,10 +37,13 @@ YAHOO.SnapTest.Manager = (function() {
 	
 	TR.onAllTestsComplete.subscribe(function(type, args, caller) {
 		Display.showMessage("All tests complete");
+		Display.enableResultsPaging();
 		Display.returnToTopOfTestList();
 	});
 	
 	Display.onRunTests.subscribe(function(type, args, caller) {
+		Display.disableTestingButton();
+		
 		var boxes = Display.getTestList();
 		var boxes_length = boxes.length;
 
@@ -61,6 +64,7 @@ YAHOO.SnapTest.Manager = (function() {
 		init: function() {
 			Display.init();
 			Display.disableTestingButton();
+			Display.disableResultsPaging();
 			Display.showMessage("Getting files");
 			FL.getFiles();
 		},

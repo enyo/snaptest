@@ -33,7 +33,9 @@ $urls = array(
             <h1>SnapTest Web Testing Console</h1>
             <p id="app_status">Loading...</p>
             <div id="app_controls">
-                <button id="run_tests">Run</button>
+                <button id="run_tests" class="run_tests">Run</button>
+                <button id="prev_failure" class="review_results">Prev</button>
+                <button id="next_failure" class="review_results">Next</button>
             </div>
         </div>
     </div>

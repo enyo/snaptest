@@ -390,22 +390,72 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		return tests;
 	};
 	
+	var error_scroll = 0;
+	var scrollToError = function(by) {
+		var nodes = YAHOO.util.Dom.getElementsByClassName('fail', 'dd');
+		var nodes_length = nodes.length;
+		
+		var next_node = error_scroll + by;
+		
+		if (next_node < 0) {
+			return;
+		}
+		
+		if (next_node > nodes_length) {
+			next_node = 0;
+		}
+		
+		if (!nodes[next_node]) {
+			return;
+		}
+		
+		alert(next_node);
+	};
+	
 	var disableTestingButton = function() {
 		var btn = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.RUN_TESTS_BUTTON);
 		
 		YAHOO.util.Event.removeListener(btn, "click");
-		YAHOO.util.Dom.addClass(btn, "disabled");
+		
+		YAHOO.util.Dom.removeClass(YAHOO.SnapTest.Constants.APP_CONTROLS, "status_run_tests");
 	};
 	
 	var enableTestingButton = function() {
 		var btn = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.RUN_TESTS_BUTTON);
 		
-		YAHOO.util.Dom.removeClass(btn, "disabled");
-		
 		YAHOO.util.Event.addListener(btn, 'click', function(e) {
 			YAHOO.util.Event.stopEvent(e);
 			onRunTests.fire();
 		});
+		
+		YAHOO.util.Dom.addClass(YAHOO.SnapTest.Constants.APP_CONTROLS, "status_run_tests");
+	};
+	
+	var disableResultsPaging = function() {
+		var btn_next = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.NEXT_ERROR_BUTTON);
+		var btn_prev = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.PREV_ERROR_BUTTON);
+		
+		YAHOO.util.Event.removeListener(btn_next, "click");
+		YAHOO.util.Event.removeListener(btn_prev, "click");
+		
+		YAHOO.util.Dom.removeClass(YAHOO.SnapTest.Constants.APP_CONTROLS, "status_review_tests");
+	};
+	
+	var enableResultsPaging = function() {
+		var btn_next = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.NEXT_ERROR_BUTTON);
+		var btn_prev = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.PREV_ERROR_BUTTON);
+		
+		YAHOO.util.Event.addListener(btn_next, 'click', function(e) {
+			YAHOO.util.Event.stopEvent(e);
+			scrollToError(1);
+		});
+		
+		YAHOO.util.Event.addListener(btn_prev, 'click', function(e) {
+			YAHOO.util.Event.stopEvent(e);
+			scrollToError(-1);
+		});
+		
+		YAHOO.util.Dom.addClass(YAHOO.SnapTest.Constants.APP_CONTROLS, "status_review_tests");
 	};
 	
 	// footer hide / show utility of awesomeness
@@ -446,8 +496,12 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	iface.recordTestResults = recordTestResults;
 	iface.getTestList = getTestList;
 	iface.showMessage = showMessage;
+	
 	iface.disableTestingButton = disableTestingButton;
 	iface.enableTestingButton = enableTestingButton;
+	iface.enableResultsPaging = enableResultsPaging;
+	iface.disableResultsPaging = disableResultsPaging;
+	
 	iface.returnToTopOfTestList = returnToTopOfTestList;
 	
 	// events

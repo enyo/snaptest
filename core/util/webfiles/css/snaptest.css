@@ -185,7 +185,26 @@ dl.details dd {
 }
 
 #footer button {
+	display: none;
+}
+
+#footer .status_run_tests #run_tests {
+	display: block;
 	position: absolute;
 	right: 0.3em;
+	top: 0;
+}
+
+#footer .status_review_tests #next_failure {
+	display: block;
+	position: absolute;
+	right: 0.3em;
+	top: 0;
+}
+
+#footer .status_review_tests #prev_failure {
+	display: block;
+	position: absolute;
+	right: 5em;
 	top: 0;
 }
