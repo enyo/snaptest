@@ -21,6 +21,10 @@ class Snap_Tester_Test extends Snap_UnitTestCase {
     public function testResultOfRunningTestsIsTrue() {
         return $this->assertTrue($this->result);
     }
+    
+    public function testMoo() {
+        return $this->assertTrue(false);
+    }
 }
 
 class Snap_Tester_Test_Invalid_Output extends Snap_UnitTestCase {

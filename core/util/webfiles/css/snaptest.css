@@ -25,7 +25,8 @@ ul ul, ul dl, dl dt {
 }
 
 dl dd {
-	margin: 0 0 0 2em;
+	margin: 0 0 0 1em;
+	padding: 0 0 0 1em;
 }
 
 dd {
@@ -49,7 +50,6 @@ dl.details dd {
 }
 
 .clear {
-	padding-bottom: 7em;
 	clear: both;
 }
 
@@ -136,6 +136,41 @@ dl.details dd {
 	float: left;
 }
 
+.result_container {
+	position: relative;
+}
+
+dt.test {
+	margin-top: 0.2em;
+	padding: 0.2em;
+	position: relative;
+}
+
+dt.test .rc_tl,
+dt.test .rc_tr,
+dt.test .rc_bl,
+dt.test .rc_br,
+dd.result_container .rc_tl,
+dd.result_container .rc_tr {
+	display: none;
+}
+
+dl.warning dt .rc_tl,
+dl.warning dt .rc_tr {
+	display: block;
+}
+
+/* pass gets them all turned on */
+dl.warning dt.pass .rc_bl,
+dl.warning dt.pass .rc_br {
+	display: block;
+}
+
+dl.warning dd .rc_bl,
+dl.warning dd .rc_br {
+	display: block;
+}
+
 .pass {
 	background: #cfc;
 }
@@ -144,6 +179,10 @@ dl.details dd {
 }
 .warning {
 	background: #ffc;
+}
+
+#footer_spacer {
+	padding-bottom: 7em;
 }
 
 #footer_container {
@@ -192,19 +231,19 @@ dl.details dd {
 	display: block;
 	position: absolute;
 	right: 0.3em;
-	top: 0;
+	bottom: 0.3em;
 }
 
 #footer .status_review_tests #next_failure {
 	display: block;
 	position: absolute;
 	right: 0.3em;
-	top: 0;
+	bottom: 0.3em;
 }
 
 #footer .status_review_tests #prev_failure {
 	display: block;
 	position: absolute;
 	right: 5em;
-	top: 0;
+	bottom: 0.3em;
 }

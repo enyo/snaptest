@@ -27,7 +27,7 @@ $urls = array(
 </head>
 <body id="snaptest">
     <div id="test_container"></div>
-    <div class="clear"></div>
+    <div id="footer_spacer" class="clear"></div>
     <div id="footer_container">
         <div id="footer">
             <h1>SnapTest Web Testing Console</h1>

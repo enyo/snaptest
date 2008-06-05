@@ -138,21 +138,40 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		return div;
 	};
 	
-	var attachCorners = function(div) {
-		var tl = document.createElement("div");
-		var tr = document.createElement("div");
-		var bl = document.createElement("div");
-		var br = document.createElement("div");
+	var attachCorners = function(div, types) {
 		
-		YAHOO.util.Dom.addClass(tl, "rc_tl");
-		YAHOO.util.Dom.addClass(tr, "rc_tr");
-		YAHOO.util.Dom.addClass(bl, "rc_bl");
-		YAHOO.util.Dom.addClass(br, "rc_br");
+		if (!types) {
+			types = {
+				top: true,
+				left: true,
+				bottom: true,
+				right: true
+			};
+		}
 		
-		div.appendChild(tl);
-		div.appendChild(tr);
-		div.appendChild(bl);
-		div.appendChild(br);
+		if (types.top && types.left) {
+			var tl = document.createElement("div");
+			YAHOO.util.Dom.addClass(tl, "rc_tl");
+			div.appendChild(tl);
+		}
+		
+		if (types.top && types.right) {
+			var tr = document.createElement("div");
+			YAHOO.util.Dom.addClass(tr, "rc_tr");
+			div.appendChild(tr);
+		}
+		
+		if (types.bottom && types.left) {
+			var bl = document.createElement("div");
+			YAHOO.util.Dom.addClass(bl, "rc_bl");
+			div.appendChild(bl);
+		}
+			
+		if (types.bottom && types.right) {
+			var br = document.createElement("div");
+			YAHOO.util.Dom.addClass(br, "rc_br");
+			div.appendChild(br);
+		}
 	};
 	
 	var clear = function() {
@@ -252,9 +271,11 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		
 		var dd = document.createElement("dd");
 		dd.id = getHeirarchy(file, klass, test, '_RESULTS');
+		YAHOO.util.Dom.addClass(dd, "result_container");
 		
 		klass_container.appendChild(dt);
 			dt.appendChild(label);
+			attachCorners(dt);
 				label.appendChild(cb);
 				label.appendChild(txt);
 		klass_container.appendChild(dd);
@@ -307,6 +328,9 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		var dt_file_txt = document.createTextNode("in file:");
 		var dd_file = document.createElement("dd");
 		var dd_file_txt = document.createTextNode(file);
+		
+		var div = document.createElement("div");
+		YAHOO.util.Dom.addClass(div, "clear");
 
 		result_node.appendChild(p);
 			p.appendChild(txt);
@@ -323,6 +347,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 				dt_file.appendChild(dt_file_txt);
 			dl.appendChild(dd_file);
 				dd_file.appendChild(dd_file_txt);
+		result_node.appendChild(div);
+		attachCorners(result_node);
 	};
 	
 	var checkTests = function(node) {
@@ -390,26 +416,29 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		return tests;
 	};
 	
-	var error_scroll = 0;
+	var error_scroll = null;
 	var scrollToError = function(by) {
-		var nodes = YAHOO.util.Dom.getElementsByClassName('fail', 'dd');
+		var nodes = YAHOO.util.Dom.getElementsByClassName('fail', 'dt');
 		var nodes_length = nodes.length;
 		
-		var next_node = error_scroll + by;
+		if (error_scroll !== null) {
+			var next_node = error_scroll + by;
 		
-		if (next_node < 0) {
-			return;
+			if (next_node < 0) {
+				return;
+			}
+		
+			if (next_node > nodes_length) {
+				next_node = 0;
+			}
 		}
-		
-		if (next_node > nodes_length) {
+		else {
 			next_node = 0;
 		}
 		
-		if (!nodes[next_node]) {
-			return;
-		}
+		error_scroll = next_node;
 		
-		alert(next_node);
+		window.scrollTo(0, YAHOO.util.Dom.getY(nodes[next_node]));
 	};
 	
 	var disableTestingButton = function() {
@@ -459,33 +488,33 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	};
 	
 	// footer hide / show utility of awesomeness
-	YAHOO.util.Event.onDOMReady(function() {
-		var node = YAHOO.util.Dom.get("footer_container");
-		
-		YAHOO.util.Event.addListener(node, "mouseover", function(e) {
-			var anim = new YAHOO.util.Anim(node, {
-				height: { to: 60 }
-			}, 0.3);
-			anim.animate();
-		});
-		
-		YAHOO.util.Event.addListener(node, "mouseout", function(e) {
-			var went_to = e.relatedTarget || e.toElement;
-			
-			// if it is a child, do nothing
-			while (went_to && went_to.parentNode) {
-				if (went_to == node) {
-					return;
-				}
-				went_to = went_to.parentNode;
-			}
-			
-			var anim = new YAHOO.util.Anim(node, {
-				height: { to: 25 }
-			}, 1);
-			anim.animate();
-		});
-	});
+	// YAHOO.util.Event.onDOMReady(function() {
+	// 	var node = YAHOO.util.Dom.get("footer_container");
+	// 	
+	// 	YAHOO.util.Event.addListener(node, "mouseover", function(e) {
+	// 		var anim = new YAHOO.util.Anim(node, {
+	// 			height: { to: 60 }
+	// 		}, 0.3);
+	// 		anim.animate();
+	// 	});
+	// 	
+	// 	YAHOO.util.Event.addListener(node, "mouseout", function(e) {
+	// 		var went_to = e.relatedTarget || e.toElement;
+	// 		
+	// 		// if it is a child, do nothing
+	// 		while (went_to && went_to.parentNode) {
+	// 			if (went_to == node) {
+	// 				return;
+	// 			}
+	// 			went_to = went_to.parentNode;
+	// 		}
+	// 		
+	// 		var anim = new YAHOO.util.Anim(node, {
+	// 			height: { to: 25 }
+	// 		}, 1);
+	// 		anim.animate();
+	// 	});
+	// });
 	
 	var iface = {};
 	// methods
