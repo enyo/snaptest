@@ -37,6 +37,7 @@ YAHOO.SnapTest.Manager = (function() {
 	
 	TR.onAllTestsComplete.subscribe(function(type, args, caller) {
 		Display.showMessage("All tests complete");
+		Display.returnToTopOfTestList();
 	});
 	
 	Display.onRunTests.subscribe(function(type, args, caller) {

@@ -1,24 +1,48 @@
 YAHOO.SnapTest.DisplayManager = (function() {
 	var onRunTests = new YAHOO.util.CustomEvent("runTests", this);
 	
-	var fileToId = function(file) {
-		return file.replace(/\//g, '_').replace(/\./g, '__');
+	var last_scroll_y = 0;
+	
+	var id_mapping = {};
+	
+	var getHeirarchy = function(file, klass, test, suffix) {
+		id = [];
+		
+		if (file) {
+			id.push(getId(file));
+		}
+		if (klass) {
+			id.push(getId(file, klass));
+		}
+		if (test) {
+			id.push(getId(file, klass, test));
+		}
+		if (suffix) {
+			id.push(getId(file, klass, test, suffix));
+		}
+		
+		return id.join("_");
 	};
 	
-	var klassToId = function(file, klass) {
-		return fileToId(file)+"_"+klass;
-	};
-	
-	var klassToIdGroup = function(file, klass) {
-		return klassToId(file, klass)+"_GROUP";
-	};
-	
-	var testToId = function(file, klass, test) {
-		return klassToId(file, klass)+"_"+test;
-	};
-	
-	var testResultsToId = function(file, klass, test) {
-		return testToId(file, klass, test)+"_RESULTS";
+	var getId = function(file, klass, test, suffix) {
+		
+		if (!klass) {
+			klass = '';
+		}
+		if (!test) {
+			test = '';
+		}
+		if (!suffix) {
+			suffix = '';
+		}
+		
+		var name = file.replace(/\//g, '_').replace(/\./g, '__')+"_"+klass+"_"+test+"_"+suffix;
+		
+		if (!id_mapping[name]) {
+			id_mapping[name] = YAHOO.util.Dom.generateId();
+		}
+		
+		return id_mapping[name];
 	};
 	
 	var makeCheckbox = function(file, klass, test) {
@@ -32,14 +56,16 @@ YAHOO.SnapTest.DisplayManager = (function() {
 			cb.checked = true;
 		}
 		
+		cb.id = YAHOO.util.Dom.generateId();
+		
 		cb.value = file+"|||"+klass+"|||"+test;
 		
 		if (file) {
-			YAHOO.util.Dom.addClass(cb, fileToId(file));
+			YAHOO.util.Dom.addClass(cb, getHeirarchy(file));
 			
 			if (!klass && !test) {
 				YAHOO.util.Event.addListener(cb, 'click', function(e) {
-					var nodes = YAHOO.util.Dom.getElementsByClassName(fileToId(file));
+					var nodes = YAHOO.util.Dom.getElementsByClassName(getHeirarchy(file));
 					var nodes_length = nodes.length;
 					for (var i = 0; i < nodes_length; i++) {
 						var node = nodes[i];
@@ -49,11 +75,11 @@ YAHOO.SnapTest.DisplayManager = (function() {
 			}
 		}
 		if (klass) {
-			YAHOO.util.Dom.addClass(cb, klassToId(file, klass));
+			YAHOO.util.Dom.addClass(cb, getHeirarchy(file, klass));
 			
 			if (!test) {
 				YAHOO.util.Event.addListener(cb, 'click', function(e) {
-					var nodes = YAHOO.util.Dom.getElementsByClassName(klassToId(file, klass));
+					var nodes = YAHOO.util.Dom.getElementsByClassName(getHeirarchy(file, klass));
 					var nodes_length = nodes.length;
 					for (var i = 0; i < nodes_length; i++) {
 						var node = nodes[i];
@@ -64,7 +90,12 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		}
 		if (test) {
 			YAHOO.util.Dom.addClass(cb, "test_selector");
-			YAHOO.util.Dom.addClass(cb, testToId(file, klass, test));
+			YAHOO.util.Dom.addClass(cb, getHeirarchy(file, klass, test));
+		}
+		
+		// add a special class for file-only level things
+		if (file && !klass && !test) {
+			YAHOO.util.Dom.addClass(cb, "file_selector");
 		}
 		
 		return cb;
@@ -138,35 +169,41 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	
 	var init = function() {
 		YAHOO.SnapTest.DisplayManager.clear();
-		
+		window.scrollTo(0,0);
 	};
 	
 	var addFile = function(file) {
 		var li = document.createElement("li");
-		li.id = fileToId(file);
+		li.id = getHeirarchy(file);
+		YAHOO.util.Dom.addClass(li, "file_group");
 		
 		var cb = makeCheckbox(file);
 		
+		var label = document.createElement("label");
+		label.setAttribute("for", cb.id);
+		
 		var p = document.createElement("p");
+		YAHOO.util.Dom.addClass(p, "file_name");
 		
 		var txt = document.createTextNode(file);
 		
 		YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.TEST_LIST).appendChild(li);
 			li.appendChild(makeFoldingControl());
-			li.appendChild(cb);
-			li.appendChild(p);
-				p.appendChild(txt);
+			li.appendChild(label);
+				label.appendChild(cb);
+				label.appendChild(p);
+					p.appendChild(txt);
 	};
 	
 	var addTestToFile = function(file, klass, test) {
-		var file_container = YAHOO.util.Dom.get(fileToId(file));
+		var file_container = YAHOO.util.Dom.get(getHeirarchy(file));
 		
 		// alert('adding '+file+'::'+klass+'::'+test);
 		
-		if (!YAHOO.util.Dom.get(klassToId(file, klass))) {
+		if (!YAHOO.util.Dom.get(getHeirarchy(file, klass))) {
 			var div = document.createElement("div");
-			div.id = klassToIdGroup(file, klass);
-			YAHOO.util.Dom.addClass(div, "file_group");
+			div.id = getHeirarchy(file, klass, null, '_GROUP');
+			YAHOO.util.Dom.addClass(div, "test_group");
 			
 			var ul = document.createElement("ul");
 			
@@ -174,54 +211,62 @@ YAHOO.SnapTest.DisplayManager = (function() {
 			
 			var cb = makeCheckbox(file, klass);
 			
-			YAHOO.util.Dom.addClass(cb, "file_group_box");
+			var label = document.createElement("label");
+			label.setAttribute("for", cb.id);
+			
+			YAHOO.util.Dom.addClass(cb, "test_group_box");
 			
 			var p = document.createElement("p");
 			
 			var txt = document.createTextNode(klass);
 			
 			var dl = document.createElement("dl");
-			dl.id = klassToId(file, klass);
+			dl.id = getHeirarchy(file, klass);
 			
 			file_container.appendChild(div);
 				attachCorners(div);
 				div.appendChild(ul);
 					ul.appendChild(li);
 						li.appendChild(makeFoldingControl());
-						li.appendChild(cb);
-						li.appendChild(p);
-							p.appendChild(txt);
+						li.appendChild(label);
+							label.appendChild(cb);
+							label.appendChild(p);
+								p.appendChild(txt);
 						li.appendChild(dl);
 		}
 		
 		// now we can add the test
-		var klass_container = YAHOO.util.Dom.get(klassToId(file, klass));
+		var klass_container = YAHOO.util.Dom.get(getHeirarchy(file, klass));
 		
 		var dt = document.createElement("dt");
-		dt.id = testToId(file, klass, test);
-		YAHOO.util.Dom.addClass(dt, testToId(file, klass, test));
+		dt.id = getHeirarchy(file, klass, test);
+		// YAHOO.util.Dom.addClass(dt, testToId(file, klass, test));
 		YAHOO.util.Dom.addClass(dt, "test");
 		
 		var cb = makeCheckbox(file, klass, test);
 		
+		var label = document.createElement("label");
+		label.setAttribute("for", cb.id);
+		
 		var txt = document.createTextNode(test);
 		
 		var dd = document.createElement("dd");
-		dd.id = testResultsToId(file, klass, test);
+		dd.id = getHeirarchy(file, klass, test, '_RESULTS');
 		
 		klass_container.appendChild(dt);
-			dt.appendChild(cb);
-			dt.appendChild(txt);
+			dt.appendChild(label);
+				label.appendChild(cb);
+				label.appendChild(txt);
 		klass_container.appendChild(dd);
 	};
-	
+	var no = false;
 	var recordTestResults = function(proc, results) {
 		var file = proc.file;
 		var klass = proc.klass;
 		var test = proc.test;
 		
-		var test_container = testToId(file, klass, test);
-		var result_container = testResultsToId(file, klass, test);
+		var test_container = getHeirarchy(file, klass, test);
+		var result_container = getHeirarchy(file, klass, test, '_RESULTS');
 		var result_node = YAHOO.util.Dom.get(result_container);
 		
 		YAHOO.util.Dom.addClass(test_container, results.type);
@@ -232,8 +277,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 			result_node.removeChild(result_node.firstChild);
 		}
 		
-		checkTests(YAHOO.util.Dom.get(klassToId(file, klass)));
-		checkTests(YAHOO.util.Dom.get(klassToIdGroup(file, klass)));
+		checkTests(YAHOO.util.Dom.get(getHeirarchy(file, klass)));
+		checkTests(YAHOO.util.Dom.get(getHeirarchy(file, klass, null, '_GROUP')));
 		
 		// pass are skipped
 		if (results.type == "pass") {
@@ -303,6 +348,12 @@ YAHOO.SnapTest.DisplayManager = (function() {
 
 		if (complete) {
 			YAHOO.util.Dom.addClass(node, "complete");
+			
+			// scroll to it if it's farther down our page
+			var scroll_to = YAHOO.util.Dom.getY(node);
+			if (scroll_to > last_scroll_y) {
+				window.scrollTo(0, scroll_to);
+			}
 		}		
 		if (pass) {
 			YAHOO.util.Dom.addClass(node, "pass");
@@ -310,6 +361,10 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		if (fail) {
 			YAHOO.util.Dom.addClass(node, "warning");
 		}
+	};
+	
+	var returnToTopOfTestList = function() {
+		window.scrollTo(0,0);
 	};
 	
 	var showMessage = function(msg) {
@@ -336,18 +391,51 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	};
 	
 	var disableTestingButton = function() {
-		YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.RUN_TESTS_BUTTON).enabled = false;
+		var btn = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.RUN_TESTS_BUTTON);
+		
+		YAHOO.util.Event.removeListener(btn, "click");
+		YAHOO.util.Dom.addClass(btn, "disabled");
 	};
 	
 	var enableTestingButton = function() {
 		var btn = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.RUN_TESTS_BUTTON);
 		
-		btn.enabled = true;
+		YAHOO.util.Dom.removeClass(btn, "disabled");
+		
 		YAHOO.util.Event.addListener(btn, 'click', function(e) {
 			YAHOO.util.Event.stopEvent(e);
 			onRunTests.fire();
 		});
 	};
+	
+	// footer hide / show utility of awesomeness
+	YAHOO.util.Event.onDOMReady(function() {
+		var node = YAHOO.util.Dom.get("footer_container");
+		
+		YAHOO.util.Event.addListener(node, "mouseover", function(e) {
+			var anim = new YAHOO.util.Anim(node, {
+				height: { to: 60 }
+			}, 0.3);
+			anim.animate();
+		});
+		
+		YAHOO.util.Event.addListener(node, "mouseout", function(e) {
+			var went_to = e.relatedTarget || e.toElement;
+			
+			// if it is a child, do nothing
+			while (went_to && went_to.parentNode) {
+				if (went_to == node) {
+					return;
+				}
+				went_to = went_to.parentNode;
+			}
+			
+			var anim = new YAHOO.util.Anim(node, {
+				height: { to: 25 }
+			}, 1);
+			anim.animate();
+		});
+	});
 	
 	var iface = {};
 	// methods
@@ -360,6 +448,7 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	iface.showMessage = showMessage;
 	iface.disableTestingButton = disableTestingButton;
 	iface.enableTestingButton = enableTestingButton;
+	iface.returnToTopOfTestList = returnToTopOfTestList;
 	
 	// events
 	iface.onRunTests = onRunTests;

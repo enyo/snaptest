@@ -20,12 +20,14 @@ $packages = array(
         SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'snaptest.css',
     ),
     'corner.gif' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners.gif'),
+    'edge.png' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'edge.png'),
 );
 
 $content_types = array(
     'js'            => 'text/javascript',
     'css'           => 'text/css',
     'corner.gif'    => 'image/gif',
+    'edge.png'      => 'image/png',
 );
 
 $replacements = array(

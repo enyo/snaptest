@@ -97,7 +97,7 @@ YAHOO.SnapTest.TestRunner = function() {
 				continue;
 			}
 			
-			var t = tests.pop();
+			var t = tests.shift();
 			
 			// put a file in
 			queue[i].txn = YAHOO.util.Connect.asyncRequest('POST', YAHOO.SnapTest.Constants.TEST_RUNNER, {
