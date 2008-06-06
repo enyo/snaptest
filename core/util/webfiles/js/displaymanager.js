@@ -382,7 +382,7 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		var msg = "Tests: "+testcount+", Pass: "+pass+", Fail: "+fail+", Defect: "+defect+", Skip: "+skip+", Todo: "+todo;
 		
 		showMessage(msg);
-	}
+	};
 	
 	var checkTests = function(node) {
 		// get all tests under that

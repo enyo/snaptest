@@ -50,7 +50,7 @@ YAHOO.SnapTest.TestLoader = function() {
 			tests.push({
 				file: details[i].file,
 				klass: details[i].klass,
-				test: details[i].test,
+				test: details[i].test
 			});
 		}
 		
