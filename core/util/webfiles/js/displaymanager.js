@@ -3,6 +3,16 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	
 	var last_scroll_y = 0;
 	
+	var help_panel = null;
+	
+	var test_tally = {
+		pass: 0,
+		defect: 0,
+		fail: 0,
+		skip: 0,
+		todo: 0
+	};
+	
 	var id_mapping = {};
 	
 	var getHeirarchy = function(file, klass, test, suffix) {
@@ -280,7 +290,7 @@ YAHOO.SnapTest.DisplayManager = (function() {
 				label.appendChild(txt);
 		klass_container.appendChild(dd);
 	};
-	var no = false;
+
 	var recordTestResults = function(proc, results) {
 		var file = proc.file;
 		var klass = proc.klass;
@@ -301,6 +311,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		checkTests(YAHOO.util.Dom.get(getHeirarchy(file, klass)));
 		checkTests(YAHOO.util.Dom.get(getHeirarchy(file, klass, null, '_GROUP')));
 		
+		test_tally[results.type]++;
+		
 		// pass are skipped
 		if (results.type == "pass") {
 			return;
@@ -308,7 +320,15 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		
 		// everything else is logged
 		var p = document.createElement("p");
-		var txt = document.createTextNode(results.message);
+		
+		// if the server hands back HTML formatted errors, use innerHTML instead
+		if (results.message.match(/</)) {
+			p.innerHTML = results.message;
+		}
+		else {
+			var txt = document.createTextNode(results.message);
+			p.appendChild(txt);
+		}
 
 		var dl = document.createElement("dl");
 		
@@ -333,7 +353,6 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		YAHOO.util.Dom.addClass(div, "clear");
 
 		result_node.appendChild(p);
-			p.appendChild(txt);
 		result_node.appendChild(dl);
 			dl.appendChild(dt_test);
 				dt_test.appendChild(dt_test_txt);
@@ -350,6 +369,20 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		result_node.appendChild(div);
 		attachCorners(result_node);
 	};
+	
+	var showTestResults = function() {
+		var pass = test_tally.pass;
+		var fail = test_tally.fail;
+		var defect = test_tally.defect;
+		var skip = test_tally.skip;
+		var todo = test_tally.todo;
+		
+		var testcount = pass + fail + defect + skip + todo;
+		
+		var msg = "Tests: "+testcount+", Pass: "+pass+", Fail: "+fail+", Defect: "+defect+", Skip: "+skip+", Todo: "+todo;
+		
+		showMessage(msg);
+	}
 	
 	var checkTests = function(node) {
 		// get all tests under that
@@ -416,9 +449,40 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		return tests;
 	};
 	
+	var hideUncheckedTests = function() {
+		var tests = [];
+		
+		var nodes = YAHOO.util.Dom.getElementsByClassName("test_selector");
+		var nodes_length = nodes.length;
+		for (var i = 0; i < nodes_length; i++) {
+			if (!nodes[i].checked) {
+				var pieces = nodes[i].value.split("|||");
+				var file = pieces[0];
+				var klass = pieces[1];
+				var test = pieces[2];
+				
+				YAHOO.util.Dom.setStyle(nodes[i].parentNode.parentNode, "display", "none");
+			}
+		}
+		
+		return tests;
+	};
+	
 	var error_scroll = null;
 	var scrollToError = function(by) {
-		var nodes = YAHOO.util.Dom.getElementsByClassName('fail', 'dt');
+		var nodes = [];
+		
+		var list = YAHOO.util.Dom.getElementsByClassName('fail', 'dt');
+		var list_length = list.length;
+		for (var i = 0; i < list_length; i++) {
+			nodes.push(list[i]);
+		}
+		var list = YAHOO.util.Dom.getElementsByClassName('defect', 'dt');
+		var list_length = list.length;
+		for (var i = 0; i < list_length; i++) {
+			nodes.push(list[i]);
+		}
+		
 		var nodes_length = nodes.length;
 		
 		if (error_scroll !== null) {
@@ -487,34 +551,29 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		YAHOO.util.Dom.addClass(YAHOO.SnapTest.Constants.APP_CONTROLS, "status_review_tests");
 	};
 	
-	// footer hide / show utility of awesomeness
-	// YAHOO.util.Event.onDOMReady(function() {
-	// 	var node = YAHOO.util.Dom.get("footer_container");
-	// 	
-	// 	YAHOO.util.Event.addListener(node, "mouseover", function(e) {
-	// 		var anim = new YAHOO.util.Anim(node, {
-	// 			height: { to: 60 }
-	// 		}, 0.3);
-	// 		anim.animate();
-	// 	});
-	// 	
-	// 	YAHOO.util.Event.addListener(node, "mouseout", function(e) {
-	// 		var went_to = e.relatedTarget || e.toElement;
-	// 		
-	// 		// if it is a child, do nothing
-	// 		while (went_to && went_to.parentNode) {
-	// 			if (went_to == node) {
-	// 				return;
-	// 			}
-	// 			went_to = went_to.parentNode;
-	// 		}
-	// 		
-	// 		var anim = new YAHOO.util.Anim(node, {
-	// 			height: { to: 25 }
-	// 		}, 1);
-	// 		anim.animate();
-	// 	});
-	// });
+	// help system
+	YAHOO.util.Event.onDOMReady(function() {
+		YAHOO.util.Event.addListener("help", "click", function(e) {
+			if (!help_panel) {
+				help_panel = new YAHOO.widget.Panel("help_popup",  {
+					width: "500px", 
+			  		fixedcenter: true, 
+			  		close: true, 
+			  		draggable: false, 
+					underlay: "shadow",
+			  		zindex: 20,
+			  		modal: true,
+			  		visible: false
+				});
+			}
+			
+			help_panel.setHeader("SnapTest Web Console Help");
+			help_panel.setBody(YAHOO.util.Dom.get("help_contents").innerHTML);
+			
+			help_panel.render("snaptest");
+			help_panel.show();
+		});
+	});
 	
 	var iface = {};
 	// methods
@@ -524,7 +583,10 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	iface.addTestToFile = addTestToFile;
 	iface.recordTestResults = recordTestResults;
 	iface.getTestList = getTestList;
+	iface.hideUncheckedTests = hideUncheckedTests;
 	iface.showMessage = showMessage;
+	
+	iface.showTestResults = showTestResults;
 	
 	iface.disableTestingButton = disableTestingButton;
 	iface.enableTestingButton = enableTestingButton;

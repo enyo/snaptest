@@ -1,9 +1,13 @@
 YAHOO.SnapTest.TestRunner = function() {
+	var onTestStarted = new YAHOO.util.CustomEvent("testStarted", this);
 	var onTestComplete = new YAHOO.util.CustomEvent("testComplete", this);
 	var onAllTestsComplete = new YAHOO.util.CustomEvent("allTestsComplete", this);
+	var onRequestError = new YAHOO.util.CustomEvent("requestError", this);
 	
+	this.onTestStarted = onTestStarted;
 	this.onTestComplete = onTestComplete;
 	this.onAllTestsComplete = onAllTestsComplete;
+	this.onRequestError = onRequestError;
 	
 	var tests = [];
 	
@@ -41,7 +45,7 @@ YAHOO.SnapTest.TestRunner = function() {
 		    var results = YAHOO.lang.JSON.parse(o.responseText);
 		}
 		catch (e) {
-		    onRequestError.fire(e);
+		    onRequestError.fire(proc.file, proc.klass, proc.test, o.responseText);
 			return;
 		}
 
@@ -75,7 +79,7 @@ YAHOO.SnapTest.TestRunner = function() {
 			}
 		}
 		
-		onRequestError.fire(o);
+		onRequestError.fire(proc.file, proc.klass, proc.test, o.responseText);
 	};
 	
 	this.addTest = function(file, klass, test) {
@@ -98,6 +102,8 @@ YAHOO.SnapTest.TestRunner = function() {
 			}
 			
 			var t = tests.shift();
+			
+			onTestStarted.fire(t.file, t.klass, t.test);
 			
 			// put a file in
 			queue[i].txn = YAHOO.util.Connect.asyncRequest('POST', YAHOO.SnapTest.Constants.TEST_RUNNER, {

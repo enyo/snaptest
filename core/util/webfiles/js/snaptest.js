@@ -35,14 +35,39 @@ YAHOO.SnapTest.Manager = (function() {
 		Display.recordTestResults(args[0], args[1]);
 	});
 	
+	TR.onTestStarted.subscribe(function(type, args, caller) {
+		var file = args[0];
+		var klass = args[1];
+		var test = args[2];
+		Display.showMessage("Testing "+klass+"::"+test);
+	});
+	
+	TR.onRequestError.subscribe(function(type, args, caller) {
+		var proc = {
+			file: args[0],
+			klass: args[1],
+			test: args[2]
+		};
+		
+		var results = {
+			type: "defect",
+			message: args[3]
+		};
+		
+		Display.recordTestResults(proc, results);
+	});
+	
 	TR.onAllTestsComplete.subscribe(function(type, args, caller) {
-		Display.showMessage("All tests complete");
 		Display.enableResultsPaging();
+		Display.showTestResults();
 		Display.returnToTopOfTestList();
 	});
 	
 	Display.onRunTests.subscribe(function(type, args, caller) {
 		Display.disableTestingButton();
+		
+		// hide all our tests we aren't testing
+		Display.hideUncheckedTests();
 		
 		var boxes = Display.getTestList();
 		var boxes_length = boxes.length;

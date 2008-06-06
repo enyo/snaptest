@@ -25,7 +25,26 @@ $urls = array(
     <link rel="stylesheet" type="text/css" href="<?php echo $urls['css'];?>"> 
     <script type="text/javascript" src="<?php echo $urls['js'];?>"></script> 
 </head>
-<body id="snaptest">
+<body id="snaptest" class="yui-skin-sam">
+    <h1 id="title">SnapTest Web Console<abbr id="help" title="help">?</abbr></h1>
+    <div id="help_contents">
+        <p>The SnapTest Web Console provides an alternative to the standard command line interface
+            used for running SnapTest. If you're reading this, then you definitely have things up
+            and running. Check the tests you would like to run, and then click "run" at the bottom
+            right corner of the page. <strong class="pass">Passed tests</strong>,
+            <strong class="fail">failed tests</strong>, and <strong class="warning">test cases with
+            both passes and fails</strong> are marked in the colors indicated. Tests you choose to
+            not run will be hidden from view. When all tests have completed, use the "Previous"
+            and "Next" button to step through any failed tests.
+        </p>
+    </div>
+    <dl id="testing_parameters">
+        <dt>Test Path:</dt>
+        <dd><?php echo SNAP_WI_TEST_PATH ?></dd>
+        
+        <dt>Test Match:</dt>
+        <dd><?php echo SNAP_WI_TEST_MATCH ?></dd>
+    </dl>
     <div id="test_container"></div>
     <div id="footer_spacer" class="clear"></div>
     <div id="footer_container">

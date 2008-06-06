@@ -1,3 +1,7 @@
+body, html {
+	background: #EEF1F7;
+}
+
 a {
 	text-decoration: none;
 }
@@ -6,7 +10,38 @@ p {
 	margin: 0;
 }
 
+#title {
+	margin: 0.3em 0 0 0.3em;
+	padding: 0;
+}
+
+#title abbr {
+	margin-left: 1em;
+}
+
+#testing_parameters {
+	margin: 0.3em 0 0 3em;
+}
+
+#testing_parameters dt,
+#testing_parameters dd {
+	margin: 0;
+	display: block;
+	float: left;
+	clear: none;
+}
+#testing_parameters dt {
+	clear: both;
+	width: 7em;
+	font-weight: bold;
+}
+
+#help_contents {
+	display: none;
+}
+
 #test_container {
+	clear: both;
 	padding: 1em 0.3em 1em 0.3em;
 }
 
@@ -33,7 +68,8 @@ dd {
 	display: none;
 }
 
-dd.fail, dt.fail {
+dd.fail, dt.fail,
+dd.defect, dt.defect {
 	display: block;
 }
 
@@ -106,25 +142,25 @@ dl.details dd {
 .test_group .rc_tl {
 	left: 0;
 	top: 0;
-	background: url({IMG}corner.gif) top left;
+	background: url({IMG}corners.gif) top left;
 }
 
 .test_group .rc_tr {
 	right: 0;
 	top: 0;
-	background: url({IMG}corner.gif) top right;
+	background: url({IMG}corners.gif) top right;
 }
 
 .test_group .rc_bl {
 	left: 0;
 	bottom: 0;
-	background: url({IMG}corner.gif) bottom left;
+	background: url({IMG}corners.gif) bottom left;
 }
 
 .test_group .rc_br {
 	right: 0;
 	bottom: 0;
-	background: url({IMG}corner.gif) bottom right;
+	background: url({IMG}corners.gif) bottom right;
 }
 
 .test_group .folder {
@@ -146,47 +182,87 @@ dt.test {
 	position: relative;
 }
 
-dt.test .rc_tl,
-dt.test .rc_tr,
-dt.test .rc_bl,
-dt.test .rc_br,
-dd.result_container .rc_tl,
-dd.result_container .rc_tr {
+.test_group dl .rc_tl {
+	background: url({IMG}corners-b.gif) top left;
+}
+
+.test_group dl .rc_tr {
+	background: url({IMG}corners-b.gif) top right;
+}
+
+.test_group dl .rc_bl {
+	background: url({IMG}corners-b.gif) bottom left;
+}
+
+.test_group dl .rc_br {
+	background: url({IMG}corners-b.gif) bottom right;
+}
+
+.test_group dl.warning .rc_tl {
+	background: url({IMG}corners-y.gif) top left;
+}
+
+.test_group dl.warning .rc_tr {
+	background: url({IMG}corners-y.gif) top right;
+}
+
+.test_group dl.warning .rc_bl {
+	background: url({IMG}corners-y.gif) bottom left;
+}
+
+.test_group dl.warning .rc_br {
+	background: url({IMG}corners-y.gif) bottom right;
+}
+
+.test_group dl.warning dt.fail .rc_bl,
+.test_group dl.warning dt.fail .rc_br,
+.test_group dl.warning dt.defect .rc_bl,
+.test_group dl.warning dt.defect .rc_br {
 	display: none;
 }
 
-dl.warning dt .rc_tl,
-dl.warning dt .rc_tr {
-	display: block;
+.test_group dl.warning dd.fail .rc_tl,
+.test_group dl.warning dd.fail .rc_tr,
+.test_group dl.warning dd.defect .rc_tl,
+.test_group dl.warning dd.defect .rc_tr {
+	display: none;
 }
 
-/* pass gets them all turned on */
-dl.warning dt.pass .rc_bl,
-dl.warning dt.pass .rc_br {
-	display: block;
+.test_group dl.pass .rc_tl {
+	background: url({IMG}corners-g.gif) top left;
 }
 
-dl.warning dd .rc_bl,
-dl.warning dd .rc_br {
-	display: block;
+.test_group dl.pass .rc_tr {
+	background: url({IMG}corners-g.gif) top right;
+}
+
+.test_group dl.pass .rc_bl {
+	background: url({IMG}corners-g.gif) bottom left;
+}
+
+.test_group dl.pass .rc_br {
+	background: url({IMG}corners-g.gif) bottom right;
 }
 
 .pass {
-	background: #cfc;
+	background: #A8D7AB;
 }
-.fail {
-	background: #fcc;
+.fail, .defect {
+	background: #D7A8BC;
+}
+.skip {
+	background: #AAAAAA;
 }
 .warning {
-	background: #ffc;
+	background: #D4D7A8;
 }
 
 #footer_spacer {
-	padding-bottom: 7em;
+	padding-bottom: 10px;
 }
 
 #footer_container {
-	background: #fff;
+	background: #A8BCD7;
 	overflow: visible;
 	position: fixed;
 	bottom: 0;
@@ -216,11 +292,14 @@ dl.warning dd .rc_br {
 #footer h1 {
 	margin: 0;
 	padding-left: 0.3em;
-	padding-bottom: 10px;
+	float: left;
 }
 
 #footer p {
-	padding-left: 0.3em;
+	float: left;
+	font-style: italic;
+	padding-left: 2em;
+	line-height: 25px;
 }
 
 #footer button {
@@ -231,19 +310,35 @@ dl.warning dd .rc_br {
 	display: block;
 	position: absolute;
 	right: 0.3em;
-	bottom: 0.3em;
+	top: 1px;
+	height: 23px;
 }
 
 #footer .status_review_tests #next_failure {
 	display: block;
 	position: absolute;
 	right: 0.3em;
-	bottom: 0.3em;
+	top: 1px;
+	height: 23px;
 }
 
 #footer .status_review_tests #prev_failure {
 	display: block;
 	position: absolute;
 	right: 5em;
-	bottom: 0.3em;
+	top: 1px;
+	height: 23px;
+}
+
+
+
+/** YUI SAM SKIN OVERRIDES **/
+.yui-skin-sam .mask {
+	opacity: 0.75;
+	*filter:alpha(opacity=75);
+}
+
+body.masked {
+	height: 100%;
+	overflow: hidden;
 }
