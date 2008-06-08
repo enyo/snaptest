@@ -135,6 +135,7 @@ dl.details dd {
 .test_group .rc_br {
 	width: 3px;
 	height: 3px;
+	overflow: hidden;
 	position: absolute;
 	z-index: 2;
 }
@@ -142,25 +143,25 @@ dl.details dd {
 .test_group .rc_tl {
 	left: 0;
 	top: 0;
-	background: url({IMG}corners.gif) top left;
+	background: url({IMG}corners.gif) top left no-repeat;
 }
 
 .test_group .rc_tr {
 	right: 0;
 	top: 0;
-	background: url({IMG}corners.gif) top right;
+	background: url({IMG}corners.gif) -2px 0 no-repeat;
 }
 
 .test_group .rc_bl {
 	left: 0;
 	bottom: 0;
-	background: url({IMG}corners.gif) bottom left;
+	background: url({IMG}corners.gif) 0 -2px no-repeat;
 }
 
 .test_group .rc_br {
 	right: 0;
 	bottom: 0;
-	background: url({IMG}corners.gif) bottom right;
+	background: url({IMG}corners.gif) -2px -2px no-repeat;
 }
 
 .test_group .folder {
@@ -183,35 +184,35 @@ dt.test {
 }
 
 .test_group dl .rc_tl {
-	background: url({IMG}corners-b.gif) top left;
+	background: url({IMG}corners-b.gif) top left no-repeat;
 }
 
 .test_group dl .rc_tr {
-	background: url({IMG}corners-b.gif) top right;
+	background: url({IMG}corners-b.gif) -2px 0 no-repeat;
 }
 
 .test_group dl .rc_bl {
-	background: url({IMG}corners-b.gif) bottom left;
+	background: url({IMG}corners-b.gif) 0 -2px no-repeat;
 }
 
 .test_group dl .rc_br {
-	background: url({IMG}corners-b.gif) bottom right;
+	background: url({IMG}corners-b.gif) -2px -2px no-repeat;
 }
 
 .test_group dl.warning .rc_tl {
-	background: url({IMG}corners-y.gif) top left;
+	background: url({IMG}corners-y.gif) top left no-repeat;
 }
 
 .test_group dl.warning .rc_tr {
-	background: url({IMG}corners-y.gif) top right;
+	background: url({IMG}corners-y.gif) -2px 0 no-repeat;
 }
 
 .test_group dl.warning .rc_bl {
-	background: url({IMG}corners-y.gif) bottom left;
+	background: url({IMG}corners-y.gif) 0 -2px no-repeat;
 }
 
 .test_group dl.warning .rc_br {
-	background: url({IMG}corners-y.gif) bottom right;
+	background: url({IMG}corners-y.gif) -2px -2px no-repeat;
 }
 
 .test_group dl.warning dt.fail .rc_bl,
@@ -229,19 +230,19 @@ dt.test {
 }
 
 .test_group dl.pass .rc_tl {
-	background: url({IMG}corners-g.gif) top left;
+	background: url({IMG}corners-g.gif) top left no-repeat;
 }
 
 .test_group dl.pass .rc_tr {
-	background: url({IMG}corners-g.gif) top right;
+	background: url({IMG}corners-g.gif) -2px 0 no-repeat;
 }
 
 .test_group dl.pass .rc_bl {
-	background: url({IMG}corners-g.gif) bottom left;
+	background: url({IMG}corners-g.gif) 0 -2px no-repeat;
 }
 
 .test_group dl.pass .rc_br {
-	background: url({IMG}corners-g.gif) bottom right;
+	background: url({IMG}corners-g.gif) -2px -2px no-repeat;
 }
 
 .pass {
@@ -278,15 +279,6 @@ dt.test {
 	margin-top: -10px;
 	padding-top: 10px;
 	background: url({IMG}edge.png) left top repeat-x;
-}
-
-/**
- * IE 6 Needs a proper "fixed" setting
- **/
-* html div#footer {
-	position: absolute;
-	top: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop + (documentElement.clientHeight - this.clientHeight) : document.body.scrollTop + (document.body.clientHeight-this.clientHeight));
-	left: 0;
 }
 
 #footer h1 {
@@ -331,11 +323,23 @@ dt.test {
 }
 
 
+/** YUI COMPONENTS **/
+#logger {
+	position: fixed;
+	top: 0;
+	right: 0;
+	z-index: 20;
+}
+
 
 /** YUI SAM SKIN OVERRIDES **/
 .yui-skin-sam .mask {
 	opacity: 0.75;
-	*filter:alpha(opacity=75);
+}
+
+.yui-log-sourcefilters .yui-log-filtergrp {
+	display: block;
+	float: left;
 }
 
 body.masked {

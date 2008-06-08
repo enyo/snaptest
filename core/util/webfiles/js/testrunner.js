@@ -9,6 +9,8 @@ YAHOO.SnapTest.TestRunner = function() {
 	this.onAllTestsComplete = onAllTestsComplete;
 	this.onRequestError = onRequestError;
 	
+	this.toString = function() { return "YAHOO.SnapTest.TestRunner"; };
+	
 	var tests = [];
 	
 	var scope = this;
@@ -23,7 +25,6 @@ YAHOO.SnapTest.TestRunner = function() {
 	}
 	
 	var runTestsSuccess = function(o) {
-		// [{"type":"pass","function":"testCallingSkipRecordsTestSkip","class":"Snap_UnitTestCase_Calling_Skip_In_Setup"},{"type":"case","class":"Snap_UnitTestCase_Calling_Skip_In_Setup"}]
 		// remove the item from the queue
 		var proc = null;
 		

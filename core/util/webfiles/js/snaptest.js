@@ -4,7 +4,11 @@ YAHOO.SnapTest.Manager = (function() {
 	var TR = new YAHOO.SnapTest.TestRunner();
 	var Display = YAHOO.SnapTest.DisplayManager;
 	
+	var Logger = new YAHOO.widget.LogWriter("Manager"); 
+	
 	FL.onFileLoadComplete.subscribe(function(type, args, caller) {
+		Logger.log("Caught event of type "+type);
+		
 		var results = args[0];
 		var results_length = results.length;
 		for (var i = 0; i < results_length; i++) {
@@ -12,10 +16,14 @@ YAHOO.SnapTest.Manager = (function() {
 			Display.addFile(results[i]);
 		}
 		Display.showMessage("Getting tests");
+		
+		Logger.log("Dispatching "+TL.toString()+".getTests()");
 		TL.getTests();
 	});
 	
 	TL.onTestLoadComplete.subscribe(function(type, args, caller) {
+		Logger.log("Caught event of type "+type);
+		
 		var results = args[0];
 		var results_length = results.length;
 		
@@ -26,16 +34,22 @@ YAHOO.SnapTest.Manager = (function() {
 	});
 	
 	TL.onAllTestsLoadComplete.subscribe(function(type, args, caller) {
+		Logger.log("Caught event of type "+type);
+		
 		Display.showMessage("Test loading complete. Ready to run.");
 		Display.enableTestingButton();
 	});
 	
-	TR.onTestComplete.subscribe(function(type, args, caller) {			
+	TR.onTestComplete.subscribe(function(type, args, caller) {
+		Logger.log("Caught event of type "+type);
+		
 		// 0 is results
 		Display.recordTestResults(args[0], args[1]);
 	});
 	
 	TR.onTestStarted.subscribe(function(type, args, caller) {
+		Logger.log("Caught event of type "+type);
+		
 		var file = args[0];
 		var klass = args[1];
 		var test = args[2];
@@ -43,6 +57,8 @@ YAHOO.SnapTest.Manager = (function() {
 	});
 	
 	TR.onRequestError.subscribe(function(type, args, caller) {
+		Logger.log("Caught event of type "+type);
+		
 		var proc = {
 			file: args[0],
 			klass: args[1],
@@ -58,12 +74,16 @@ YAHOO.SnapTest.Manager = (function() {
 	});
 	
 	TR.onAllTestsComplete.subscribe(function(type, args, caller) {
+		Logger.log("Caught event of type "+type);
+		
 		Display.enableResultsPaging();
 		Display.showTestResults();
 		Display.returnToTopOfTestList();
 	});
 	
 	Display.onRunTests.subscribe(function(type, args, caller) {
+		Logger.log("Caught event of type "+type);
+		
 		Display.disableTestingButton();
 		
 		// hide all our tests we aren't testing
@@ -81,6 +101,7 @@ YAHOO.SnapTest.Manager = (function() {
 			TR.addTest(file, klass, test);
 		}
 
+		Logger.log("Dispatching "+TR.toString()+".runTests()");
 		TR.runTests();
 	});
 	
@@ -91,6 +112,8 @@ YAHOO.SnapTest.Manager = (function() {
 			Display.disableTestingButton();
 			Display.disableResultsPaging();
 			Display.showMessage("Getting files");
+			
+			Logger.log("Dispatching "+FL.toString()+".getFiles()");
 			FL.getFiles();
 		},
 		reset: function() {
@@ -102,5 +125,13 @@ YAHOO.SnapTest.Manager = (function() {
 })();
 
 YAHOO.util.Event.onDOMReady(function() {
+	// get a logger set up if enabled
+	if (location.search.match(/debug=true/)) {
+		var logdiv = document.createElement("div");
+		logdiv.id = "logger";
+		var myLogReader = new YAHOO.widget.LogReader(logdiv, { newestOnTop: true });
+		document.body.insertBefore(logdiv, document.body.firstChild);
+	}
+	
 	YAHOO.SnapTest.Manager.init();
 });

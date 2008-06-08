@@ -8,6 +8,14 @@ $urls = array(
         'mode'  => 'resource',
         'file'  => 'css',
         )),
+    'css-ie6'       => Snap_Request::makeURL(array(
+        'mode'  => 'resource',
+        'file'  => 'css-ie6',
+        )),
+    'css-ie7'       => Snap_Request::makeURL(array(
+        'mode'  => 'resource',
+        'file'  => 'css-ie7',
+        )),
     'js'            => Snap_Request::makeURL(array(
         'mode'  => 'resource',
         'file'  => 'js',
@@ -22,7 +30,15 @@ $urls = array(
     <meta http-equiv="Content-Language" content="en-us" />    
     <title>SnapTest Web Testing Console</title>
 
-    <link rel="stylesheet" type="text/css" href="<?php echo $urls['css'];?>"> 
+    <link rel="stylesheet" type="text/css" href="<?php echo $urls['css'];?>">
+    
+    <!--[if IE 6]>
+        <link rel="stylesheet" type="text/css" href="<?php echo $urls['css-ie6'];?>">
+    <![endif]-->
+    <!--[if IE 7]>
+        <link rel="stylesheet" type="text/css" href="<?php echo $urls['css-ie7'];?>">
+    <![endif]-->
+    
     <script type="text/javascript" src="<?php echo $urls['js'];?>"></script> 
 </head>
 <body id="snaptest" class="yui-skin-sam">

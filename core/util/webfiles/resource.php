@@ -8,6 +8,7 @@ $packages = array(
         SNAPTEST_WEBFILES . 'js' . DIRECTORY_SEPARATOR . 'yui' . DIRECTORY_SEPARATOR . 'utilities.js',
         SNAPTEST_WEBFILES . 'js' . DIRECTORY_SEPARATOR . 'yui' . DIRECTORY_SEPARATOR . 'container-min.js',
         SNAPTEST_WEBFILES . 'js' . DIRECTORY_SEPARATOR . 'yui' . DIRECTORY_SEPARATOR . 'json-min.js',
+        SNAPTEST_WEBFILES . 'js' . DIRECTORY_SEPARATOR . 'yui' . DIRECTORY_SEPARATOR . 'logger-min.js',
         SNAPTEST_WEBFILES . 'js' . DIRECTORY_SEPARATOR . 'constants.js',
         SNAPTEST_WEBFILES . 'js' . DIRECTORY_SEPARATOR . 'displaymanager.js',
         SNAPTEST_WEBFILES . 'js' . DIRECTORY_SEPARATOR . 'fileloader.js',
@@ -19,20 +20,25 @@ $packages = array(
         SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'yui' . DIRECTORY_SEPARATOR .'reset-fonts.css',
         SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'yui' . DIRECTORY_SEPARATOR .'base-min.css',
         SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'yui' . DIRECTORY_SEPARATOR .'container.css',
+        SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'yui' . DIRECTORY_SEPARATOR .'logger.css',
         SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'snaptest.css',
     ),
-    'corners.gif' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners.gif'),
-    'corners-y.gif' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners-y.gif'),
-    'corners-g.gif' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners-g.gif'),
-    'corners-r.gif' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners-r.gif'),
-    'corners-b.gif' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners-b.gif'),
-    'edge.png' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'edge.png'),
-    'sam-assets.png' => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'sam-assets.png'),
+    'css-ie6'           => array(SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'snaptest-ie6.css'),
+    'css-ie7'           => array(SNAPTEST_WEBFILES . 'css' . DIRECTORY_SEPARATOR . 'snaptest-ie7.css'),
+    'corners.gif'       => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners.gif'),
+    'corners-y.gif'     => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners-y.gif'),
+    'corners-g.gif'     => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners-g.gif'),
+    'corners-r.gif'     => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners-r.gif'),
+    'corners-b.gif'     => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'corners-b.gif'),
+    'edge.png'          => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'edge.png'),
+    'sam-assets.png'    => array(SNAPTEST_WEBFILES . 'img' . DIRECTORY_SEPARATOR . 'sam-assets.png'),
 );
 
 $content_types = array(
     'js'                => 'text/javascript',
     'css'               => 'text/css',
+    'css-ie6'           => 'text/css',
+    'css-ie7'           => 'text/css',
     'corners.gif'       => 'image/gif',
     'corners-y.gif'     => 'image/gif',
     'corners-g.gif'     => 'image/gif',
@@ -43,7 +49,15 @@ $content_types = array(
 );
 
 $replacements = array(
-    'css'   => array(
+    'css'       => array(
+        '{IMG}' => SNAP_WI_URL_PATH.'?mode=resource&file=',
+        '../../../../assets/skins/sam/sprite.png' => SNAP_WI_URL_PATH.'?mode=resource&file=sam-assets.png'
+    ),
+    'css-ie6'   => array(
+        '{IMG}' => SNAP_WI_URL_PATH.'?mode=resource&file=',
+        '../../../../assets/skins/sam/sprite.png' => SNAP_WI_URL_PATH.'?mode=resource&file=sam-assets.png'
+    ),
+    'css-ie7'   => array(
         '{IMG}' => SNAP_WI_URL_PATH.'?mode=resource&file=',
         '../../../../assets/skins/sam/sprite.png' => SNAP_WI_URL_PATH.'?mode=resource&file=sam-assets.png'
     ),

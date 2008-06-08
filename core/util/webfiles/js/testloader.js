@@ -7,6 +7,8 @@ YAHOO.SnapTest.TestLoader = function() {
 	this.onTestLoadComplete = onTestLoadComplete;
 	this.onRequestError = onRequestError;
 	
+	this.toString = function() { return "YAHOO.SnapTest.TestLoader"; };
+	
 	var files = [];
 	
 	var scope = this;

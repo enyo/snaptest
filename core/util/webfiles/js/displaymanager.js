@@ -15,6 +15,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	
 	var id_mapping = {};
 	
+	var Logger = new YAHOO.widget.LogWriter("DisplayManager");
+	
 	var getHeirarchy = function(file, klass, test, suffix) {
 		id = [];
 		
@@ -65,6 +67,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 			cb.type = "checkbox";
 			cb.checked = true;
 		}
+		
+		Logger.log("Making checkbox for file: "+file+" klass: "+klass+" test: "+test);
 		
 		cb.id = YAHOO.util.Dom.generateId();
 		
@@ -185,6 +189,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	};
 	
 	var clear = function() {
+		Logger.log("Cleared");
+		
 		var test_container = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.TEST_CONTAINER);
 		while (test_container.firstChild) {
 			test_container.removeChild(test_container.firstChild);
@@ -202,6 +208,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	};
 	
 	var addFile = function(file) {
+		Logger.log("Adding file "+file);
+		
 		var li = document.createElement("li");
 		li.id = getHeirarchy(file);
 		YAHOO.util.Dom.addClass(li, "file_group");
@@ -225,6 +233,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	};
 	
 	var addTestToFile = function(file, klass, test) {
+		Logger.log("Adding test "+klass+"::"+test+" to file "+file);
+		
 		var file_container = YAHOO.util.Dom.get(getHeirarchy(file));
 		
 		// alert('adding '+file+'::'+klass+'::'+test);
@@ -253,7 +263,6 @@ YAHOO.SnapTest.DisplayManager = (function() {
 			dl.id = getHeirarchy(file, klass);
 			
 			file_container.appendChild(div);
-				attachCorners(div);
 				div.appendChild(ul);
 					ul.appendChild(li);
 						li.appendChild(makeFoldingControl());
@@ -262,6 +271,7 @@ YAHOO.SnapTest.DisplayManager = (function() {
 							label.appendChild(p);
 								p.appendChild(txt);
 						li.appendChild(dl);
+				attachCorners(div);
 		}
 		
 		// now we can add the test
@@ -285,9 +295,9 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		
 		klass_container.appendChild(dt);
 			dt.appendChild(label);
-			attachCorners(dt);
 				label.appendChild(cb);
 				label.appendChild(txt);
+			attachCorners(dt);
 		klass_container.appendChild(dd);
 	};
 
@@ -295,6 +305,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		var file = proc.file;
 		var klass = proc.klass;
 		var test = proc.test;
+		
+		Logger.log("Recording test results for "+klass+"::"+test+" in "+file);
 		
 		var test_container = getHeirarchy(file, klass, test);
 		var result_container = getHeirarchy(file, klass, test, '_RESULTS');
@@ -427,6 +439,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	};
 	
 	var showMessage = function(msg) {
+		Logger.log("Showing message: "+msg);
+		
 		var node = YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.MESSAGE_CONTAINER);
 		while (node.firstChild) {
 			node.removeChild(node.firstChild);
@@ -446,10 +460,14 @@ YAHOO.SnapTest.DisplayManager = (function() {
 			}
 		}
 		
+		Logger.log("Geting tests, found "+tests.length+" tests");
+		
 		return tests;
 	};
 	
 	var hideUncheckedTests = function() {
+		Logger.log("Hiding unchecked tests");
+		
 		var tests = [];
 		
 		var nodes = YAHOO.util.Dom.getElementsByClassName("test_selector");
@@ -576,6 +594,8 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	});
 	
 	var iface = {};
+	iface.toString = function() { return "YAHOO.SnapTest.DisplayManager"; };
+	
 	// methods
 	iface.clear = clear;
 	iface.init = init;

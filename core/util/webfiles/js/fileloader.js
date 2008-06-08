@@ -5,6 +5,8 @@ YAHOO.SnapTest.FileLoader = function() {
 	this.onFileLoadComplete = onFileLoadComplete;
 	this.onRequestError = onRequestError;
 	
+	this.toString = function() { return "YAHOO.SnapTest.FileLoader"; };
+	
 	this.getFiles = function() {
 		// make URL call
 		var txn = YAHOO.util.Connect.asyncRequest('POST', YAHOO.SnapTest.Constants.FILE_LOADER, {
