@@ -1,3 +1,14 @@
+/** Fixes the test path / match display **/
+#testing_parameters dd {
+	float: left;
+	margin-top: -1.27em;
+	padding-left: 8em;
+}
+
+#testing_parameters dt {
+	float: none;
+}
+
 /** YUI SAM SKIN OVERRIDES **/
 .yui-skin-sam .mask {
 	*filter:alpha(opacity=75);

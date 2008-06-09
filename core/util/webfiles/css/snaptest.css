@@ -296,30 +296,26 @@ dt.test {
 
 #footer button {
 	display: none;
+	top: 1px;
+	height: 23px;
 }
 
 #footer .status_run_tests #run_tests {
 	display: block;
 	position: absolute;
 	right: 0.3em;
-	top: 1px;
-	height: 23px;
 }
 
 #footer .status_review_tests #next_failure {
 	display: block;
 	position: absolute;
 	right: 0.3em;
-	top: 1px;
-	height: 23px;
 }
 
 #footer .status_review_tests #prev_failure {
 	display: block;
 	position: absolute;
-	right: 5em;
-	top: 1px;
-	height: 23px;
+	right: 6.6em;
 }
 
 
