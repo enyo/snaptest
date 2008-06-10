@@ -15,16 +15,7 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'constants.php';
 
 $options = Snap_Request::getLongOptions(array(
     'mode'      => 'index',
-    'key'       => '',
 ));
-
-if (SNAP_WI_KEY) {
-    if ($options['key'] != SNAP_WI_KEY) {
-        echo "\n";
-        echo "SnapTest Web Interface: Key Mismatch\n";
-        exit;
-    }
-}
 
 Snap_Request::setURLBase(SNAP_WI_URL_PATH);
 

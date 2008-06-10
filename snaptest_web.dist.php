@@ -14,18 +14,10 @@ define('SNAP_WI_TEST_PATH', '/path/to/my/tests/');
 // once more without weird script url hackery
 define('SNAP_WI_URL_PATH', 'http://www.example.com/path/to/snaptest_web.dist.php');
 
-// STEP 4: Set a key. You only need this if you are putting your
-// tests on a publicly accessible server. This also offers very minimal
-// protection. If you're actually going this far in the protecting bit,
-// it is probably time to read up on .htaccess and possibly write your own
-// web stub to do security.
-// A blank string means no key will be used.
-define('SNAP_WI_KEY', '');
-
-// STEP 5: set the matching path Files matching this pattern will be testable
+// STEP 4: set the matching path Files matching this pattern will be testable
 define('SNAP_WI_TEST_MATCH', '^.*\.stest\.php$');
 
-// STEP 6: Relax, you're done.
+// STEP 5: Relax, you're done.
 // Go to http://www.example.com/path/to/snaptest_web.dist.php
 
 // --------------------------------------------------------------------------

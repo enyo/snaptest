@@ -50,43 +50,16 @@ $content_types = array(
 
 $replacements = array(
     'css'       => array(
-        '{IMG}' => Snap_Request::makeURL(array(
-            'key'   => SNAP_WI_KEY,
-            'mode'  => 'resource',
-            'file'  => null,
-        )),
-
-        '../../../../assets/skins/sam/sprite.png' => Snap_Request::makeURL(array(
-            'key'   => SNAP_WI_KEY,
-            'mode'  => 'resource',
-            'file'  => 'sam-assets.png',
-        )),
+        '{IMG}' => SNAP_WI_URL_PATH.'?mode=resource&file=',
+        '../../../../assets/skins/sam/sprite.png' => SNAP_WI_URL_PATH.'?mode=resource&file=sam-assets.png'
     ),
     'css-ie6'   => array(
-        '{IMG}' => Snap_Request::makeURL(array(
-            'key'   => SNAP_WI_KEY,
-            'mode'  => 'resource',
-            'file'  => null,
-        )),
-
-        '../../../../assets/skins/sam/sprite.png' => Snap_Request::makeURL(array(
-            'key'   => SNAP_WI_KEY,
-            'mode'  => 'resource',
-            'file'  => 'sam-assets.png',
-        )),
+        '{IMG}' => SNAP_WI_URL_PATH.'?mode=resource&file=',
+        '../../../../assets/skins/sam/sprite.png' => SNAP_WI_URL_PATH.'?mode=resource&file=sam-assets.png'
     ),
     'css-ie7'   => array(
-        '{IMG}' => Snap_Request::makeURL(array(
-            'key'   => SNAP_WI_KEY,
-            'mode'  => 'resource',
-            'file'  => null,
-        )),
-
-        '../../../../assets/skins/sam/sprite.png' => Snap_Request::makeURL(array(
-            'key'   => SNAP_WI_KEY,
-            'mode'  => 'resource',
-            'file'  => 'sam-assets.png',
-        )),
+        '{IMG}' => SNAP_WI_URL_PATH.'?mode=resource&file=',
+        '../../../../assets/skins/sam/sprite.png' => SNAP_WI_URL_PATH.'?mode=resource&file=sam-assets.png'
     ),
 );
 
