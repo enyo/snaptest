@@ -57,6 +57,21 @@ class Snap_Equals_Expectation extends Snap_Expectation {
 }
 
 /**
+ * Basic Not Equals Expectation. Must pass a == check
+ */
+class Snap_Not_Equals_Expectation extends Snap_Expectation {
+
+    /**
+     * matches an incoming item against the constructor data
+     * @param mixed $in the incoming item to match
+     * @return bool TRUE if matched
+     */
+    public function match($in) {
+        return ($in != $this->data) ? TRUE : FALSE;
+    }
+}
+
+/**
  * Snap Identical Expectation. Must pass a === check
  */
 class Snap_Identical_Expectation extends Snap_Expectation {
@@ -66,6 +81,19 @@ class Snap_Identical_Expectation extends Snap_Expectation {
      */
     public function match($in) {
         return ($in === $this->data) ? TRUE : FALSE;
+    }
+}
+
+/**
+ * Snap Identical Expectation. Must pass a === check
+ */
+class Snap_Not_Identical_Expectation extends Snap_Expectation {
+
+    /**
+     * matches against a strict equals ===
+     */
+    public function match($in) {
+        return ($in !== $this->data) ? TRUE : FALSE;
     }
 }
 
