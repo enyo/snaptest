@@ -6,6 +6,28 @@ YAHOO.SnapTest.Manager = (function() {
 	
 	var Logger = new YAHOO.widget.LogWriter("Manager"); 
 	
+	var runTests = function() {
+		Display.disableTestingButton();
+		
+		// hide all our tests we aren't testing
+		Display.hideUncheckedTests();
+		
+		var boxes = Display.getTestList();
+		var boxes_length = boxes.length;
+
+		for (var i = 0; i < boxes_length; i++) {
+			var pieces = boxes[i].split('|||');
+			var file = pieces[0];
+			var klass = pieces[1];
+			var test = pieces[2];
+			
+			TR.addTest(file, klass, test);
+		}
+
+		Logger.log("Dispatching "+TR.toString()+".runTests()");
+		TR.runTests();
+	};
+	
 	FL.onFileLoadComplete.subscribe(function(type, args, caller) {
 		Logger.log("Caught event of type "+type);
 		
@@ -37,6 +59,13 @@ YAHOO.SnapTest.Manager = (function() {
 		Logger.log("Caught event of type "+type);
 		
 		Display.showMessage("Test loading complete. Ready to run.");
+		
+		// autorun flag
+		if (location.search.match(/autorun=true/)) {
+			runTests();
+			return;
+		}
+		
 		Display.enableTestingButton();
 	});
 	
@@ -84,25 +113,7 @@ YAHOO.SnapTest.Manager = (function() {
 	Display.onRunTests.subscribe(function(type, args, caller) {
 		Logger.log("Caught event of type "+type);
 		
-		Display.disableTestingButton();
-		
-		// hide all our tests we aren't testing
-		Display.hideUncheckedTests();
-		
-		var boxes = Display.getTestList();
-		var boxes_length = boxes.length;
-
-		for (var i = 0; i < boxes_length; i++) {
-			var pieces = boxes[i].split('|||');
-			var file = pieces[0];
-			var klass = pieces[1];
-			var test = pieces[2];
-			
-			TR.addTest(file, klass, test);
-		}
-
-		Logger.log("Dispatching "+TR.toString()+".runTests()");
-		TR.runTests();
+		runTests();
 	});
 	
 
