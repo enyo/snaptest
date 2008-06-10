@@ -213,6 +213,27 @@ class Snap_UnitTestCase_AssertIdentical_Test extends Snap_UnitTestCase {
         return $this->assertTrue(FALSE);
     }
 }
+
+class Snap_UnitTestCase_AssertNotIdentical_Test extends Snap_UnitTestCase {
+    public function setUp() {}
+    public function tearDown() {}
+    
+    public function testAssertNotIdenticalReturnsPassedTest() {
+        $result = $this->assertNotIdentical(TRUE, 1);
+        return $this->assertIsA($result, 'Snap_PassedTestAssertion');
+    }
+    
+    public function testFailingAssertNotIdenticalThrowsException() {
+        try {
+            $this->assertNotIdentical(TRUE, TRUE);
+        }
+        catch (Snap_AssertNotIdenticalUnitTestException $e) {
+            return $this->assertTrue(TRUE);
+        }
+        
+        return $this->assertTrue(FALSE);
+    }
+}
     
 class Snap_UnitTestCase_AssertNull_Test extends Snap_UnitTestCase {
 
@@ -251,7 +272,7 @@ class Snap_UnitTestCase_AssertNotNull_Test extends Snap_UnitTestCase {
         try {
             $this->assertNotNull(NULL);
         }
-        catch (Snap_AssertNotSameUnitTestException $e) {
+        catch (Snap_AssertNotIdenticalUnitTestException $e) {
             return $this->assertTrue(TRUE);
         }
         

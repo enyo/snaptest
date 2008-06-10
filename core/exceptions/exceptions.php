@@ -183,11 +183,10 @@ class Snap_AssertIdenticalUnitTestException extends Snap_AssertCompareUnitTestEx
     }
 }
 
-
 /**
- * Used for testing when assertions were supposed to not be the same
+ * Used for testing when assertions were supposed to be not the same
  */
-class Snap_AssertNotSameUnitTestException extends Snap_AssertCompareUnitTestException {
+class Snap_AssertNotIdenticalUnitTestException extends Snap_AssertCompareUnitTestException {
 
     /**
      * Constructor
@@ -197,7 +196,7 @@ class Snap_AssertNotSameUnitTestException extends Snap_AssertCompareUnitTestExce
      * @param mixed $should_be the result that it should have been
      */
     public function __construct($code, $message, $outcome, $should_be) {
-        parent::__construct($code, $message, $outcome, $should_be, '===');
+        parent::__construct($code, $message, $outcome, $should_be, '!==');
     }
 }
 
@@ -268,9 +267,11 @@ class Snap_AssertCompareUnitTestException extends Snap_UnitTestException {
             case 'assert_not_equal':
                 $prefix = 'Not Equal (!=) assertion failed.';
                 break;
-            case 'assert_same':
             case 'assert_identical':
                 $prefix = 'Identical (===) assertion failed.';
+                break;
+            case 'assert_not_identical':
+                $prefix = 'Not Identical (!==) assertion failed.';
                 break;
             case 'assert_null':
                 $prefix = 'NULL assertion failed.';

@@ -178,6 +178,22 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
     }
     
     /**
+     * Assert that the incomming value is not identical (!==) to the incoming expectation
+     * @param mixed $expected the value it should be
+     * @param mixed $actual the value actually testing
+     * @param string $msg user message on failure
+     * @return boolean TRUE
+     * @throws AssertIdenticalUnitTestException
+     **/
+    protected function assertNotIdentical($actual, $expected, $msg = '') {
+        if ($expected === $actual) {
+            throw new Snap_AssertNotIdenticalUnitTestException('assert_not_identical', $msg, $expected, $actual);
+        }
+        
+        return new Snap_PassedTestAssertion();
+    }
+    
+    /**
      * assert that the incoming value is NULL
      * @param mixed $value the value to test
      * @param string $msg user message on failure
@@ -197,11 +213,11 @@ abstract class Snap_UnitTestCase implements Snap_RunnableTestCaseInterface {
      * @param mixed $value the value to test
      * @param string $msg user message on failure
      * @return boolean TRUE
-     * @throws AssertNotSameUnitTestException
+     * @throws AssertNotIdenticalUnitTestException
      **/
     protected function assertNotNull($value, $msg = '') {
         if ($value === NULL) {
-            throw new Snap_AssertNotSameUnitTestException('assert_not_null', $msg, $value, NULL);
+            throw new Snap_AssertNotIdenticalUnitTestException('assert_not_null', $msg, $value, NULL);
         }
         
         return new Snap_PassedTestAssertion();
