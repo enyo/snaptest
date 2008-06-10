@@ -5,18 +5,22 @@
 
 $urls = array(
     'css'           => Snap_Request::makeURL(array(
+        'key'   => SNAP_WI_KEY,
         'mode'  => 'resource',
         'file'  => 'css',
         )),
     'css-ie6'       => Snap_Request::makeURL(array(
+        'key'   => SNAP_WI_KEY,
         'mode'  => 'resource',
         'file'  => 'css-ie6',
         )),
     'css-ie7'       => Snap_Request::makeURL(array(
+        'key'   => SNAP_WI_KEY,
         'mode'  => 'resource',
         'file'  => 'css-ie7',
         )),
     'js'            => Snap_Request::makeURL(array(
+        'key'   => SNAP_WI_KEY,
         'mode'  => 'resource',
         'file'  => 'js',
         )),
