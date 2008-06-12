@@ -5,6 +5,8 @@ YAHOO.namespace("SnapTest.Constants");
 
 // define some var within a local scope
 var loc = location.href;
+loc = loc.replace(/#/, '');
+
 var connect = (loc.match(/\?/)) ? '&' : '?';
 
 loc = loc+connect;
