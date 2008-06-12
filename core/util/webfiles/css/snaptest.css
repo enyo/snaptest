@@ -4,6 +4,10 @@ body, html {
 
 a {
 	text-decoration: none;
+	color: #536783;
+}
+a:link, a:visited, a:hover, a:active {
+	color: #536783;
 }
 
 p {
@@ -34,6 +38,24 @@ p {
 	clear: both;
 	width: 7em;
 	font-weight: bold;
+}
+
+#expand_collapse_all {
+	clear: both;
+	padding-top: 1em;
+	padding-left: 3em;
+}
+
+#collapse_all {
+	margin-right: 0.5em;
+}
+
+#expand_all {
+	border: 1px solid #000;
+	border-top: 0;
+	border-right: 0;
+	border-bottom: 0;
+	padding-left: 0.5em;
 }
 
 #help_contents {

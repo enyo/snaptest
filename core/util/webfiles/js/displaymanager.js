@@ -571,7 +571,10 @@ YAHOO.SnapTest.DisplayManager = (function() {
 	
 	// help system
 	YAHOO.util.Event.onDOMReady(function() {
+
 		YAHOO.util.Event.addListener("help", "click", function(e) {
+			YAHOO.util.Event.stopEvent(e);
+			
 			if (!help_panel) {
 				help_panel = new YAHOO.widget.Panel("help_popup",  {
 					width: "500px", 
@@ -591,6 +594,31 @@ YAHOO.SnapTest.DisplayManager = (function() {
 			help_panel.render("snaptest");
 			help_panel.show();
 		});
+
+		YAHOO.util.Event.addListener("collapse_all", "click", function(e) {
+			YAHOO.util.Event.stopEvent(e);
+			
+			var nodes = YAHOO.util.Dom.getElementsByClassName("file_group", "li");
+			var nodes_length = nodes.length;
+			for (var i = 0; i < nodes_length; i++) {
+				if (!YAHOO.util.Dom.hasClass(nodes[i], "folded")) {
+					YAHOO.util.Dom.addClass(nodes[i], "folded");
+				}
+			}
+		});
+		
+		YAHOO.util.Event.addListener("expand_all", "click", function(e) {
+			YAHOO.util.Event.stopEvent(e);
+			
+			var nodes = YAHOO.util.Dom.getElementsByClassName("file_group", "li");
+			var nodes_length = nodes.length;
+			for (var i = 0; i < nodes_length; i++) {
+				if (YAHOO.util.Dom.hasClass(nodes[i], "folded")) {
+					YAHOO.util.Dom.removeClass(nodes[i], "folded");
+				}
+			}
+		});
+
 	});
 	
 	var iface = {};

@@ -65,6 +65,10 @@ $urls = array(
         <dt>Test Match:</dt>
         <dd><?php echo SNAP_WI_TEST_MATCH ?></dd>
     </dl>
+    <div id="expand_collapse_all">
+        <a href="#" id="collapse_all">Collapse All</a>
+        <a href="#" id="expand_all">Expand All</a>
+    </div>
     <div id="test_container"></div>
     <div id="footer_spacer" class="clear"></div>
     <div id="footer_container">
