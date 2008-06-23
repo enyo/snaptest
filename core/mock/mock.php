@@ -515,7 +515,7 @@ class Snap_MockObject {
         if (!isset($this->signatures[$method_name]) || count($method_params) == 0) {
             return array();
         }
-        
+    
         $sigs = array();
         foreach ($this->signatures[$method_name] as $signature => $details) {
             $params = $details['params'];
@@ -528,7 +528,7 @@ class Snap_MockObject {
             $param_match = TRUE;
             foreach ($params as $idx => $param) {
                 // more params in sig than sent to us
-                if (!isset($method_params[$idx])) {
+                if (!in_array($idx, array_keys($method_params))) {
                     $param_match = FALSE;
                     break;
                 }
