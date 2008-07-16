@@ -91,7 +91,9 @@ dd {
 }
 
 dd.fail, dt.fail,
-dd.defect, dt.defect {
+dd.defect, dt.defect,
+dd.skip, dt.skip,
+dd.todo, dt.todo {
 	display: block;
 }
 
