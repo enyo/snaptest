@@ -404,7 +404,7 @@ class Snap_MockObject {
                 $returns_at_default[] = $sig;
             }
         }
-        
+
         // > 1 return is an exception
         if (count($returns_at_call_count) > 1) {
             // error here
@@ -525,16 +525,29 @@ class Snap_MockObject {
                 continue;
             }
             
+            // look at every param submitted versus the params in the signature
+            // once we have a non-match, we fail out the test.
+            // if we get all the way through then add the signature to our
+            // match list
             $param_match = TRUE;
             foreach ($params as $idx => $param) {
-                // more params in sig than sent to us
-                if (!in_array($idx, array_keys($method_params))) {
+                // more params in sig than sent to us, and this wasn't an anything expectation
+                if (!in_array($idx, array_keys($method_params)) && is_object($param) && strtolower(get_class($param)) != 'snap_anything_expectation') {
                     $param_match = FALSE;
                     break;
                 }
                 
+                // if this is an anything expectation, and there was no param (optional),
+                // make the method param anything we want.
+                if (strtolower(get_class($param)) == 'snap_anything_expectation' && !isset($method_params[$idx])) {
+                    $method_param = NULL;
+                }
+                else {
+                    $method_param = $method_params[$idx];
+                }
+                
                 // run a match, if it fails, it is a non match
-                if (!$param->match($method_params[$idx])) {
+                if (!$param->match($method_param)) {
                     $param_match = FALSE;
                     break;
                 }
@@ -562,6 +575,7 @@ class Snap_MockObject {
         if (!isset($this->signatures[$method_name])) {
             return NULL;
         }
+
         foreach ($this->signatures[$method_name] as $signature => $details) {
             if (count($details['params']) == 0) {
                 return $signature;
