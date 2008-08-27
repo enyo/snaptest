@@ -21,16 +21,17 @@ Place Snap wherever you want, and run a self test:
 
 When ran, you should see output like the following:
 
-<code>
+<code><pre>
 User@Host ~/snaptest> ./snaptest.sh ./
-...............................................................................................
+..............................................................................
+.................
 ______________________________________________________________________
 Total Cases:    37
 Total Tests:    95
 Total Pass:     95
 Total Defects:  0
 Total Failures: 0
-</code>
+</pre></code>
 
 If you don't get any failures (marked with an F followed by information about the error, you're ready to go!
 
