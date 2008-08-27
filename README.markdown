@@ -11,7 +11,7 @@ SnapTest is a free software project licensed under the Mozilla Public License.
 
 Getting Started
 ---------------
-(from http://code.google.com/p/snaptest/wiki/QuickStart)
+(from [http://code.google.com/p/snaptest/wiki/QuickStart](http://code.google.com/p/snaptest/wiki/QuickStart))
 
 Place Snap wherever you want, and run a self test:
 
@@ -35,7 +35,7 @@ Total Failures: 0
 
 If you don't get any failures (marked with an F followed by information about the error, you're ready to go!
 
-From here, check out http://code.google.com/p/snaptest/wiki/QuickStart Step 2 to start writing your own tests.
+From here, check out [The Getting Started Guide](http://code.google.com/p/snaptest/wiki/QuickStart) Step 2 to start writing your own tests.
 
 License
 -------
