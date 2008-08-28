@@ -10,6 +10,9 @@ all accepted submissions have met the Developer's Certificate of Origin
 at:
 http://code.google.com/p/snaptest/wiki/SourceInformation
 
+getoptx.sh is written by Grigoriy Strokin <grg@philol.msu.ru> and is in the
+Public Domain
+
 ---
 
 Redistribution and use in source and binary forms, with or without
