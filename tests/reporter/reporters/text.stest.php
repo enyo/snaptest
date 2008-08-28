@@ -5,6 +5,10 @@ include_once SNAPTEST_CORE . 'reporter' . DIRECTORY_SEPARATOR .'reporters'.DIREC
 
 class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
     public function setUp() {
+        if (SNAP_CGI_MODE) {
+            $this->skip('Output tests are not available in CGI mode');
+        }
+        
         ob_start();
         $this->reporter = new Snap_Text_UnitTestReporter();
 
@@ -100,6 +104,10 @@ class Snap_Text_UnitTestReporter_Test_Pass_Reporting_Totals extends Snap_UnitTes
     const testcount = 7;
     
     public function setUp() {
+        if (SNAP_CGI_MODE) {
+            $this->skip('Output tests are not available in CGI mode');
+        }
+        
         $this->reporter = new Snap_Text_UnitTestReporter();
 
         ob_start();

@@ -30,22 +30,27 @@ class Snap_AnsiText_UnitTestReporter extends Snap_UnitTestReporter implements Sn
     
     public function announceTestPass($report) {
         echo $this->pass_color.'.'.$this->default_color;
+        $this->flush();
     }
     
     public function announceTestFail($report) {
         echo $this->fail_color.'F'.$this->default_color;
+        $this->flush();
     }
     
     public function announceTestDefect($report) {
         echo $this->fail_color.'D'.$this->default_color;
+        $this->flush();
     }
     
     public function announceTestTodo($report) {
         echo $this->todo_color.'T'.$this->default_color;
+        $this->flush();
     }
     
     public function announceTestSkip($report) {
         echo $this->skip_color.'S'.$this->default_color;
+        $this->flush();
     }
     
     public function announceTestCaseComplete($report) {}
@@ -130,6 +135,7 @@ class Snap_AnsiText_UnitTestReporter extends Snap_UnitTestReporter implements Sn
             $output .= $this->default_color;
             
             echo $output;
+            $this->flush();
         }
         
         $tests = $pass + $fail + $defect;
@@ -154,7 +160,9 @@ class Snap_AnsiText_UnitTestReporter extends Snap_UnitTestReporter implements Sn
         echo 'Total Defects:  '.$defect."\n";
         echo 'Total Failures: '.$fail."\n";
         echo 'Total Skips:    '.$skip."\n";
-        echo 'Total Todo:     '.$todo."\n";        
+        echo 'Total Todo:     '.$todo."\n";
+        
+        $this->flush();
     }
     
     public function generateFooter() {
@@ -173,7 +181,17 @@ class Snap_AnsiText_UnitTestReporter extends Snap_UnitTestReporter implements Sn
                 echo '    '.$addon['name']."\n";
             }
         }
+        
+        $this->flush();
     }
     
+    protected function flush() {
+        if (!SNAP_CGI_MODE) {
+            return;
+        }
+        
+        @ob_flush();
+        @flush();
+    }
 
 }

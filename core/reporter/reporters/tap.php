@@ -22,10 +22,12 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter implements Snap_Un
     public function generateHeader() {
         echo "\n";
         echo "TAP version 13\n";
+        $this->flush();
     }
     
     public function announceTestCount($test_count) {
         echo "1..{$test_count}\n";
+        $this->flush();
     }
     
     public function announceTestPass($report) {
@@ -70,6 +72,8 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter implements Snap_Un
                 echo '#    '.$addon['name']."\n";
             }
         }
+        
+        $this->flush();
     }
     
     protected function displayReport($report) {
@@ -104,7 +108,15 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter implements Snap_Un
         // make pretty classname / function
         $pretty_function = preg_replace('/^test /i', '', preg_replace('/[^A-Z0-9 ]/i', '', preg_replace('/([A-Z])/', ' \\1', $function)));
         
-        echo "$pass_status $report_number - $pretty_function\n";
+        if ($report['type'] == 'skip') {
+            echo "$pass_status $report_number - # SKIP $message\n";
+        }
+        elseif ($report['type'] == 'todo') {
+            echo "$pass_status $report_number - # TODO $pretty_function\n";
+        }
+        else {
+            echo "$pass_status $report_number - $pretty_function\n";
+        }
         
         if (!$this->type_mapping[$report['type']]) {
             echo "  ---\n";
@@ -116,5 +128,16 @@ class Snap_Tap_UnitTestReporter extends Snap_UnitTestReporter implements Snap_Un
             echo "      file:   $file\n";
             echo "  ...\n";
         }
+        
+        $this->flush();
+    }
+    
+    protected function flush() {
+        if (!SNAP_CGI_MODE) {
+            return;
+        }
+        
+        @ob_flush();
+        @flush();
     }
 }

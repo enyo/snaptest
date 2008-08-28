@@ -12,22 +12,27 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
     
     public function announceTestPass($report) {
         echo '.';
+        $this->flush();
     }
     
     public function announceTestFail($report) {
         echo 'F';
+        $this->flush();
     }
     
     public function announceTestDefect($report) {
         echo 'D';
+        $this->flush();
     }
     
     public function announceTestTodo($report) {
         echo 'T';
+        $this->flush();
     }
     
     public function announceTestSkip($report) {
         echo 'S';
+        $this->flush();
     }
     
     public function announceTestCaseComplete($report) {}
@@ -94,6 +99,7 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
             }
             
             echo $output;
+            $this->flush();
         }
         
         $tests = $pass + $fail + $defect;
@@ -111,7 +117,9 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
         echo 'Total Defects:  '.$defect."\n";
         echo 'Total Failures: '.$fail."\n";
         echo 'Total Skips:    '.$skip."\n";
-        echo 'Total Todo:     '.$todo."\n";        
+        echo 'Total Todo:     '.$todo."\n";
+        
+        $this->flush();
     }
     
     public function generateFooter() {
@@ -128,7 +136,16 @@ class Snap_Text_UnitTestReporter extends Snap_UnitTestReporter implements Snap_U
                 echo '    '.$addon['name']."\n";
             }
         }
+        
+        $this->flush();
     }
     
-
+    protected function flush() {
+        if (!SNAP_CGI_MODE) {
+            return;
+        }
+        
+        @ob_flush();
+        @flush();
+    }
 }
