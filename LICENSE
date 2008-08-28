@@ -10,9 +10,6 @@ all accepted submissions have met the Developer's Certificate of Origin
 at:
 http://code.google.com/p/snaptest/wiki/SourceInformation
 
-getoptx.sh is written by Grigoriy Strokin <grg@philol.msu.ru> and is in the
-Public Domain
-
 ---
 
 Redistribution and use in source and binary forms, with or without
@@ -45,3 +42,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 getoptx.sh is licensed under the Public Domain and may be distributed on its
 own, independent of this software package.
+
+The YUI Library is (c) 2008 Yahoo! Inc, licensed under the BSD License and
+may be distributed on its own, independent of this software package. For
+terms and conditions of redistribution of the YUI Library, please see the
+license at http://developer.yahoo.com/yui/license.html
