@@ -33,10 +33,8 @@ function SNAP_usage() {
     
 return <<<SNAPDOC
 
-Usage: snaptest.sh [--out=outmode] [--php=phppath] [--nice=nicepath]
-                   [--help] <path>
-Usage: php snaptest.php [--out=outmode] [--php=phppath] [--nice=nicepath]
-                   [--help] <path>
+Usage: snaptest.sh [--out=outmode] [--php=phppath] [--help] <path>
+Usage: php snaptest.php [--out=outmode] [--php=phppath] [--help] <path>
 
 <path> :: The path to the test you want to run.
 
@@ -54,14 +52,10 @@ location for you.
 that match this regular expression will be included by the test
 harness. By default, SnapTest looks for the pattern ^.*\.stest\.php$
 
---nice=nicepath :: set the path to GNU Nice. If not specified, nice will
-not be used. If running snaptest.sh, the shell will try and autodetect
-the location for you. --nice is ignored in Windows.
-
 --help :: display this message
 
 Additional information can always be found on the SnapTest home page:
-http://snaptest.googlecode.com
+http://www.snaptest.net
 
 SNAPDOC;
 }

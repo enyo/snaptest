@@ -31,27 +31,6 @@ if [[ ! -z $PHPX ]] ; then
     PHP=$PHPX
 fi
 
-# Auto Locate Nice
-NICEX=`which nice`
-if [[ ! -x "$NICEX" ]] ; then
-    NICEX=""
-    if [ -z $NICEX ] ; then
-        if [ -x "/usr/local/bin/nice" ] ; then
-            NICEX="/usr/local/bin/nice"
-        fi
-        if [ -x "/usr/bin/nice" ] ; then
-            NICEX="/usr/bin/nice"
-        fi
-        if [ -x "/opt/local/bin/nice" ] ; then
-            NICEX="/opt/local/bin/nice"
-        fi
-    fi
-fi
-
-if [[ ! -z $NICEX ]] ; then
-    NICE=$NICEX
-fi
-
 # parse the options
 CMD=""
 while getoptex "out. php. nice. match. help;" "$@"
@@ -61,14 +40,6 @@ do
             PHP=$OPTARG
         else
             echo "The path of $OPTARG was not a valid php path."
-            exit 0
-        fi
-    fi
-    if [ "$OPTOPT" = "nice" ] ; then
-        if [ -x "$OPTARG" ] ; then
-            NICE=$OPTARG
-        else
-            echo "The path of $OPTARG was not a valid nice path."
             exit 0
         fi
     fi
@@ -113,8 +84,7 @@ else
     PHPSAFE=`echo "$PHP" | sed "s/\./__D_O_T__/g"`
     CMDSAFE=`echo "$CMD" | sed "s/\./__D_O_T__/g"`
     PTHSAFE=`echo "$PTH" | sed "s/\./__D_O_T__/g"`
-    NICESAFE=`echo "$NICE" | sed "s/\./__D_O_T__/g"`
 
-    CMD="$PHP -q $FPATH/snaptest.php --php=$PHPSAFE --nice=$NICESAFE $CMDSAFE $PTHSAFE"
+    CMD="$PHP -q $FPATH/snaptest.php --php=$PHPSAFE $CMDSAFE $PTHSAFE"
 fi
 $CMD
