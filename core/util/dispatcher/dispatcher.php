@@ -40,6 +40,11 @@ class Snap_Dispatcher {
         if (!$use_prefix) {
             return $this->php;
         }
+        
+        // windows gets a nice via /low
+        if (substr(PHP_OS, 0, 3) == 'WIN') {
+            return 'start /low /b ' . $this->php;
+        }
 
         $php = $this->php;
         
@@ -47,8 +52,32 @@ class Snap_Dispatcher {
         if (SNAP_CGI_MODE) {
             $php .= ' -q';
         }
+        
+        // get snap NICE option if set and use it
+        $options = Snap_Request::getLongOptions(array('nice' => ''));
+        if ($options['nice']) {
+            $php = $options['nice'] . ' -n 15 ' . $php;
+        }
 
         return $php;
+    }
+    
+    /**
+     * Returns the PHP command suffix
+     * On some OSes, additional suffixes may be needed for running PHP
+     * in the background or with quiet input.
+     * @return string
+     **/
+    protected function getPHPCommandSuffix() {
+        if (substr(PHP_OS, 0, 3) != 'WIN') {
+            if (SNAP_CGI_MODE) {
+                return ' &';
+            }
+            else {
+                return ' 2>&1 &';
+            }
+        }
+        return '';
     }
     
     /**
@@ -69,6 +98,15 @@ class Snap_Dispatcher {
     }
     
     /**
+     * Closes an open resource handle from popen
+     * @param $handle a resource handle
+     * @return boolean
+     **/
+    protected function closeHandle($handle) {
+        return pclose($handle);
+    }
+    
+    /**
      * Opens a resource handle as a background process
      * This opens the PHP process, and returns the execution handle
      * back to the calling function. This is the guts of the fork()
@@ -81,50 +119,11 @@ class Snap_Dispatcher {
     
         $options = $this->makeLongOptions($call);
     
-        $exec = $this->getPHP() . ' ' . $this->getSnaptestPath() . ' ' . $options;
-        
-        $descriptors = array(
-            0   => array('pipe', 'r'),
-            1   => array('pipe', 'w'),
-            2   => array('pipe', 'w'),
-        );
-        
-        $process = proc_open($exec, $descriptors, $pipes);
-        stream_set_blocking($pipes[1], 0);
-        
-        if (is_resource($process)) {
-            fclose($pipes[0]);
-            return array(
-                'proc'  => $process,
-                'read'  => $pipes[1],
-                'err'   => $pipes[2],
-            );
-        }
-        
-        return FALSE;
-    }
-    
-    /**
-     * Checks to see if a stream is available for non-blocking read operations
-     * if a stream is found, the key for the array stream is returned.
-     * in order to find the stream easier in the calling method
-     * @param $array an array of sockets to check
-     * @param $timeout [default: 0] a timeout for stream_select
-     **/
-    protected function selectStream($array, $timeout = 0) {
-        $selects = $array;
-        
-        if (stream_select($array, $a = NULL, $b = NULL, $timeout)) {
-            $streams = array();
-            foreach ($selects as $key => $stream) {
-                if (in_array($stream, $array)) {
-                    $streams[$key] = $stream;
-                }
-            }
-            return $streams;
-        }
-        
-        return FALSE;
+        $exec = $this->getPHP() . ' ' . $this->getSnaptestPath() . ' ' . $options . $this->getPHPCommandSuffix();
+
+        $exec_handle = popen($exec, "r");
+
+        return $exec_handle;
     }
 
     /**
@@ -137,89 +136,103 @@ class Snap_Dispatcher {
      **/
     public function dispatch($options) {
         $key_list = $options['keys'];
-        $procs = array();
-        $reads = array();
+
+        $socket_list = array_fill(0, $this->getMaxChildren(), FALSE);
         $threads_processing = FALSE;
-        for ($i = 0; $i < $this->getMaxChildren(); $i++) {
-            $procs[$i] = NULL;
+        while (count($key_list) || $threads_processing) {
+            // there are files to process
+            // look for an empty socket
+            for ($i = 0; $i < $this->getMaxChildren(); $i++) {
+                if ($socket_list[$i]) {
+                    // established socket, read in data, add to stream
+                    if (!feof($socket_list[$i]['handle'])) {
+                        $data = fread($socket_list[$i]['handle'], 1024);
+                    }
+                    else {
+                        $data = NULL;
+                    }
+
+                    if ($data) {
+                        // add the data to the stream
+                        $socket_list[$i]['stream'] .= $data;
+                        
+                        // is ending token found?
+                        $end = strpos($socket_list[$i]['stream'], SNAP_STREAM_ENDING_TOKEN);
+                        if ($end !== FALSE) {
+                            // if so, capture output up to ending token, trim
+                            $output = trim(substr($socket_list[$i]['stream'], 0, $end));
+                            
+                            // call complete with the key and the payload
+                            call_user_func_array($options['onThreadComplete'], array($socket_list[$i]['key'], $output));
+                            
+                            // clear the socket
+                            $this->closeHandle($socket_list[$i]['handle']);
+                            $socket_list[$i] = FALSE;
+                        }
+                        else {
+                            // we're not done yet... continue to next $i
+                            continue;
+                        }
+                    }
+                    else {
+                        // broken stream, requeue that file
+                        call_user_func_array($options['onThreadFail'], array($socket_list[$i]['key'], $socket_list[$i]['stream']));
+                        
+                        // array_push($key_list, $socket_list[$i]['key']);
+                        $this->closeHandle($socket_list[$i]['handle']);
+                        $socket_list[$i] = FALSE;
+                    }
+                }
+        
+                // if we are out of files to assign, just continue
+                // to finish cleaning on this pass
+                if (!count($key_list)) {
+                    continue;
+                }
+        
+                // available slot, assign it a file
+                $key = array_pop($key_list);
+
+                // dispatch an analyze call
+                $dispatch = array();
+                foreach ($options['dispatch'] as $k => $v) {
+                    if ($k == '$key') {
+                        $k = $key;
+                    }
+                    if ($v == '$key') {
+                        $v = $key;
+                    }
+                    $dispatch[$k] = $v;
+                }
+                $handle = $this->createHandle($dispatch);
+
+                if (!$handle) {
+                    // failed opening sub process
+                    // put file back on stack, continue
+                    array_push($key_list, $key);
+                    continue;
+                }
+        
+                // valid handle, assign to socket list
+                $socket_list[$i] = array(
+                    'key'       => $key,
+                    'handle'    => $handle,
+                    'stream'    => '',
+                );
+            }
+    
+            // check if any threads are processing, and set appropriately
+            for ($i = 0; $i < $this->getMaxChildren(); $i++) {
+                if ($socket_list[$i]) {
+                    $threads_processing = TRUE;
+                    break;
+                }
+                else {
+                    $threads_processing = FALSE;
+                }
+            }
         }
         
-        while (count($key_list) || $threads_processing) {
-            // loop through the procs, assign open slots
-            for ($i = 0; $i < $this->getMaxChildren(); $i++) {
-                if ($procs[$i] === NULL) {
-                    // needs a process
-                    // skip if no keys left to grab
-                    if (count($key_list) <= 0) {
-                        continue;
-                    }
-                    
-                    $key = array_pop($key_list);
-            
-                    $dispatch = array();
-                    foreach ($options['dispatch'] as $k => $v) {
-                        if ($k == '$key') {
-                            $k = $key;
-                        }
-                        if ($v == '$key') {
-                            $v = $key;
-                        }
-                        $dispatch[$k] = $v;
-                    }
-                    
-                    $handle = $this->createHandle($dispatch);
-                    
-                    if ($handle === FALSE) {
-                        call_user_func_array($options['onThreadFail'], array($key, ''));
-                        
-                        $threads_processing = FALSE;
-                        for ($i = 0; $i < $this->getMaxChildren(); $i++) {
-                            if ($procs[$i] !== NULL) {
-                                $threads_processing = TRUE;
-                                break;
-                            }
-                        }
-                        
-                        continue;
-                    }
-                    
-                    $handle['key'] = $key;
-                    $procs[$i] = $handle;
-                    $reads[$i] = $handle['read'];
-                    $threads_processing = TRUE;
-                }
-            }
-            
-            // collect all streams ready for read
-            $ready_streams = $this->selectStream($reads, 60);
-            if ($ready_streams !== FALSE) {
-                foreach ($ready_streams as $key => $stream) {
-                    $handle = $procs[$key];
-                    call_user_func_array($options['onThreadComplete'], array($handle['key'], stream_get_contents($stream)));
-                    
-                    fclose($handle['read']);
-                    fclose($handle['err']);
-                    proc_close($handle['proc']);
-                
-                    unset($reads[$key]);
-                    unset($procs[$key]);
-                    unset($ready_streams[$key]);
-                    $procs[$key] = NULL;
-                }
-                
-                // sweep to see if there are any threads processing
-                $threads_processing = FALSE;
-                for ($i = 0; $i < $this->getMaxChildren(); $i++) {
-                    if ($procs[$i] !== NULL) {
-                        $threads_processing = TRUE;
-                        break;
-                    }
-                }
-            }
-            unset($ready_streams);
-        } // end while there are keys left to process || threads processing
-        
-        // fire callback, all keys processed
         return call_user_func_array($options['onComplete'], array());
     }
 }
