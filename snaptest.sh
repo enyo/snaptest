@@ -31,30 +31,9 @@ if [[ ! -z $PHPX ]] ; then
     PHP=$PHPX
 fi
 
-# Auto Locate Nice
-NICEX=`which nice`
-if [[ ! -x "$NICEX" ]] ; then
-    NICEX=""
-    if [ -z $NICEX ] ; then
-        if [ -x "/usr/local/bin/nice" ] ; then
-            NICEX="/usr/local/bin/nice"
-        fi
-        if [ -x "/usr/bin/nice" ] ; then
-            NICEX="/usr/bin/nice"
-        fi
-        if [ -x "/opt/local/bin/nice" ] ; then
-            NICEX="/opt/local/bin/nice"
-        fi
-    fi
-fi
-
-if [[ ! -z $NICEX ]] ; then
-    NICE=$NICEX
-fi
-
 # parse the options
 CMD=""
-while getoptex "out. php. nice. match. help;" "$@"
+while getoptex "out. php. match. help;" "$@"
 do
     if [ "$OPTOPT" = "php" ] ; then
         if [ -x "$OPTARG" ] ; then
