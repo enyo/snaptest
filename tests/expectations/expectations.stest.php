@@ -44,7 +44,7 @@ class Snap_Equals_Expectation_Test extends Snap_UnitTestCase {
     
     public function tearDown() {
         unset($this->expectation);
-        unset($this->actual);
+        unset($this->response);
     }
     
     public function testIsAnInstanceOfSnapExpectation() {
@@ -53,6 +53,28 @@ class Snap_Equals_Expectation_Test extends Snap_UnitTestCase {
     
     public function testLooseTypeMatches() {
         return $this->assertTrue($this->response);
+    }
+}
+
+/**
+ * Tests Snap_EqualsInsensitive_Expectation
+ **/
+class Snap_EqualsInsensitive_Expectation_Test extends Snap_UnitTestCase {
+    const expect = 'Foo';
+    const actual = 'foo';
+    
+    public function setUp() {
+        $this->expectation = new Snap_EqualsInsensitive_Expectation(self::expect);
+        $this->response = $this->expectation->match(self::actual);
+    }
+    
+    public function tearDown() {
+        unset($this->expectation);
+        unset($this->response);
+    }
+    
+    public function testIsAnInstanceOfSnapExpectation() {
+        return $this->assertTrue($this->expectation instanceof Snap_Expectation);
     }
 }
 

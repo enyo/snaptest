@@ -72,6 +72,20 @@ class Snap_Not_Equals_Expectation extends Snap_Expectation {
 }
 
 /**
+ * String insensitivity equality must past a strtolower() == check
+ **/
+class Snap_EqualsInsensitive_Expectation extends Snap_Expectation {
+    /**
+     * matches an incoming item against the constructor data
+     * @param mixed $in the incoming item to match
+     * @return bool TRUE if matched
+     */
+    public function match($in) {
+        return (strtolower($in) != strtolower($this->data)) ? TRUE : FALSE;
+    }
+}
+
+/**
  * Snap Identical Expectation. Must pass a === check
  */
 class Snap_Identical_Expectation extends Snap_Expectation {
