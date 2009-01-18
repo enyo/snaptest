@@ -66,7 +66,7 @@ class Snap_TestAggregator {
             }
         }
         
-        foreach ($results as $report) {
+        if (is_array($results)) foreach ($results as $report) {
             // cases are added only on first occurance
             if ($report['type'] == 'case') {
                 if (!isset($this->case_list[$report['class']])) {
