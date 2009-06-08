@@ -22,10 +22,19 @@ define('SNAP_WI_URL_PATH', 'http://www.example.com/path/to/snaptest_web.dist.php
 // A blank string means no key will be used.
 define('SNAP_WI_KEY', '');
 
-// STEP 5: set the matching path Files matching this pattern will be testable
+// STEP 5: Obfuscation key. If you decided to set a key for STEP 4, then
+// you may want a key for STEP 5. Setting a crypt key will obfuscate all
+// path information in the web interface. Great if you want to show off your
+// test results without exposing your path to the world. Is this wise?
+// I suppose that'd be your call.
+// A blank string means no obfuscation will be done.
+define('SNAP_WI_CRYPT', '');
+
+// STEP 6: set the matching path
+// Files matching this pattern will be testable
 define('SNAP_WI_TEST_MATCH', '^.*\.stest\.php$');
 
-// STEP 6: Relax, you're done.
+// STEP 7: Relax, you're done. Bask in your awesomeness.
 // Go to http://www.example.com/path/to/snaptest_web.dist.php
 
 // --------------------------------------------------------------------------

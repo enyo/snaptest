@@ -60,7 +60,18 @@ $urls = array(
     </div>
     <dl id="testing_parameters">
         <dt>Test Path:</dt>
-        <dd><?php echo SNAP_WI_TEST_PATH ?></dd>
+        <dd><?php 
+            if (SNAP_WI_CRYPT) {
+                $crypt = snap_blowfish_encrypt(SNAP_WI_TEST_PATH, SNAP_WI_CRYPT);
+                $crypt = str_replace('_', '', $crypt);
+                $crypt = substr($crypt, -32);
+                echo $crypt;
+                echo " <strong>(File obfuscation is on)</strong>";
+            }
+            else {
+                echo SNAP_WI_TEST_PATH;
+            }
+        ?></dd>
         
         <dt>Test Match:</dt>
         <dd><?php echo SNAP_WI_TEST_MATCH ?></dd>

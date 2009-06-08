@@ -13,6 +13,12 @@ if (!$options['file']) {
 }
 
 $file = $options['file'];
+$file_original = $options['file'];
+
+// decrypt if required
+if (SNAP_WI_CRYPT) {
+    $file = snap_blowfish_decrypt($file, SNAP_WI_CRYPT);
+}
 
 // ensure file path matches test path prefix
 $file = str_replace(array('..', '//'), array('.', '/'), $file);
@@ -34,7 +40,7 @@ $output = array();
 foreach ($results as $klassname => $classes) {
     if (!is_array($classes)) {
         $out = array();
-        $out['file'] = $file;
+        $out['file'] = $file_original;
         $out['error'] = $classes;
         $output[] = $out;
         continue;
@@ -42,7 +48,7 @@ foreach ($results as $klassname => $classes) {
     
     foreach ($classes as $klass => $test) {
         $out = array();
-        $out['file'] = $file;
+        $out['file'] = $file_original;
         $out['klass'] = $klassname;
         $out['test'] = $test;
         $output[] = $out;

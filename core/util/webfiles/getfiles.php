@@ -10,6 +10,12 @@ else {
     $file_list = array(SNAP_WI_TEST_PATH);
 }
 
+if (SNAP_WI_CRYPT) {
+    foreach ($file_list as $idx => $file) {
+        $file_list[$idx] = snap_blowfish_encrypt($file, SNAP_WI_CRYPT);
+    }
+}
+
 echo json_encode($file_list);
 
 exit;

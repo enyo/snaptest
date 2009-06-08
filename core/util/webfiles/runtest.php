@@ -18,6 +18,11 @@ $file = $options['file'];
 $test = $options['test'];
 $klass = $options['klass'];
 
+// decrypt if required
+if (SNAP_WI_CRYPT) {
+    $file = snap_blowfish_decrypt($file, SNAP_WI_CRYPT);
+}
+
 // ensure file path matches test path prefix
 $file = str_replace(array('..', '//'), array('.', '/'), $file);
 

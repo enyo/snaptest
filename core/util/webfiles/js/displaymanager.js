@@ -222,7 +222,9 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		var p = document.createElement("p");
 		YAHOO.util.Dom.addClass(p, "file_name");
 		
-		var txt = document.createTextNode(file);
+		var fileDisplay = file;
+		fileDisplay = fileDisplay.substr(fileDisplay.length - 32, 32);
+		var txt = document.createTextNode(fileDisplay);
 		
 		YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.TEST_LIST).appendChild(li);
 			li.appendChild(makeFoldingControl());
