@@ -25,6 +25,8 @@ class Snap_Request {
      * @return string
      **/
     public static function mangleRequest($var) {
+        $var = str_replace(' ', '\ ', $var);
+        
         if (SNAP_CGI_MODE) {
             return str_replace('.', SNAP_MANGLE_STRING, $var);
         }
@@ -133,10 +135,20 @@ class Snap_Request {
                 break;
             }
         
+            $prev = '';
             foreach ($argv as $idx => $arg) {
                 if ($idx == 0) {
                     continue;
                 }
+                
+                // if there is a \ as last char, link to $prev and go again
+                if (strrpos($arg, '\\') + 1 === strlen($arg)) {
+                    $prev = $arg.' ';
+                    continue;
+                }
+                
+                $arg = $prev.$arg;
+                $prev = '';
             
                 if (strpos($arg, '--') === FALSE) {
                     $sequentials[] = $arg;

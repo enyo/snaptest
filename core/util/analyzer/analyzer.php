@@ -66,6 +66,7 @@ class Snap_FileAnalyzer {
     
         // include, and then scan for new classes
         include_once $file;
+        
         $classes = array_diff(get_declared_classes(), $classes);
     
         $output = array();

@@ -21,7 +21,7 @@ $options = Snap_Request::getLongOptions(array(
     'analyze'   => FALSE,
 ));
 
-$path       = $options[0];
+$path       = str_replace('\ ', ' ', $options[0]);
 $out_mode   = $options['out'];
 $php        = $options['php'];
 $xtn        = $options['match'];

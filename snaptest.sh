@@ -1,14 +1,34 @@
 #!/bin/bash
 
+# Portable version of resolve_symlink to work across multiple
+# *nix flavors.
+function resolve_symlink {
+    SCRIPT=$1 NEWSCRIPT=''
+    until [ "$SCRIPT" = "$NEWSCRIPT" ]; do
+        if [ "${SCRIPT:0:1}" = '.' ]; then SCRIPT=$PWD/$SCRIPT; fi
+        cd $(dirname $SCRIPT)
+        if [ ! "${SCRIPT:0:1}" = '.' ]; then SCRIPT=$(basename $SCRIPT); fi
+        SCRIPT=${NEWSCRIPT:=$SCRIPT}
+        NEWSCRIPT=$(ls -l $SCRIPT | awk '{ print $NF }')
+    done
+    if [ ! "${SCRIPT:0:1}" = '/' ]; then SCRIPT=$PWD/$SCRIPT; fi
+    echo $(dirname $SCRIPT)
+}
+
+
 # change to shell script real location
-FPATH=`dirname "$0"`
+FPATH=$(resolve_symlink $0);
+
+# correct pwd to resolve any symlinks and spaces in the name
 OPATH=`pwd`
-cd $FPATH;
+# OPATH=`echo $OPATH | sed s/\ /\\\\\\\\\ /`
+
+cd $FPATH
 
 # load options
 . getoptx.sh
 
-cd $OPATH
+cd "$OPATH"
 
 # Auto Locate PHP
 PHPX=`which php`
@@ -64,6 +84,8 @@ if [ "$RELPTH" = "RELPTHMATCH" ] ; then
     PTH="$OPATH/$PTH"
 fi
 
+PTH=`echo $PTH | sed "s/ /\\\\\\ /g"`;
+
 # choke and die if we couldn't auto-find PHP and the user didn't supply
 # a valid PHP executable path
 if [ -z $PHP ] ; then
@@ -77,6 +99,7 @@ CGI=`$PHP -v | grep cgi | wc -l | sed "s/[^0-9]//g"`
 
 # run php on the snaptest.php file with the commands
 if [ "$CGI" = "0" ] ; then
+    # PTH=`echo $PTH | sed "s/ /__S_P_A_C_E__/g"`
     CMD="$PHP -q $FPATH/snaptest.php --php=$PHP --nice=$NICE $CMD $PTH"
 else
     # if we are running in CGI mode, we need to mangle our . characters
@@ -87,4 +110,5 @@ else
 
     CMD="$PHP -q $FPATH/snaptest.php --php=$PHPSAFE $CMDSAFE $PTHSAFE"
 fi
+
 $CMD
