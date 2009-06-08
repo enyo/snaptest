@@ -6,7 +6,7 @@ include_once SNAPTEST_CORE . 'reporter' . DIRECTORY_SEPARATOR .'reporters'.DIREC
 class Snap_Text_UnitTestReporter_Test extends Snap_UnitTestCase {
     public function setUp() {
         if (SNAP_CGI_MODE) {
-            $this->skip('Output tests are not available in CGI mode');
+            $this->skip('Output tests are not available in non-CLI mode');
         }
         
         ob_start();
