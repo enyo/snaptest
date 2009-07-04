@@ -12,7 +12,7 @@ else {
 
 if (SNAP_WI_CRYPT) {
     foreach ($file_list as $idx => $file) {
-        $file_list[$idx] = snap_blowfish_encrypt($file, SNAP_WI_CRYPT);
+        $file_list[$idx] = snap_encrypt($file, SNAP_WI_CRYPT);
     }
 }
 

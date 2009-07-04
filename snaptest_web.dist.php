@@ -14,27 +14,17 @@ define('SNAP_WI_TEST_PATH', '/path/to/my/tests/');
 // once more without weird script url hackery
 define('SNAP_WI_URL_PATH', 'http://www.example.com/path/to/snaptest_web.dist.php');
 
-// STEP 4: Set a key. You only need this if you are putting your
-// tests on a publicly accessible server. This also offers very minimal
-// protection. If you're actually going this far in the protecting bit,
-// it is probably time to read up on .htaccess and possibly write your own
-// web stub to do security.
-// A blank string means no key will be used.
-define('SNAP_WI_KEY', '');
+// STEP 4: Obfuscation. If this is defined to TRUE then full path obfuscation
+// will be on and the path informaton will be ommitted from the display side
+// of everything. It is strongly encouraged to leave this on unless you are in
+// a secure environment and don't mind your entire path being exposed.
+define('SNAP_WI_CRYPT', TRUE);
 
-// STEP 5: Obfuscation key. If you decided to set a key for STEP 4, then
-// you may want a key for STEP 5. Setting a crypt key will obfuscate all
-// path information in the web interface. Great if you want to show off your
-// test results without exposing your path to the world. Is this wise?
-// I suppose that'd be your call.
-// A blank string means no obfuscation will be done.
-define('SNAP_WI_CRYPT', '');
-
-// STEP 6: set the matching path
+// STEP 5: set the matching path
 // Files matching this pattern will be testable
 define('SNAP_WI_TEST_MATCH', '^.*\.stest\.php$');
 
-// STEP 7: Relax, you're done. Bask in your awesomeness.
+// STEP 6: Relax, you're done. Bask in your awesomeness.
 // Go to http://www.example.com/path/to/snaptest_web.dist.php
 
 // --------------------------------------------------------------------------

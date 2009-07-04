@@ -223,7 +223,7 @@ YAHOO.SnapTest.DisplayManager = (function() {
 		YAHOO.util.Dom.addClass(p, "file_name");
 		
 		var fileDisplay = file;
-		fileDisplay = fileDisplay.substr(fileDisplay.length - 32, 32);
+        // fileDisplay = fileDisplay.substr(fileDisplay.length - 32, 32);
 		var txt = document.createTextNode(fileDisplay);
 		
 		YAHOO.util.Dom.get(YAHOO.SnapTest.Constants.TEST_LIST).appendChild(li);

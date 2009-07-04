@@ -18,18 +18,7 @@ $options = Snap_Request::getLongOptions(array(
     'key'       => '',
 ));
 
-if (SNAP_WI_KEY) {
-    if ($options['key'] != SNAP_WI_KEY) {
-        echo "\n";
-        echo "SnapTest Web Interface: Key Mismatch\n";
-        exit;
-    }
-}
-
-// include the blowfish library if they are crypting
-if (SNAP_WI_CRYPT) {
-    require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'util' . DIRECTORY_SEPARATOR . 'blowfish' . DIRECTORY_SEPARATOR . 'blowfish.php';
-}
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'util' . DIRECTORY_SEPARATOR . 'webfiles' . DIRECTORY_SEPARATOR . 'functions.php';
 
 Snap_Request::setURLBase(SNAP_WI_URL_PATH);
 

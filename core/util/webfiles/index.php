@@ -5,22 +5,18 @@
 
 $urls = array(
     'css'           => Snap_Request::makeURL(array(
-        'key'   => SNAP_WI_KEY,
         'mode'  => 'resource',
         'file'  => 'css',
         )),
     'css-ie6'       => Snap_Request::makeURL(array(
-        'key'   => SNAP_WI_KEY,
         'mode'  => 'resource',
         'file'  => 'css-ie6',
         )),
     'css-ie7'       => Snap_Request::makeURL(array(
-        'key'   => SNAP_WI_KEY,
         'mode'  => 'resource',
         'file'  => 'css-ie7',
         )),
     'js'            => Snap_Request::makeURL(array(
-        'key'   => SNAP_WI_KEY,
         'mode'  => 'resource',
         'file'  => 'js',
         )),
@@ -62,11 +58,7 @@ $urls = array(
         <dt>Test Path:</dt>
         <dd><?php 
             if (SNAP_WI_CRYPT) {
-                $crypt = snap_blowfish_encrypt(SNAP_WI_TEST_PATH, SNAP_WI_CRYPT);
-                $crypt = str_replace('_', '', $crypt);
-                $crypt = substr($crypt, -32);
-                echo $crypt;
-                echo " <strong>(File obfuscation is on)</strong>";
+                echo "??? <strong>(Full path obfuscation is on)</strong>";
             }
             else {
                 echo SNAP_WI_TEST_PATH;
