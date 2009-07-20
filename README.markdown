@@ -1,6 +1,11 @@
 README - SnapTest
 =================
 
+Core Branch:
+[http://github.com/Jakobo/snaptest/tree/master](http://github.com/Jakobo/snaptest/tree/master)
+
+Issues: [http://github.com/Jakobo/snaptest/issues](http://github.com/Jakobo/snaptest/issues)
+
 Introduction
 ------------
 SnapTest is a powerful unit testing framework for PHP 5+, leveraging PHP's unique runtime language to simplify the unit test process without sacrificing the agility tests provide.
@@ -11,7 +16,6 @@ SnapTest is a free software project licensed under the Mozilla Public License.
 
 Getting Started
 ---------------
-(from [http://code.google.com/p/snaptest/wiki/QuickStart](http://code.google.com/p/snaptest/wiki/QuickStart))
 
 Place Snap wherever you want, and run a self test:
 
@@ -35,7 +39,7 @@ Total Failures: 0
 
 If you don't get any failures (marked with an F followed by information about the error, you're ready to go!
 
-From here, check out [The Getting Started Guide](http://code.google.com/p/snaptest/wiki/QuickStart) Step 2 to start writing your own tests.
+From here, check out [http://wiki.github.com/Jakobo/snaptest/base-unit-test-class](http://wiki.github.com/Jakobo/snaptest/base-unit-test-class) Step 2 to start writing your own tests.
 
 License
 -------
