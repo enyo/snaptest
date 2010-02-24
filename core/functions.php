@@ -54,6 +54,8 @@ harness. By default, SnapTest looks for the pattern ^.*\.stest\.php$
 
 --help :: display this message
 
+--verbose :: does output logging to snaptest.log. Useful for debugging
+
 Additional information can always be found on the SnapTest home page:
 http://www.snaptest.net
 
