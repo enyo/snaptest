@@ -80,6 +80,11 @@ class Snap_FileAnalyzer {
             if (!method_exists($class_name, 'runTests')) {
                 continue;
             }
+            
+            $reflectedClass = new ReflectionClass($class_name);
+            if ($reflectedClass->isAbstract()) {
+              continue;
+            }
         
             $methods = get_class_methods($class_name);
         

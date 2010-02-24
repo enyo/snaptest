@@ -6,6 +6,9 @@ Core Branch:
 
 Issues: [http://github.com/Jakobo/snaptest/issues](http://github.com/Jakobo/snaptest/issues)
 
+Wiki:
+[http://wiki.github.com/Jakobo/snaptest/](http://wiki.github.com/Jakobo/snaptest/)
+
 Introduction
 ------------
 SnapTest is a powerful unit testing framework for PHP 5+, leveraging PHP's unique runtime language to simplify the unit test process without sacrificing the agility tests provide.
@@ -27,18 +30,18 @@ When ran, you should see output like the following:
 
 <code><pre>
 User@Host ~/snaptest> ./snaptest.sh ./
-..............................................................................................................................
+...............................................................................................................................
 ______________________________________________________________________
-Total Cases:    50
-Total Tests:    126
-Total Pass:     126
+Total Cases:    51
+Total Tests:    127
+Total Pass:     127
 Total Defects:  0
 Total Failures: 0
 Total Skips:    0
 Total Todo:     0
 </pre></code>
 
-Sanity Check: There are 50 Cases and 126 Tests
+Sanity Check: There are currently 51 Cases and 127 Tests
 
 If you don't get any failures (marked with an F followed by information about the error, you're ready to go!
 
