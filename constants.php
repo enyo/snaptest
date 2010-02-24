@@ -27,6 +27,8 @@ if (!defined('SNAPTEST_ROOT')) {
     include_once SNAPTEST_CORE . 'functions.php';
     
     if (defined('SNAPTEST_CLI_INTERFACE')) {
+        date_default_timezone_set('Europe/London');
+      
         include_once SNAPTEST_UTIL . 'analyzer' . DIRECTORY_SEPARATOR . 'analyzer.php';
         include_once SNAPTEST_UTIL . 'request' . DIRECTORY_SEPARATOR . 'request.php';
         include_once SNAPTEST_UTIL . 'dispatcher' . DIRECTORY_SEPARATOR . 'dispatcher.php';

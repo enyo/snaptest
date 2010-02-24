@@ -67,7 +67,7 @@ SNAPDOC;
  */
 function writelog($msg) {
   if (defined('SNAPTEST_CLI_INTERFACE') && defined('SNAPTEST_VERBOSE_MODE') && SNAPTEST_VERBOSE_MODE) {
-    $msg = "\n" . date('['.getmypid().'] Y-m-d H:i:s - ', time()) . $msg;
+    $msg = "\n" . '['.getmypid().'] ' . date('Y-m-d H:i:s - ', time()) . $msg;
     file_put_contents(SNAPTEST_LOGFILE, $msg, FILE_APPEND);
   }
 }
