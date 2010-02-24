@@ -7,6 +7,7 @@ if (!defined('SNAPTEST_ROOT')) {
     define('SNAPTEST_WEBFILES', SNAPTEST_UTIL . 'webfiles' . DIRECTORY_SEPARATOR);
     define('SNAPTEST_LOADERS', SNAPTEST_CORE . 'loader' . DIRECTORY_SEPARATOR . 'loaders' . DIRECTORY_SEPARATOR);
     define('SNAPTEST_REPORTERS', SNAPTEST_CORE . 'reporter' . DIRECTORY_SEPARATOR . 'reporters' . DIRECTORY_SEPARATOR);
+    define('SNAPTEST_LOGFILE', SNAPTEST_ROOT . 'snaptest.log');
     
     if (!isset($argv) || !is_array($argv)) {
         define('SNAP_CGI_MODE', TRUE);

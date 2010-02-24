@@ -158,10 +158,7 @@ class Snap_Dispatcher {
             
                     $dispatch = array();
                     foreach ($options['dispatch'] as $k => $v) {
-                        if ($k == '$key') {
-                            $k = $key;
-                        }
-                        if ($v == '$key') {
+                        if ($v === '__KEY__') {
                             $v = $key;
                         }
                         $dispatch[$k] = $v;
