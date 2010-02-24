@@ -57,7 +57,6 @@ if ($analyze) {
 
 // test subprocess
 if ($test) {
-    writelog('Doing test substep');
     // new reporter in phpserializer mode
     $snap = new Snap_Tester('phpserializer');
     
@@ -69,6 +68,8 @@ if ($test) {
     
     // add the class now that it exists
     $snap->addInput('local', $test['class']);
+
+    writelog('Doing test substep: '.$test['class'].'::'.$test['method']);
     
     // run tests with an exact match on the test name
     $snap->runTests('^'.$test['method'].'$');
