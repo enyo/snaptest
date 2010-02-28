@@ -13,9 +13,7 @@ Introduction
 ------------
 SnapTest is a powerful unit testing framework for PHP 5+, leveraging PHP's unique runtime language to simplify the unit test process without sacrificing the agility tests provide.
 
-SnapTest is a free software project licensed under the Mozilla Public License.
-
-**NOTE** Starting with SnapTest 1.2.0, SnapTest will be licensed under the BSD License.
+SnapTest is a free software project licensed under the new BSD License.
 
 Getting Started
 ---------------
@@ -49,6 +47,4 @@ From here, check out [http://wiki.github.com/Jakobo/snaptest/base-unit-test-clas
 
 License
 -------
-  * SnapTest < 1.2.0 is licensed under the Mozilla Public license (MPL)
-
   * SnapTest >= 1.2.0 is licensed under the new BSD License (please see LICENSE for full terms)
