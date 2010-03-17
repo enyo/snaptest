@@ -24,6 +24,7 @@ class Snap_FileAnalyzer {
         
         if (!$results) {
             $data = str_replace(array(SNAPTEST_TOKEN_START, SNAPTEST_TOKEN_END), '', $data);
+            $this->results[$file] = $data;
             return FALSE;
         }
         $this->results[$file] = $results;
@@ -78,6 +79,11 @@ class Snap_FileAnalyzer {
             // skip classes that don't have a runTests method
             if (!method_exists($class_name, 'runTests')) {
                 continue;
+            }
+            
+            $reflectedClass = new ReflectionClass($class_name);
+            if ($reflectedClass->isAbstract()) {
+              continue;
             }
         
             $methods = get_class_methods($class_name);
