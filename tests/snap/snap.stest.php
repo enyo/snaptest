@@ -34,7 +34,7 @@ class Snap_Tester_Test_Invalid_Output extends Snap_UnitTestCase {
     
     public function testThrowsAnException() {
         $this->willThrow('Exception');
-        $this->willError();
+        $this->willWarn();
         new Snap_Tester('magical_non_existant_thing');
     }
 }
@@ -50,7 +50,7 @@ class Snap_Tester_Test_Invalid_Input extends Snap_UnitTestCase {
     
     public function testThrowsAnException() {
         $this->willThrow('Exception');
-        $this->willError();
+        $this->willWarn();
         $this->snap->addInput('whonkows', 'foo');
     }
 }
