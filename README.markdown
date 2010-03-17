@@ -1,13 +1,11 @@
 README - SnapTest
 =================
 
-Core Branch:
-[http://github.com/Jakobo/snaptest/tree/master](http://github.com/Jakobo/snaptest/tree/master)
+Core Branch: [http://github.com/Jakobo/snaptest/tree/master](http://github.com/Jakobo/snaptest/tree/master)
 
 Issues: [http://github.com/Jakobo/snaptest/issues](http://github.com/Jakobo/snaptest/issues)
 
-Wiki:
-[http://wiki.github.com/Jakobo/snaptest/](http://wiki.github.com/Jakobo/snaptest/)
+Wiki: [http://wiki.github.com/Jakobo/snaptest/](http://wiki.github.com/Jakobo/snaptest/)
 
 Introduction
 ------------
