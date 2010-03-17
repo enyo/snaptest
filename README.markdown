@@ -27,19 +27,19 @@ Place Snap wherever you want, and run a self test:
 When ran, you should see output like the following:
 
 <code><pre>
-User@Host ~/snaptest> ./snaptest.sh ./
-...............................................................................................................................
+user@host> ./snaptest.sh ./
+..................................................................................................................................
 ______________________________________________________________________
-Total Cases:    51
-Total Tests:    127
-Total Pass:     127
+Total Cases:    53
+Total Tests:    130
+Total Pass:     130
 Total Defects:  0
 Total Failures: 0
 Total Skips:    0
 Total Todo:     0
 </pre></code>
 
-Sanity Check: There are currently 51 Cases and 127 Tests
+Sanity Check: There are currently 53 Cases and 130 Tests
 
 If you don't get any failures (marked with an F followed by information about the error, you're ready to go!
 
