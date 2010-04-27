@@ -77,7 +77,7 @@ class Snap_FileAnalyzer {
         $methods = array();
         foreach ($classes as $class_name) {
 
-						// skip abstract classes
+            // skip abstract classes
             $class = new ReflectionClass($class_name);
             if ($class->isAbstract()) continue;
 
