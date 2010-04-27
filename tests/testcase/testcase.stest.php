@@ -53,6 +53,9 @@ class Snap_UnitTestCase_AssertCount_Test extends Snap_UnitTestCase {
 
 }
 
+/**
+ * AXIOM: All Tests Depend on this
+ **/
 class Snap_UnitTestCase_AssertTrue_Test extends Snap_UnitTestCase {
 
     public function setUp() {}
@@ -327,5 +330,38 @@ class Snap_UnitTestCase_Calling_Skip_In_Setup extends Snap_UnitTestCase {
     }
     public function testCallingSkipRecordsTestSkip() {
         return $this->assertCallCount($this->reporter, 'recordTestSkip', 1);
+    }
+}
+
+// handles exceptions being thrown
+class Snap_UnitTestCase_WillThrow_Test extends Snap_UnitTestCase {
+    public function setUp() {}
+    public function tearDown() {}
+    public function testWillThrowPasses() {
+        $this->willThrow('Exception');
+        throw new Exception('foo');
+    }
+}
+
+// disabled. Fatal errors must always fall through as failures
+// issue #4
+// handles fatal errors
+class Snap_UnitTestCase_WillError_Test extends Snap_UnitTestCase {
+    public function setUp() {}
+    public function tearDown() {}
+    public function testWillErrorPasses() {
+        $this->willError();
+        ljifsdkjndjkdjkdsjk(); // call to function with no arguments
+    }
+}
+
+// handles warnings
+class Snap_UnitTestCase_WillWarn_Test extends Snap_UnitTestCase {
+    public function setUp() {}
+    public function tearDown() {}
+    public function testWillWarnPasses() {
+        $this->willWarn();
+        $file = md5(time().file_get_contents(__FILE__));
+        include $file;
     }
 }
